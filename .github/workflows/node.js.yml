@@ -25,16 +25,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Run install
-      uses: borales/actions-yarn@v4
-      with:
-        cmd: install # will run `yarn install` command
-    - name: Build 
-      uses: borales/actions-yarn@v4
-      with:
-        cmd: build  # will run `yarn build` command
-    - name: Test
-      uses: borales/actions-yarn@v4
-      with:
-        cmd: test  # will run `yarn test`
+        cache: 'yarn'
+    - run: yarn ci
+    - run: yarn bulild
+    - run: yarn test
