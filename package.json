@@ -1,0 +1,51 @@
+{
+  "name": "relude",
+  "description": "Alternative standard library (prelude) for ReasonML",
+  "homepage": "https://github.com/reazen/relude",
+  "bugs": "https://github.com/reazen/relude/issues",
+  "version": "0.66.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reazen/relude.git"
+  },
+  "scripts": {
+    "clean": "rescript clean",
+    "build": "rescript build",
+    "watch": "rescript build -w",
+    "test": "jest",
+    "coverage": "npm run test",
+    "docs": "docsify serve ./docs",
+    "cleanbisect": "rm bisect*.coverage || true",
+    "cleanbuild": "npm run clean && npm run build",
+    "cleanwatch": "npm run clean && npm run watch",
+    "cleantest": "npm run cleanbuild && npm run test",
+    "cleancoverage": "npm run cleanbisect && BISECT_ENABLE=yes npm run cleanbuild && npm run coverage",
+    "releasebuild": "npm run cleancoverage"
+  },
+  "keywords": [
+    "ReasonML",
+    "Melange",
+    "Utility",
+    "Prelude",
+    "Standard Library"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@glennsl/bs-jest": "^0.7.0",
+    "bs-bastet": "github:dsiu/rescript-bastet",
+    "docsify-cli": "~4.4.0",
+    "rescript": "^10.0.0"
+  },
+  "peerDependencies": {
+    "bs-bastet": "github:dsiu/rescript-bastet"
+  },
+  "dependencies": {},
+  "jest": {
+    "verbose": false,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/testUtils/"
+    ]
+  }
+}
