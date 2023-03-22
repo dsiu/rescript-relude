@@ -10,7 +10,7 @@
   },
   "scripts": {
     "clean": "rescript clean",
-    "build": "rescript build",
+    "build": "rescript build -with-deps",
     "watch": "rescript build -w",
     "test": "jest",
     "coverage": "npm run test",

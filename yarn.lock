@@ -936,7 +936,7 @@ browserslist@^4.21.3:
 
 "bs-bastet@github:dsiu/rescript-bastet":
   version "2.0.0"
-  resolved "https://codeload.github.com/dsiu/rescript-bastet/tar.gz/ea8b874b1e5f51e4a370c38079a5a05fb83be891"
+  resolved "https://codeload.github.com/dsiu/rescript-bastet/tar.gz/74a7aa5b3be3c092b4e4c7c8926dbf2b520f91d7"
   dependencies:
     bs-stdlib-shims "^0.1.0"
 
