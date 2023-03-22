@@ -33,12 +33,12 @@
   "license": "MIT",
   "devDependencies": {
     "@glennsl/bs-jest": "^0.7.0",
-    "bs-bastet": "github:dsiu/rescript-bastet",
+    "bs-bastet": "github:dsiu/rescript-bastet#main",
     "docsify-cli": "~4.4.0",
     "rescript": "^10.0.0"
   },
   "peerDependencies": {
-    "bs-bastet": "github:dsiu/rescript-bastet"
+    "bs-bastet": "github:dsiu/rescript-bastet#main"
   },
   "dependencies": {},
   "jest": {
