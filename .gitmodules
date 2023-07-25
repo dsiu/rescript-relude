@@ -1,4 +1,0 @@
-[submodule "relude"]
-	path = relude
-	url = git@github.com:dsiu/relude.git
-	branch = rescript-v10
