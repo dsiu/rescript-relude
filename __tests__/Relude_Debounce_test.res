@@ -47,7 +47,7 @@ describe("Debounce", () => {
       isScheduled2,
       isScheduled3,
       isScheduled4,
-    )) |> toEqual((0, 0, 1, false, true, true, false))
+    )) -> toEqual((0, 0, 1, false, true, true, false))
   })
 
   test("debounce (leading=true)", () => {
@@ -76,7 +76,7 @@ describe("Debounce", () => {
     Jest.advanceTimersByTime(1)
     let runCount3 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3)) |> toEqual((1, 1, 2))
+    expect((runCount1, runCount2, runCount3)) -> toEqual((1, 1, 2))
   })
 
   test("cancel", () => {
@@ -103,7 +103,7 @@ describe("Debounce", () => {
 
     let runCount3 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3)) |> toEqual((0, 0, 0))
+    expect((runCount1, runCount2, runCount3)) -> toEqual((0, 0, 0))
   })
 
   test("flush", () => {
@@ -132,6 +132,6 @@ describe("Debounce", () => {
 
     let runCount4 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3, runCount4)) |> toEqual((0, 0, 1, 1))
+    expect((runCount1, runCount2, runCount3, runCount4)) -> toEqual((0, 0, 1, 1))
   })
 })

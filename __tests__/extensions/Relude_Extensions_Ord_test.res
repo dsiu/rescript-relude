@@ -88,12 +88,12 @@ let users2 = list{user5, user1, user3, user4, user6, user2}
 describe("Extensions_Ord", () => {
   test("compareWithConversion", () => {
     let compare = String.compareWithConversion((user: User.t) => user.name)
-    expect(List.sortBy(compare, users2)) |> toEqual(list{user1, user3, user2, user5, user4, user6})
+    expect(List.sortBy(compare, users2)) -> toEqual(list{user1, user3, user2, user5, user4, user6})
   })
 
   test("compareReversed", () => {
     let compare = String.compareReversed
-    expect(List.sortBy(compare, list{"c", "b", "a", "e", "d"})) |> toEqual(list{
+    expect(List.sortBy(compare, list{"c", "b", "a", "e", "d"})) -> toEqual(list{
       "e",
       "d",
       "c",
@@ -103,7 +103,7 @@ describe("Extensions_Ord", () => {
   })
 
   test("OrdByName", () =>
-    expect(List.sort(module(User.OrdByName), users2)) |> toEqual(list{
+    expect(List.sort(module(User.OrdByName), users2)) -> toEqual(list{
       user1,
       user3,
       user2,
@@ -114,7 +114,7 @@ describe("Extensions_Ord", () => {
   )
 
   test("OrdByAge", () =>
-    expect(List.sort(module(User.OrdByAge), users2)) |> toEqual(list{
+    expect(List.sort(module(User.OrdByAge), users2)) -> toEqual(list{
       user3,
       user6,
       user5,
@@ -125,7 +125,7 @@ describe("Extensions_Ord", () => {
   )
 
   test("OrdByNameThenAge1", () =>
-    expect(List.sort(module(User.OrdByNameThenAge1), users2)) |> toEqual(list{
+    expect(List.sort(module(User.OrdByNameThenAge1), users2)) -> toEqual(list{
       user3,
       user1,
       user2,
@@ -136,7 +136,7 @@ describe("Extensions_Ord", () => {
   )
 
   test("OrdByNameThenAge2", () =>
-    expect(List.sort(module(User.OrdByNameThenAge2), users2)) |> toEqual(list{
+    expect(List.sort(module(User.OrdByNameThenAge2), users2)) -> toEqual(list{
       user3,
       user1,
       user2,

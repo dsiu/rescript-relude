@@ -12,12 +12,12 @@ module HMapS = HMap.WithKeyMeta({
 })
 
 describe("HMap", () => {
-  test("empty has size 0", () => expect(HMap.empty |> HMap.size) |> toEqual(0))
+  test("empty has size 0", () => expect(HMap.empty |> HMap.size) -> toEqual(0))
 
   test("singleton", () => {
     let intKey = HMap.Key.create()
     let map = HMap.singleton(intKey, 42)
-    expect((map |> HMap.find(intKey), map |> HMap.size)) |> toEqual((Some(42), 1))
+    expect((map |> HMap.find(intKey), map |> HMap.size)) -> toEqual((Some(42), 1))
   })
 
   test("add, hasKey, find, size", () => {
@@ -32,20 +32,20 @@ describe("HMap", () => {
       map |> HMap.hasKey(stringKey),
       map |> HMap.find(stringKey),
       map |> HMap.size,
-    )) |> toEqual((true, Some(5), true, Some("hi"), 2))
+    )) -> toEqual((true, Some(5), true, Some("hi"), 2))
   })
 
   test("find success", () => {
     let intKey = HMap.Key.create()
     let map = HMap.empty |> HMap.add(intKey, 5)
-    expect(HMap.find(intKey, map)) |> toEqual(Some(5))
+    expect(HMap.find(intKey, map)) -> toEqual(Some(5))
   })
 
   test("find failure", () => {
     let intKey = HMap.Key.create()
     let stringKey = HMap.Key.create()
     let map = HMap.empty |> HMap.add(intKey, 5)
-    expect(HMap.find(stringKey, map)) |> toEqual(None)
+    expect(HMap.find(stringKey, map)) -> toEqual(None)
   })
 
   test("remove", () => {
@@ -73,7 +73,7 @@ describe("HMap", () => {
       map |> HMap.find(intKey1),
       map |> HMap.find(intKey2),
       map |> HMap.find(intKey3),
-    )) |> toEqual((
+    )) -> toEqual((
       3,
       Some(1),
       Some(2),
@@ -111,7 +111,7 @@ describe("HMap", () => {
       list{label, show(v), ...acc}
     }, list{})
 
-    expect(value) |> toEqual(list{"key3", "42.3", "key2", "hi", "key1", "5"})
+    expect(value) -> toEqual(list{"key3", "42.3", "key2", "hi", "key1", "5"})
   })
 
   test("forEach", () => {
@@ -135,7 +135,7 @@ describe("HMap", () => {
       array |> Js.Array.unshift(label) |> ignore
     })
 
-    expect(array) |> toEqual(["key3", "42.3", "key2", "hi", "key1", "5"])
+    expect(array) -> toEqual(["key3", "42.3", "key2", "hi", "key1", "5"])
   })
 
   test("all", () => {
@@ -156,7 +156,7 @@ describe("HMap", () => {
       Relude.String.contains(~search="key", label)
     })
 
-    expect(value) |> toEqual(true)
+    expect(value) -> toEqual(true)
   })
 
   test("any", () => {
@@ -177,7 +177,7 @@ describe("HMap", () => {
       Relude.String.contains(~search="key2", label)
     })
 
-    expect(value) |> toEqual(true)
+    expect(value) -> toEqual(true)
   })
 
   test("filter", () => {
@@ -198,6 +198,6 @@ describe("HMap", () => {
       label != "key2"
     })
 
-    expect(map2 |> HMapS.size) |> toEqual(2)
+    expect(map2 |> HMapS.size) -> toEqual(2)
   })
 })

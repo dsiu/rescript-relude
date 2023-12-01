@@ -27,7 +27,7 @@ describe("Eq", () => {
     },
     ((user1, user2, expected)) => {
       let userEqByName = String.eq |> Eq.by((user: user) => user.name)
-      expect(userEqByName(user1, user2)) |> toEqual(expected)
+      expect(userEqByName(user1, user2)) -> toEqual(expected)
     },
   )
 
@@ -38,7 +38,7 @@ describe("Eq", () => {
       let eq = (a: string, b: string) => a == b
       let notEq = eq |> Eq.invert
 
-      expect((eq(a, b), notEq(a, b))) |> toEqual((eqExpected, notEqExpected))
+      expect((eq(a, b), notEq(a, b))) -> toEqual((eqExpected, notEqExpected))
     },
   )
 })

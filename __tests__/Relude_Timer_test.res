@@ -19,7 +19,7 @@ describe("Timer", () => {
     Jest.advanceTimersByTime(40)
     let wasRun3 = wasRun.contents
 
-    expect((wasRun1, wasRun2, wasRun3)) |> toEqual((false, false, true))
+    expect((wasRun1, wasRun2, wasRun3)) -> toEqual((false, false, true))
   })
 
   test("repeat", () => {
@@ -47,7 +47,7 @@ describe("Timer", () => {
     Jest.advanceTimersByTime(40) // 200 (4 hits)
     let runCount6 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3, runCount4, runCount5, runCount6)) |> toEqual((
+    expect((runCount1, runCount2, runCount3, runCount4, runCount5, runCount6)) -> toEqual((
       0,
       0,
       1,
@@ -82,7 +82,7 @@ describe("Timer", () => {
     Jest.advanceTimersByTime(40) // 200 (still 3)
     let runCount6 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3, runCount4, runCount5, runCount6)) |> toEqual((
+    expect((runCount1, runCount2, runCount3, runCount4, runCount5, runCount6)) -> toEqual((
       0,
       0,
       1,

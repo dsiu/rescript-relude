@@ -26,31 +26,31 @@ open Json.DSL
 
 describe("Json", () => {
   test("show", () =>
-    list{("a", JE.bool(true)), ("b", JE.bool(false))}
+    ( list{("a", JE.bool(true)), ("b", JE.bool(false))}
     |> Js.Dict.fromList
     |> Json.fromDictOfJson
-    |> Json.show(~indentSpaces=4)
-    |> expect
-    |> toEqual(`{
+    |> Json.show(~indentSpaces=4) )
+    -> expect
+    -> toEqual(`{
     "a": true,
     "b": false
 }`)
   )
 
-  test("isNull", () => expect(JE.null |> Json.isNull) |> toEqual(true))
+  test("isNull", () => expect(JE.null |> Json.isNull) -> toEqual(true))
 
-  test("isBool", () => expect(JE.bool(true) |> Json.isBool) |> toEqual(true))
+  test("isBool", () => expect(JE.bool(true) |> Json.isBool) -> toEqual(true))
 
-  test("isString", () => expect(JE.string("hi") |> Json.isString) |> toEqual(true))
+  test("isString", () => expect(JE.string("hi") |> Json.isString) -> toEqual(true))
 
-  test("isNumber", () => expect(JE.float(1.23) |> Json.isNumber) |> toEqual(true))
+  test("isNumber", () => expect(JE.float(1.23) |> Json.isNumber) -> toEqual(true))
 
   test("isObject", () =>
-    expect(JE.listOfTuples(list{("hi", Json.fromFloat(1.23))}) |> Json.isObject) |> toEqual(true)
+    expect(JE.listOfTuples(list{("hi", Json.fromFloat(1.23))}) |> Json.isObject) -> toEqual(true)
   )
 
   test("isArray", () =>
-    expect(JE.list(list{Json.fromInt(42), Json.fromString("hi")}) |> Json.isArray) |> toEqual(true)
+    expect(JE.list(list{Json.fromInt(42), Json.fromString("hi")}) |> Json.isArray) -> toEqual(true)
   )
 
   test("arrayOfDict", () =>
@@ -58,7 +58,7 @@ describe("Json", () => {
       [Js.Dict.fromList(list{("a", JE.bool(true))})]
       |> JE.arrayOfDict
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
   test("listOfDict", () =>
@@ -66,12 +66,12 @@ describe("Json", () => {
       list{Js.Dict.fromList(list{("a", JE.bool(true))})}
       |> JE.listOfDict
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
-  test("toNull Some", () => expect(JE.null |> Json.toNull) |> toEqual(Some()))
+  test("toNull Some", () => expect(JE.null |> Json.toNull) -> toEqual(Some()))
 
-  test("toNull None", () => expect(JE.bool(true) |> Json.toNull) |> toEqual(None))
+  test("toNull None", () => expect(JE.bool(true) |> Json.toNull) -> toEqual(None))
 
   test("toArrayOfJsonOrElse ok", () =>
     expect(
@@ -80,7 +80,7 @@ describe("Json", () => {
       |> Json.toArrayOfJsonOrElse([JE.bool(false)])
       |> JE.array
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
   test("toArrayOfJsonOrElse error", () =>
@@ -90,7 +90,7 @@ describe("Json", () => {
       |> Json.toArrayOfJsonOrElse([JE.bool(false)])
       |> JE.array
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[false]`)
+    ) -> toEqual(`[false]`)
   )
 
   test("toArrayOfJsonOrEmpty ok", () =>
@@ -100,7 +100,7 @@ describe("Json", () => {
       |> Json.toArrayOfJsonOrEmpty
       |> JE.array
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
   test("toArrayOfJsonOrEmpty error", () =>
@@ -110,7 +110,7 @@ describe("Json", () => {
       |> Json.toArrayOfJsonOrEmpty
       |> JE.array
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[]`)
+    ) -> toEqual(`[]`)
   )
 
   test("toListOfJson some", () =>
@@ -121,10 +121,10 @@ describe("Json", () => {
       |> Option.getOrThrow
       |> JE.list
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
-  test("toListOfJson none", () => expect(%raw(`""`) |> Json.toListOfJson) |> toEqual(None))
+  test("toListOfJson none", () => expect(%raw(`""`) |> Json.toListOfJson) -> toEqual(None))
 
   test("toListOfJsonOrElse some", () =>
     expect(
@@ -133,7 +133,7 @@ describe("Json", () => {
       |> Json.toListOfJsonOrElse(list{JE.bool(false)})
       |> JE.list
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
   test("toListOfJsonOrElse none", () =>
@@ -142,7 +142,7 @@ describe("Json", () => {
       |> Json.toListOfJsonOrElse(list{JE.bool(false)})
       |> JE.list
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual("[false]")
+    ) -> toEqual("[false]")
   )
 
   test("toDictOfJsonOrElse some", () =>
@@ -150,11 +150,11 @@ describe("Json", () => {
       Js.Dict.fromList(list{("a", JE.bool(true))})
       |> JE.dict
       |> Json.toDictOfJsonOrElse(Js.Dict.empty()),
-    ) |> toEqual(Js.Dict.fromList(list{("a", JE.bool(true))}))
+    ) -> toEqual(Js.Dict.fromList(list{("a", JE.bool(true))}))
   )
 
   test("toDictOfJsonOrElse none", () =>
-    expect(%raw(`""`) |> JE.dict |> Json.toDictOfJsonOrElse(Js.Dict.empty())) |> toEqual(
+    expect(%raw(`""`) |> JE.dict |> Json.toDictOfJsonOrElse(Js.Dict.empty())) -> toEqual(
       Js.Dict.empty(),
     )
   )
@@ -162,11 +162,11 @@ describe("Json", () => {
   test("toDictOfJsonOrEmpty some", () =>
     expect(
       Js.Dict.fromList(list{("a", JE.bool(true))}) |> JE.dict |> Json.toDictOfJsonOrEmpty,
-    ) |> toEqual(Js.Dict.fromList(list{("a", JE.bool(true))}))
+    ) -> toEqual(Js.Dict.fromList(list{("a", JE.bool(true))}))
   )
 
   test("toDictOfJsonOrEmpty none", () =>
-    expect(%raw(`""`) |> JE.dict |> Json.toDictOfJsonOrEmpty) |> toEqual(Js.Dict.empty())
+    expect(%raw(`""`) |> JE.dict |> Json.toDictOfJsonOrEmpty) -> toEqual(Js.Dict.empty())
   )
 
   test("toListOrEmpty ok", () =>
@@ -176,43 +176,43 @@ describe("Json", () => {
       |> Json.toListOrEmpty
       |> JE.list
       |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[{"a":true}]`)
+    ) -> toEqual(`[{"a":true}]`)
   )
 
   test("toListOrEmpty error", () =>
     expect(
       %raw(`""`) |> JE.listOfDict |> Json.toListOrEmpty |> JE.list |> Json.show(~indentSpaces=0),
-    ) |> toEqual(`[]`)
+    ) -> toEqual(`[]`)
   )
 
-  test("encode opt Some", () => expect(JE.opt(JE.string, Some("hi"))) |> toEqual(JE.string("hi")))
+  test("encode opt Some", () => expect(JE.opt(JE.string, Some("hi"))) -> toEqual(JE.string("hi")))
 
-  test("encode opt None", () => expect(JE.opt(JE.string, None)) |> toEqual(JE.null))
+  test("encode opt None", () => expect(JE.opt(JE.string, None)) -> toEqual(JE.null))
 
   test("validateOptional null value is None", () => {
     expect(JD.opt(~errorAsNone=false, JD.string, JE.null))
-    |> toEqual(Validation.VOk(None))
+    -> toEqual(Validation.VOk(None))
     |> ignore
 
-    expect(JD.opt(JD.string, JE.null)) |> toEqual(Validation.VOk(None)) |> ignore
+    expect(JD.opt(JD.string, JE.null)) -> toEqual(Validation.VOk(None)) |> ignore
 
-    expect(Json.validateOptional(JD.string, JE.null)) |> toEqual(Validation.VOk(None))
+    expect(Json.validateOptional(JD.string, JE.null)) -> toEqual(Validation.VOk(None))
   })
 
   test("validateOptional good value validates", () =>
-    expect(JD.opt(~errorAsNone=false, JD.string, JE.string("hi"))) |> toEqual(
+    expect(JD.opt(~errorAsNone=false, JD.string, JE.string("hi"))) -> toEqual(
       Validation.VOk(Some("hi")),
     )
   )
 
   test("validateOptional bad value is an error when errorAsNone=false", () =>
-    expect(JD.opt(~errorAsNone=false, JD.string, JE.float(42.2))) |> toEqual(
+    expect(JD.opt(~errorAsNone=false, JD.string, JE.float(42.2))) -> toEqual(
       Validation.VError(Relude.Nea.pure("JSON value is not a string: 42.2")),
     )
   )
 
   test("validateOptional bad value is None when errorAsNone=true", () =>
-    expect(JD.opt(~errorAsNone=true, JD.string, JE.float(42.2))) |> toEqual(Validation.VOk(None))
+    expect(JD.opt(~errorAsNone=true, JD.string, JE.float(42.2))) -> toEqual(Validation.VOk(None))
   )
 
   test("validateOptionalAtIndex good value passes validation", () =>
@@ -225,7 +225,7 @@ describe("Json", () => {
         JD.string,
         JE.list(list{JE.int(42), JE.string("abc"), JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.VOk(Some("abc")))
+    ) -> toEqual(Validation.VOk(Some("abc")))
   )
 
   test("validateOptionalAtIndex missing value is an error when missingAsNone=false", () =>
@@ -238,7 +238,7 @@ describe("Json", () => {
         JD.string,
         JE.list(list{JE.int(42), JE.null, JE.string("hi")}),
       ),
-    ) |> toEqual(
+    ) -> toEqual(
       Validation.VError(
         Relude.Nea.pure("No value was found at index 42 for JSON: [\n  42,\n  null,\n  \"hi\"\n]"),
       ),
@@ -255,7 +255,7 @@ describe("Json", () => {
         JD.string,
         JE.list(list{JE.int(42), JE.null, JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.VOk(None))
+    ) -> toEqual(Validation.VOk(None))
   )
 
   test("validateOptionalAtIndex null value is an error when nullAsNone=false", () =>
@@ -268,7 +268,7 @@ describe("Json", () => {
         JD.string,
         JE.list(list{JE.int(42), JE.null, JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.VError(Relude.Nea.pure("1 had a null value in JSON: null")))
+    ) -> toEqual(Validation.VError(Relude.Nea.pure("1 had a null value in JSON: null")))
   )
 
   test("validateOptionalAtIndex null value is a None when nullAsNone=true", () =>
@@ -281,7 +281,7 @@ describe("Json", () => {
         JD.string,
         JE.list(list{JE.int(42), JE.null, JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.VOk(None))
+    ) -> toEqual(Validation.VOk(None))
   )
 
   test("validateOptionalAtIndex bad value is an error when errorAsNone is false", () =>
@@ -294,7 +294,7 @@ describe("Json", () => {
         JD.bool,
         JE.list(list{JE.int(42), JE.string("abc"), JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.VError(Relude.Nea.pure("JSON value is not a bool: \"abc\"")))
+    ) -> toEqual(Validation.VError(Relude.Nea.pure("JSON value is not a bool: \"abc\"")))
   )
 
   test("validateOptionalAtIndex bad value is a None when errorAsNone=true", () =>
@@ -307,12 +307,12 @@ describe("Json", () => {
         JD.bool,
         JE.list(list{JE.int(42), JE.string("abc"), JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.pure(None))
+    ) -> toEqual(Validation.pure(None))
   )
 
   test("validateOptionalAtIndex missing value is a None", () => {
     expect(JD.optAt(42, JD.string, JE.list(list{JE.int(42), JE.null, JE.string("hi")})))
-    |> toEqual(Validation.pure(None))
+    -> toEqual(Validation.pure(None))
     |> ignore
 
     expect(
@@ -321,7 +321,7 @@ describe("Json", () => {
         JD.string,
         JE.list(list{JE.int(42), JE.null, JE.string("hi")}),
       ),
-    ) |> toEqual(Validation.pure(None))
+    ) -> toEqual(Validation.pure(None))
   })
 
   test("validateOptionalForKey good value passes validation", () =>
@@ -334,7 +334,7 @@ describe("Json", () => {
         JD.string,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("abc")), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.VOk(Some("abc")))
+    ) -> toEqual(Validation.VOk(Some("abc")))
   )
 
   test("validateOptionalForKey missing value is an error when missingAsNone=false", () =>
@@ -347,7 +347,7 @@ describe("Json", () => {
         JD.string,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("abc")), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(
+    ) -> toEqual(
       Validation.VError(
         Relude.Nea.pure(
           "d was not found in JSON: {\n  \"a\": 42,\n  \"b\": \"abc\",\n  \"c\": \"hi\"\n}",
@@ -366,7 +366,7 @@ describe("Json", () => {
         JD.string,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("abc")), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.VOk(None))
+    ) -> toEqual(Validation.VOk(None))
   )
 
   test("validateOptionalForKey null value is an error when nullAsNone=false", () =>
@@ -379,7 +379,7 @@ describe("Json", () => {
         JD.string,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.null), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.VError(Relude.Nea.pure("b contained a null value in JSON: null")))
+    ) -> toEqual(Validation.VError(Relude.Nea.pure("b contained a null value in JSON: null")))
   )
 
   test("validateOptionalForKey null value is a None when nullAsNone=true", () =>
@@ -392,7 +392,7 @@ describe("Json", () => {
         JD.string,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.null), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.VOk(None))
+    ) -> toEqual(Validation.VOk(None))
   )
 
   test("validateOptionalForKey bad value is an error when errorAsNone is false", () =>
@@ -405,7 +405,7 @@ describe("Json", () => {
         JD.bool,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("abc")), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.VError(Relude.Nea.pure("JSON value is not a bool: \"abc\"")))
+    ) -> toEqual(Validation.VError(Relude.Nea.pure("JSON value is not a bool: \"abc\"")))
   )
 
   test("validateOptionalForKey bad value is a None when errorAsNone=true", () =>
@@ -418,7 +418,7 @@ describe("Json", () => {
         JD.bool,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("hi")), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.pure(None))
+    ) -> toEqual(Validation.pure(None))
   )
 
   test("validateOptionalForKey missing value is a None", () => {
@@ -429,7 +429,7 @@ describe("Json", () => {
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("abc")), ("c", JE.string("hi"))}),
       ),
     )
-    |> toEqual(Validation.VOk(None))
+    -> toEqual(Validation.VOk(None))
     |> ignore
 
     expect(
@@ -438,19 +438,23 @@ describe("Json", () => {
         JD.string,
         JE.listOfTuples(list{("a", JE.int(42)), ("b", JE.string("abc")), ("c", JE.string("hi"))}),
       ),
-    ) |> toEqual(Validation.VOk(None))
+    ) -> toEqual(Validation.VOk(None))
   })
 
   test("nullAt (success)", () =>
-    [JE.string("hi"), JE.null] |> JE.array |> JD.nullAt(1) |> expect |> toEqual(Validation.ok())
+    ( [JE.string("hi"), JE.null]
+    |> JE.array
+    |> JD.nullAt(1) )
+    -> expect
+    -> toEqual(Validation.ok())
   )
 
   test("nullAt (error)", () =>
-    [JE.string("hi"), JE.string("bye")]
+    ( [JE.string("hi"), JE.string("bye")]
     |> JE.array
-    |> JD.nullAt(1)
-    |> expect
-    |> toEqual(Validation.error(NonEmptyArray.make("1: JSON value is not a null: \"bye\"", [])))
+    |> JD.nullAt(1) )
+    -> expect
+    -> toEqual(Validation.error(NonEmptyArray.make("1: JSON value is not a null: \"bye\"", [])))
   )
 
   test("decode array using applicative validation (success)", () => {
@@ -459,7 +463,7 @@ describe("Json", () => {
 
     let expected = Validation.ok(["hi", "bye"])
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode array using applicative validation (error)", () => {
@@ -489,7 +493,7 @@ describe("Json", () => {
       ),
     )
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode object using applicative validation (success)", () => {
@@ -538,7 +542,7 @@ describe("Json", () => {
 
     let expected = Validation.ok(expectedData)
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode object using applicative validation (error)", () => {
@@ -580,7 +584,7 @@ describe("Json", () => {
       ),
     )
 
-    expect(result) |> toEqual(expected)
+    expect(result) -> toEqual(expected)
   })
 
   test("decode object using applicative validation (invalid type error)", () => {
@@ -601,7 +605,7 @@ describe("Json", () => {
       ),
     )
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode object using applicative validation (not found error)", () => {
@@ -639,7 +643,7 @@ describe("Json", () => {
       ),
     )
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode an array into an object (success)", () => {
@@ -688,7 +692,7 @@ describe("Json", () => {
 
     let expected = Validation.ok(expectedData)
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode an array into a tuple (not found error)", () => {
@@ -721,7 +725,7 @@ describe("Json", () => {
       ),
     )
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 
   test("decode an array into a tuple (invalid type error)", () => {
@@ -748,6 +752,6 @@ describe("Json", () => {
       ),
     )
 
-    expect(actual) |> toEqual(expected)
+    expect(actual) -> toEqual(expected)
   })
 })

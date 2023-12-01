@@ -36,7 +36,7 @@ describe("Throttle", () => {
 
     let runCount4 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3, runCount4)) |> toEqual((0, 1, 1, 2))
+    expect((runCount1, runCount2, runCount3, runCount4)) -> toEqual((0, 1, 1, 2))
   })
 
   test("throttle (leading=true)", () => {
@@ -71,6 +71,6 @@ describe("Throttle", () => {
 
     let runCount4 = runCount.contents
 
-    expect((runCount1, runCount2, runCount3, runCount4)) |> toEqual((0, 2, 2, 3)) // Not sure what the "right" behavior is for "leading=true" - maybe we don't even want that flag?
+    expect((runCount1, runCount2, runCount3, runCount4)) -> toEqual((0, 2, 2, 3)) // Not sure what the "right" behavior is for "leading=true" - maybe we don't even want that flag?
   })
 })

@@ -99,7 +99,7 @@ let validateUser = (first: string, last: string, age: string): ValidationE.t<Use
 
 describe("Relude_Free_Applicative", () => {
   test("validateUser success", () =>
-    expect(validateUser("Andy", "White", "101")) |> toEqual(
+    expect(validateUser("Andy", "White", "101")) -> toEqual(
       Validation.VOk({
         open User
         {first: "Andy", last: "White", age: 101}
@@ -109,7 +109,7 @@ describe("Relude_Free_Applicative", () => {
 
   test("validateUser error", () =>
     // TODO: list of errors is reversed just b/c of how this works. Could reverse it somewhere.
-    expect(validateUser("", "", "abc")) |> toEqual(
+    expect(validateUser("", "", "abc")) -> toEqual(
       Validation.VError(
         NonEmpty.List.make(
           "Invalid input for field age (expected int): abc",

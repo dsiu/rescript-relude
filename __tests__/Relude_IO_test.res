@@ -10,7 +10,7 @@ describe("IO basics", () => {
   testAsync("pure unsafeRunAsync", onDone =>
     IO.pure(42) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -19,7 +19,7 @@ describe("IO basics", () => {
   testAsync("pureWithVoid unsafeRunAsync", onDone =>
     IO.pureWithVoid(42) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -37,7 +37,7 @@ describe("IO basics", () => {
   testAsync("suspend unsafeRunAsync", onDone =>
     IO.suspend(() => 42) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -46,7 +46,7 @@ describe("IO basics", () => {
   testAsync("suspendWithVoid unsafeRunAsync", onDone =>
     IO.suspendWithVoid(() => 42) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -55,7 +55,7 @@ describe("IO basics", () => {
   testAsync("suspendIO pure unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.pure(42)) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -64,7 +64,7 @@ describe("IO basics", () => {
   testAsync("suspendIO suspend unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.suspend(() => 42)) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -73,7 +73,7 @@ describe("IO basics", () => {
   testAsync("suspendIO suspendIO pure unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.suspendIO(() => IO.pure(42))) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -82,7 +82,7 @@ describe("IO basics", () => {
   testAsync("suspendIO async unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.async(onDone => onDone(Ok(42)))) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -91,7 +91,7 @@ describe("IO basics", () => {
   testAsync("async Ok unsafeRunAsync", onDone =>
     IO.async(onDone => onDone(Ok(42))) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -101,7 +101,7 @@ describe("IO basics", () => {
     IO.async(onDone => onDone(Error("it failed"))) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(msg) => onDone(expect(msg) |> toEqual("it failed"))
+      | Error(msg) => onDone(expect(msg) -> toEqual("it failed"))
       }
     )
   )
@@ -111,7 +111,7 @@ describe("IO basics", () => {
     |> IO.map(a => a + 10)
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(52))
+      | Ok(value) => onDone(expect(value) -> toEqual(52))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -122,7 +122,7 @@ describe("IO basics", () => {
 
     \"<$$>"(IO.pure(42), a => a + 10) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(52))
+      | Ok(value) => onDone(expect(value) -> toEqual(52))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -135,7 +135,7 @@ describe("IO basics", () => {
     |> IO.tap(b => a := b)
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(_value) => onDone(expect(a.contents) |> toEqual(42))
+      | Ok(_value) => onDone(expect(a.contents) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -149,7 +149,7 @@ describe("IO basics", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(_) => onDone(expect(a.contents) |> toEqual(42))
+      | Error(_) => onDone(expect(a.contents) -> toEqual(42))
       }
     )
   })
@@ -159,7 +159,7 @@ describe("IO basics", () => {
     |> IO.apply(IO.pure(a => a * 2))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(84))
+      | Ok(value) => onDone(expect(value) -> toEqual(84))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -168,7 +168,7 @@ describe("IO basics", () => {
   testAsync("align pure pure", onDone =>
     IO.align(IO.pure(42), IO.pure("a")) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(ior) => onDone(expect(ior) |> toEqual(Relude_Ior_Type.Both(42, "a")))
+      | Ok(ior) => onDone(expect(ior) -> toEqual(Relude_Ior_Type.Both(42, "a")))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -177,7 +177,7 @@ describe("IO basics", () => {
   testAsync("align pure throw", onDone =>
     IO.align(IO.pure(42), IO.throw("e2")) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(ior) => onDone(expect(ior) |> toEqual(Relude_Ior_Type.This(42)))
+      | Ok(ior) => onDone(expect(ior) -> toEqual(Relude_Ior_Type.This(42)))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -186,7 +186,7 @@ describe("IO basics", () => {
   testAsync("align throw pure", onDone =>
     IO.align(IO.throw("e1"), IO.pure(99)) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(ior) => onDone(expect(ior) |> toEqual(Relude_Ior_Type.That(99)))
+      | Ok(ior) => onDone(expect(ior) -> toEqual(Relude_Ior_Type.That(99)))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -196,7 +196,7 @@ describe("IO basics", () => {
     IO.align(IO.throw("e1"), IO.throw("e2")) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Fail"))
-      | Error(e) => onDone(expect(e) |> toEqual("e1"))
+      | Error(e) => onDone(expect(e) -> toEqual("e1"))
       }
     )
   )
@@ -210,7 +210,7 @@ describe("IO basics", () => {
       }
     IO.alignWith(f, IO.pure(42), IO.pure("99")) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(v) => onDone(expect(v) |> toEqual(141))
+      | Ok(v) => onDone(expect(v) -> toEqual(141))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -225,7 +225,7 @@ describe("IO basics", () => {
       }
     IO.alignWith(f, IO.pure(42), IO.throw("e2")) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(v) => onDone(expect(v) |> toEqual(42))
+      | Ok(v) => onDone(expect(v) -> toEqual(42))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -240,7 +240,7 @@ describe("IO basics", () => {
       }
     IO.alignWith(f, IO.throw("e1"), IO.pure("99")) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(v) => onDone(expect(v) |> toEqual(99))
+      | Ok(v) => onDone(expect(v) -> toEqual(99))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -256,7 +256,7 @@ describe("IO basics", () => {
     IO.alignWith(f, IO.throw("e1"), IO.throw("e2")) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Fail"))
-      | Error(e) => onDone(expect(e) |> toEqual("e1"))
+      | Error(e) => onDone(expect(e) -> toEqual("e1"))
       }
     )
   })
@@ -266,7 +266,7 @@ describe("IO basics", () => {
     |> IO.flatMap(a => IO.pure(a + 10))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(52))
+      | Ok(value) => onDone(expect(value) -> toEqual(52))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -278,7 +278,7 @@ describe("IO basics", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(value) => onDone(expect(value) |> toEqual(42))
+      | Error(value) => onDone(expect(value) -> toEqual(42))
       }
     )
   )
@@ -290,7 +290,7 @@ describe("IO basics", () => {
     |> IO.flatMap(a => IO.pure(a + 10))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(72))
+      | Ok(value) => onDone(expect(value) -> toEqual(72))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -301,7 +301,7 @@ describe("IO basics", () => {
     |> IO.flatMap(a => IO.suspend(_ => a + 10) |> IO.flatMap(b => IO.pure(b * 2)))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(104))
+      | Ok(value) => onDone(expect(value) -> toEqual(104))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -312,7 +312,7 @@ describe("IO fromOption", () => {
   testAsync("fromOption Some unsafeRunAsync", onDone =>
     IO.fromOption(() => "Failed", Some(32)) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(32))
+      | Ok(a) => onDone(expect(a) -> toEqual(32))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -322,7 +322,7 @@ describe("IO fromOption", () => {
     IO.fromOption(() => "Messed up", None) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(error) => onDone(expect(error) |> toEqual("Messed up"))
+      | Error(error) => onDone(expect(error) -> toEqual("Messed up"))
       }
     )
   )
@@ -332,7 +332,7 @@ describe("IO fromResult", () => {
   testAsync("fromResult Ok unsafeRunAsync", onDone =>
     IO.fromResult(Ok(32)) |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(32))
+      | Ok(a) => onDone(expect(a) -> toEqual(32))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -342,7 +342,7 @@ describe("IO fromResult", () => {
     IO.fromResult(Error("Messed up")) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(error) => onDone(expect(error) |> toEqual("Messed up"))
+      | Error(error) => onDone(expect(error) -> toEqual("Messed up"))
       }
     )
   )
@@ -352,7 +352,7 @@ describe("IO cond", () => {
   testAsync("pure cond map unsafeRunAsync", onDone =>
     IO.pure("hello")
     |> IO.cond(a => a |> String.length == 5, "is five", "boom explosions")
-    |> IO.map(a => expect(a) |> toEqual("is five"))
+    |> IO.map(a => expect(a) -> toEqual("is five"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -367,7 +367,7 @@ describe("IO cond", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("fail"))
-      | Error(a) => onDone(expect(a) |> toEqual("boom explosions"))
+      | Error(a) => onDone(expect(a) -> toEqual("boom explosions"))
       }
     )
   )
@@ -375,7 +375,7 @@ describe("IO cond", () => {
   testAsync("pure condError mapError unsafeRunAsync", onDone =>
     IO.pure("hello world")
     |> IO.condError(a => a |> String.length == 5, "string is too long")
-    |> IO.mapError(a => expect(a) |> toEqual("string is too long"))
+    |> IO.mapError(a => expect(a) -> toEqual("string is too long"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("fail"))
@@ -389,7 +389,7 @@ describe("IO cond", () => {
     |> IO.condError(a => a |> String.length == 5, "string is too long")
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual("hello"))
+      | Ok(a) => onDone(expect(a) -> toEqual("hello"))
       | Error(_) => onDone(fail("fail"))
       }
     )
@@ -408,7 +408,7 @@ describe("IO compose", () => {
         \"<<<"(ioBToC, ioAToB)
       } |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -422,7 +422,7 @@ describe("IO compose", () => {
         \">>>"(ioAToB, ioBToC)
       } |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -434,7 +434,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -444,7 +444,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -455,7 +455,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -466,7 +466,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -478,7 +478,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -488,7 +488,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -499,7 +499,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -511,7 +511,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a("0")) |> toEqual("012"))
+        | Ok(a) => onDone(expect(a("0")) -> toEqual("012"))
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -527,7 +527,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -538,7 +538,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -549,7 +549,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -560,7 +560,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -571,7 +571,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -582,7 +582,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -593,7 +593,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -604,7 +604,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -615,7 +615,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => onDone(expect(e) |> toEqual("error"))
+        | Error(e) => onDone(expect(e) -> toEqual("error"))
         }
       )
     })
@@ -629,7 +629,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -641,7 +641,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -651,7 +651,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -662,7 +662,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -673,7 +673,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -685,7 +685,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -695,7 +695,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -706,7 +706,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -717,7 +717,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -732,7 +732,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -744,7 +744,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -754,7 +754,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -765,7 +765,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -776,7 +776,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -788,7 +788,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -798,7 +798,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -809,7 +809,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -820,7 +820,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -835,7 +835,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -847,7 +847,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -857,7 +857,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -868,7 +868,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -879,7 +879,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual(Result.error("error")) |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual(Result.error("error")) |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -890,7 +890,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -902,7 +902,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -912,7 +912,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -923,7 +923,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -934,7 +934,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -950,7 +950,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -961,7 +961,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -972,7 +972,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -983,7 +983,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -994,7 +994,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1005,7 +1005,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1016,7 +1016,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1027,7 +1027,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1038,7 +1038,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1052,7 +1052,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1064,7 +1064,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1074,7 +1074,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1085,7 +1085,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1096,7 +1096,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1108,7 +1108,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1118,7 +1118,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1129,7 +1129,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1140,7 +1140,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1155,7 +1155,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1167,7 +1167,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1177,7 +1177,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1188,7 +1188,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1199,7 +1199,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1211,7 +1211,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1221,7 +1221,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1232,7 +1232,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1243,7 +1243,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1258,7 +1258,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1270,7 +1270,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1280,7 +1280,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1291,7 +1291,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1302,7 +1302,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1314,7 +1314,7 @@ describe("IO compose", () => {
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("fail"))
-        | Error(e) => expect(e) |> toEqual("error") |> onDone
+        | Error(e) => expect(e) -> toEqual("error") |> onDone
         }
       )
     })
@@ -1324,7 +1324,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1335,7 +1335,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1346,7 +1346,7 @@ describe("IO compose", () => {
 
       IO.compose(ioBToC, ioAToB) |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a("0")) |> toEqual("012") |> onDone
+        | Ok(a) => expect(a("0")) -> toEqual("012") |> onDone
         | Error(_) => onDone(fail("fail"))
         }
       )
@@ -1360,7 +1360,7 @@ describe("IO mapError", () => {
     |> IO.mapError(_ => "error")
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(42))
+      | Ok(a) => onDone(expect(a) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -1384,7 +1384,7 @@ describe("IO catchError", () => {
     |> IO.catchError((e: string) => IO.throw(e ++ e))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(42))
+      | Ok(a) => onDone(expect(a) -> toEqual(42))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -1399,7 +1399,7 @@ describe("IO catchError", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(v) => onDone(expect(v) |> toEqual(84))
+      | Error(v) => onDone(expect(v) -> toEqual(84))
       }
     )
   )
@@ -1410,7 +1410,7 @@ describe("IO catchError", () => {
     |> IO.catchError(_ => IO.pure(55))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(55))
+      | Ok(a) => onDone(expect(a) -> toEqual(55))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -1421,7 +1421,7 @@ describe("IO catchError", () => {
     |> IO.catchError((e: string) => IO.throw(e ++ "1"))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual("0"))
+      | Ok(a) => onDone(expect(a) -> toEqual("0"))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -1433,7 +1433,7 @@ describe("IO catchError", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(e) => onDone(expect(e) |> toEqual("01"))
+      | Error(e) => onDone(expect(e) -> toEqual("01"))
       }
     )
   )
@@ -1446,7 +1446,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1458,7 +1458,7 @@ describe("IO catchError", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual("02"))
+        | Error(e) => onDone(expect(e) -> toEqual("02"))
         }
       )
     )
@@ -1468,7 +1468,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1479,7 +1479,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1490,7 +1490,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1502,7 +1502,7 @@ describe("IO catchError", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual("02"))
+        | Error(e) => onDone(expect(e) -> toEqual("02"))
         }
       )
     )
@@ -1512,7 +1512,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1523,7 +1523,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1534,7 +1534,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1549,7 +1549,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1561,7 +1561,7 @@ describe("IO catchError", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual("02"))
+        | Error(e) => onDone(expect(e) -> toEqual("02"))
         }
       )
     )
@@ -1571,7 +1571,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1582,7 +1582,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1593,7 +1593,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1605,7 +1605,7 @@ describe("IO catchError", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual("02"))
+        | Error(e) => onDone(expect(e) -> toEqual("02"))
         }
       )
     )
@@ -1615,7 +1615,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1626,7 +1626,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1637,7 +1637,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1652,7 +1652,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1664,7 +1664,7 @@ describe("IO catchError", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual("02"))
+        | Error(e) => onDone(expect(e) -> toEqual("02"))
         }
       )
     )
@@ -1674,7 +1674,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1685,7 +1685,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1696,7 +1696,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1708,7 +1708,7 @@ describe("IO catchError", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual("02"))
+        | Error(e) => onDone(expect(e) -> toEqual("02"))
         }
       )
     )
@@ -1718,7 +1718,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1729,7 +1729,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1740,7 +1740,7 @@ describe("IO catchError", () => {
       |> IO.catchError((e: string) => IO.throw(e ++ "2"))
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual("+01"))
+        | Ok(a) => onDone(expect(a) -> toEqual("+01"))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -1754,7 +1754,7 @@ describe("IO handleError", () =>
     |> IO.handleError(e => int_of_string(e))
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(42))
+      | Ok(a) => onDone(expect(a) -> toEqual(42))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -1767,7 +1767,7 @@ describe("IO mapHandleError", () => {
     |> IO.mapHandleError(a => a * 2, int_of_string)
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(b) => onDone(expect(b) |> toEqual(84))
+      | Ok(b) => onDone(expect(b) -> toEqual(84))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -1778,7 +1778,7 @@ describe("IO mapHandleError", () => {
     |> IO.mapHandleError(a => a * 2, int_of_string)
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(b) => onDone(expect(b) |> toEqual(42))
+      | Ok(b) => onDone(expect(b) -> toEqual(42))
       | Error(_) => onDone(fail("Fail"))
       }
     )
@@ -1789,7 +1789,7 @@ describe("IO bimap/bitap", () => {
   testAsync("suspend bimap bimap unsafeRunAsync", onDone =>
     IO.suspend(() => 42)
     |> IO.bimap(a => a * 2, e => e ++ e)
-    |> IO.bimap(a => expect(a) |> toEqual(84), _ => fail("fail"))
+    |> IO.bimap(a => expect(a) -> toEqual(84), _ => fail("fail"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -1805,7 +1805,7 @@ describe("IO bimap/bitap", () => {
     |> IO.bitap(b => a := b + 1, e => a := e - 1)
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(_) => onDone(expect(a.contents) |> toEqual(43))
+      | Ok(_) => onDone(expect(a.contents) -> toEqual(43))
       | Error(_) => onDone(fail("fail"))
       }
     )
@@ -1819,7 +1819,7 @@ describe("IO bimap/bitap", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("fail"))
-      | Error(_) => onDone(expect(a.contents) |> toEqual(41))
+      | Error(_) => onDone(expect(a.contents) -> toEqual(41))
       }
     )
   })
@@ -1832,7 +1832,7 @@ describe("IO alt", () => {
 
     IO.alt(IO.suspend(() => a := true), IO.suspend(() => b := true))
     |> IO.bimap(
-      _ => expect((a.contents, b.contents)) |> toEqual((true, false)),
+      _ => expect((a.contents, b.contents)) -> toEqual((true, false)),
       _ => fail("Failed"),
     )
     |> IO.unsafeRunAsync(x =>
@@ -1854,7 +1854,7 @@ describe("IO alt", () => {
       }),
       IO.suspend(() => b := true),
     )
-    |> IO.bimap(_ => expect((a.contents, b.contents)) |> toEqual((true, true)), _ => fail("Failed"))
+    |> IO.bimap(_ => expect((a.contents, b.contents)) -> toEqual((true, true)), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -1869,7 +1869,7 @@ describe("IO alt", () => {
     IO.suspend(() => a := true)
     |> IO.orElse(~fallback=IO.suspend(() => b := true))
     |> IO.bimap(
-      _ => expect((a.contents, b.contents)) |> toEqual((true, false)),
+      _ => expect((a.contents, b.contents)) -> toEqual((true, false)),
       _ => fail("Failed"),
     )
     |> IO.unsafeRunAsync(x =>
@@ -1888,7 +1888,7 @@ describe("IO alt", () => {
       IO.throw("Failed!")
     })
     |> IO.orElse(~fallback=IO.suspend(() => b := true))
-    |> IO.bimap(_ => expect((a.contents, b.contents)) |> toEqual((true, true)), _ => fail("Failed"))
+    |> IO.bimap(_ => expect((a.contents, b.contents)) -> toEqual((true, true)), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -1906,7 +1906,7 @@ describe("IO alt", () => {
     open IOE.Infix
     \"<|>"(IO.suspend(() => a := true), IO.suspend(() => b := true))
     |> IO.bimap(
-      _ => expect((a.contents, b.contents)) |> toEqual((true, false)),
+      _ => expect((a.contents, b.contents)) -> toEqual((true, false)),
       _ => fail("Failed"),
     )
     |> IO.unsafeRunAsync(x =>
@@ -1931,7 +1931,7 @@ describe("IO alt", () => {
       }),
       IO.suspend(() => b := true),
     )
-    |> IO.bimap(_ => expect((a.contents, b.contents)) |> toEqual((true, true)), _ => fail("Failed"))
+    |> IO.bimap(_ => expect((a.contents, b.contents)) -> toEqual((true, true)), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -1948,7 +1948,7 @@ describe("IO tries/exceptions", () => {
       | Ok(_) => onDone(fail("Should not be Ok"))
       | Error(Js.Exn.Error(jsExn)) =>
         let msg = Js.Exn.message(jsExn)
-        onDone(expect(msg) |> toEqual(Some("Error from JS")))
+        onDone(expect(msg) -> toEqual(Some("Error from JS")))
       | Error(_) => onDone(fail("Should have been an Js.Exn"))
       }
     )
@@ -1960,7 +1960,7 @@ describe("IO tries/exceptions", () => {
       | Ok(_) => onDone(fail("Should not be Ok"))
       | Error(jsExn) =>
         let msg = Js.Exn.message(jsExn)
-        onDone(expect(msg) |> toEqual(Some("Error from JS")))
+        onDone(expect(msg) -> toEqual(Some("Error from JS")))
       }
     )
   )
@@ -1969,7 +1969,7 @@ describe("IO tries/exceptions", () => {
     IO.triesJS(() => Js.Exn.raiseError("Fail")) |> IO.unsafeRunAsync(result =>
       switch result {
       | Ok(_) => onDone(fail("Should not be Ok"))
-      | Error(e) => onDone(expect(Js.Exn.message(e)) |> toEqual(Some("Fail")))
+      | Error(e) => onDone(expect(Js.Exn.message(e)) -> toEqual(Some("Fail")))
       }
     )
   )
@@ -1983,7 +1983,7 @@ describe("IO tries/exceptions", () => {
     IO.triesJS(() => jsThrow(.)) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Should not be Ok"))
-      | Error(e) => onDone(expect(Js.Exn.message(e)) |> toEqual(Some("This sucks")))
+      | Error(e) => onDone(expect(Js.Exn.message(e)) -> toEqual(Some("This sucks")))
       }
     )
   })
@@ -1999,7 +1999,7 @@ describe("IO tries/exceptions", () => {
       | Ok(_) => onDone(fail("Should not be Ok"))
       | Error(e) =>
         Js.log(e)
-        onDone(expect(Js.Exn.message(e)) |> toEqual(Some("Unexpected error: MyExn,8,Custom error")))
+        onDone(expect(Js.Exn.message(e)) -> toEqual(Some("Unexpected error: MyExn,8,Custom error")))
       }
     )
   })
@@ -2012,7 +2012,7 @@ describe("IO flip", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(e) => onDone(expect(e) |> toEqual(42))
+      | Error(e) => onDone(expect(e) -> toEqual(42))
       }
     )
   )
@@ -2022,7 +2022,7 @@ describe("IO flip", () => {
     |> IO.flip
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual("my error"))
+      | Ok(a) => onDone(expect(a) -> toEqual("my error"))
       | Error(_) => onDone(fail("Failed"))
       }
     )
@@ -2034,7 +2034,7 @@ describe("IO flip", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(e) => onDone(expect(e) |> toEqual(42))
+      | Error(e) => onDone(expect(e) -> toEqual(42))
       }
     )
   )
@@ -2045,7 +2045,7 @@ describe("IO flip", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(e) => onDone(expect(e) |> toEqual(42))
+      | Error(e) => onDone(expect(e) -> toEqual(42))
       }
     )
   )
@@ -2056,7 +2056,7 @@ describe("IO flip", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(e) => onDone(expect(e) |> toEqual(42))
+      | Error(e) => onDone(expect(e) -> toEqual(42))
       }
     )
   )
@@ -2069,7 +2069,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2080,7 +2080,7 @@ describe("IO flip", () => {
       |> IO.flip
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual(42))
+        | Ok(a) => onDone(expect(a) -> toEqual(42))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2093,7 +2093,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2105,7 +2105,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2117,7 +2117,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2128,7 +2128,7 @@ describe("IO flip", () => {
       |> IO.flip
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual(42))
+        | Ok(a) => onDone(expect(a) -> toEqual(42))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2141,7 +2141,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2153,7 +2153,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2165,7 +2165,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2179,7 +2179,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2190,7 +2190,7 @@ describe("IO flip", () => {
       |> IO.flip
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual(42))
+        | Ok(a) => onDone(expect(a) -> toEqual(42))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2203,7 +2203,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2215,7 +2215,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2227,7 +2227,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2238,7 +2238,7 @@ describe("IO flip", () => {
       |> IO.flip
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual(42))
+        | Ok(a) => onDone(expect(a) -> toEqual(42))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2251,7 +2251,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2263,7 +2263,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2275,7 +2275,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2287,7 +2287,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2300,7 +2300,7 @@ describe("IO flip", () => {
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(_) => onDone(fail("Failed"))
-      | Error(e) => onDone(expect(e) |> toEqual(52))
+      | Error(e) => onDone(expect(e) -> toEqual(52))
       }
     )
   )
@@ -2316,7 +2316,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(11152))
+        | Error(e) => onDone(expect(e) -> toEqual(11152))
         }
       )
     )
@@ -2327,7 +2327,7 @@ describe("IO flip", () => {
       |> IO.flip
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => onDone(expect(a) |> toEqual(42))
+        | Ok(a) => onDone(expect(a) -> toEqual(42))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2340,7 +2340,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2352,7 +2352,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2361,7 +2361,7 @@ describe("IO flip", () => {
       IO.async(onDone => onDone(Result.ok(42)))
       |> IO.flatMap(a => IO.suspend(() => a))
       |> IO.flip
-      |> IO.bimap(_ => fail("fail"), e => expect(e) |> toEqual(42))
+      |> IO.bimap(_ => fail("fail"), e => expect(e) -> toEqual(42))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2377,7 +2377,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2389,7 +2389,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2401,7 +2401,7 @@ describe("IO flip", () => {
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(_) => onDone(fail("Failed"))
-        | Error(e) => onDone(expect(e) |> toEqual(52))
+        | Error(e) => onDone(expect(e) -> toEqual(52))
         }
       )
     )
@@ -2412,7 +2412,7 @@ describe("IO summonError", () => {
   testAsync("pure summonError bimap unsafeRunAsync", onDone =>
     IO.pure(42)
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Ok(42)), _e => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Ok(42)), _e => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2424,7 +2424,7 @@ describe("IO summonError", () => {
   testAsync("suspend summonError bimap unsafeRunAsync", onDone =>
     IO.suspend(() => 42)
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Ok(42)), _e => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Ok(42)), _e => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2436,7 +2436,7 @@ describe("IO summonError", () => {
   testAsync("suspendIO pure summonError bimap unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.pure(42))
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Ok(42)), _e => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Ok(42)), _e => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2448,7 +2448,7 @@ describe("IO summonError", () => {
   testAsync("suspendIO throw summonError unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.throw("error!"))
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Error("error!")), _ => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Error("error!")), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2460,7 +2460,7 @@ describe("IO summonError", () => {
   testAsync("suspendIO pure map flatMap pure summonError bimap unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.pure(42) |> IO.map(a => a + 10) |> IO.flatMap(a => IO.pure(a + 11)))
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Ok(63)), _ => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Ok(63)), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2473,7 +2473,7 @@ describe("IO summonError", () => {
     IO.async(onDone => 42 |> Result.ok |> onDone)
     |> IO.flatMap(IO.pure)
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Ok(42)), _ => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Ok(42)), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2486,7 +2486,7 @@ describe("IO summonError", () => {
     IO.async(onDone => 42 |> Result.ok |> onDone)
     |> IO.flatMap(IO.throw)
     |> IO.summonError
-    |> IO.bimap(resA => expect(resA) |> toEqual(Error(42)), _ => fail("Failed"))
+    |> IO.bimap(resA => expect(resA) -> toEqual(Error(42)), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2499,7 +2499,7 @@ describe("IO summonError", () => {
     IO.async(onDone => onDone(Result.ok(42)))
     |> IO.flatMap(a => IO.suspend(() => a))
     |> IO.summonError
-    |> IO.bimap(res => expect(res) |> toEqual(Ok(42)), Relude.Void.absurd)
+    |> IO.bimap(res => expect(res) -> toEqual(Ok(42)), Relude.Void.absurd)
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2514,7 +2514,7 @@ describe("IO summonError", () => {
       |> IO.summonError
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(a) => expect(a |> Result.getError) |> toEqual(Some(1)) |> onDone
+        | Ok(a) => expect(a |> Result.getError) -> toEqual(Some(1)) |> onDone
         | Error(_) => fail("Failed") |> onDone
         }
       )
@@ -2523,7 +2523,7 @@ describe("IO summonError", () => {
     testAsync("suspend", onDone =>
       IO.map(a => a + 42, IO.suspend(() => 1))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(43)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(43)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2535,7 +2535,7 @@ describe("IO summonError", () => {
     testAsync("suspendIO", onDone =>
       IO.map(a => a + 42, IO.suspendIO(() => IO.pure(1)))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(43)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(43)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2547,7 +2547,7 @@ describe("IO summonError", () => {
     testAsync("async", onDone =>
       IO.map(a => a + 42, IO.async(onDone => onDone(Result.ok(1))))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(43)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(43)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2559,7 +2559,7 @@ describe("IO summonError", () => {
     testAsync("map", onDone =>
       IO.map(a => a + 42, IO.map(b => b + 2, IO.pure(1)))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(45)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(45)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2571,7 +2571,7 @@ describe("IO summonError", () => {
     testAsync("apply", onDone =>
       IO.map(a => a + 42, IO.apply(IO.pure(b => b + 2), IO.pure(1)))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(45)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(45)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2583,7 +2583,7 @@ describe("IO summonError", () => {
     testAsync("flatMap", onDone =>
       IO.map(a => a + 42, IO.flatMap(b => IO.pure(b + 2), IO.pure(1)))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(45)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(45)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2598,7 +2598,7 @@ describe("IO summonError", () => {
       IO.pure(42)
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2616,7 +2616,7 @@ describe("IO summonError", () => {
       |> IO.tap(b => a := b |> Result.getError)
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(_) => onDone(expect(a.contents) |> toEqual(Some(2)))
+        | Ok(_) => onDone(expect(a.contents) -> toEqual(Some(2)))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2626,7 +2626,7 @@ describe("IO summonError", () => {
       IO.suspend(() => 42)
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2639,7 +2639,7 @@ describe("IO summonError", () => {
       IO.suspendIO(() => IO.pure(42))
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2652,7 +2652,7 @@ describe("IO summonError", () => {
       IO.async(onDone => Ok(42) |> onDone)
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2670,7 +2670,7 @@ describe("IO summonError", () => {
       |> IO.tap(b => a := b |> Result.getError)
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(_) => onDone(expect(a.contents) |> toEqual(Some(42)))
+        | Ok(_) => onDone(expect(a.contents) -> toEqual(Some(42)))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2680,7 +2680,7 @@ describe("IO summonError", () => {
       IO.map(a => a + 1, IO.pure(41))
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2693,7 +2693,7 @@ describe("IO summonError", () => {
       IO.apply(IO.pure(a => a + 1), IO.pure(41))
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2706,7 +2706,7 @@ describe("IO summonError", () => {
       IO.flatMap(a => IO.pure(a + 1), IO.pure(41))
       |> IO.apply(IO.pure(a => a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2721,7 +2721,7 @@ describe("IO summonError", () => {
       IO.pure(42)
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2739,7 +2739,7 @@ describe("IO summonError", () => {
       |> IO.tap(b => a := b |> Result.getError)
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(_) => onDone(expect(a.contents) |> toEqual(Some(2)))
+        | Ok(_) => onDone(expect(a.contents) -> toEqual(Some(2)))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2749,7 +2749,7 @@ describe("IO summonError", () => {
       IO.suspend(() => 42)
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2762,7 +2762,7 @@ describe("IO summonError", () => {
       IO.suspendIO(() => IO.pure(42))
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2775,7 +2775,7 @@ describe("IO summonError", () => {
       IO.async(onDone => Ok(42) |> onDone)
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2793,7 +2793,7 @@ describe("IO summonError", () => {
       |> IO.tap(b => a := b |> Result.getError)
       |> IO.unsafeRunAsync(x =>
         switch x {
-        | Ok(_) => onDone(expect(a.contents) |> toEqual(Some(42)))
+        | Ok(_) => onDone(expect(a.contents) -> toEqual(Some(42)))
         | Error(_) => onDone(fail("Failed"))
         }
       )
@@ -2803,7 +2803,7 @@ describe("IO summonError", () => {
       IO.map(a => a + 1, IO.pure(41))
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2816,7 +2816,7 @@ describe("IO summonError", () => {
       IO.apply(IO.pure(a => a + 1), IO.pure(41))
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2829,7 +2829,7 @@ describe("IO summonError", () => {
       IO.flatMap(a => IO.pure(a + 1), IO.pure(41))
       |> IO.flatMap(a => IO.pure(a * 2))
       |> IO.summonError
-      |> IO.bimap(res => expect(res) |> toEqual(Ok(84)), Relude.Void.absurd)
+      |> IO.bimap(res => expect(res) -> toEqual(Ok(84)), Relude.Void.absurd)
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2844,7 +2844,7 @@ describe("IO unsummonError", () => {
   testAsync("pure Ok unsummonError bimap unsafeRunAsync", onDone =>
     IO.pure(Ok(42))
     |> IO.unsummonError
-    |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("Failed"))
+    |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2856,7 +2856,7 @@ describe("IO unsummonError", () => {
   testAsync("pure Error unsummonError bimap unsafeRunAsync", onDone =>
     IO.pure(Error("e!"))
     |> IO.unsummonError
-    |> IO.bimap(_ => fail("Failed"), error => expect(error) |> toEqual("e!"))
+    |> IO.bimap(_ => fail("Failed"), error => expect(error) -> toEqual("e!"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2868,7 +2868,7 @@ describe("IO unsummonError", () => {
   testAsync("suspend Ok unsummonError bimap unsafeRunAsync", onDone =>
     IO.suspend(() => Ok(42))
     |> IO.unsummonError
-    |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("Failed"))
+    |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2880,7 +2880,7 @@ describe("IO unsummonError", () => {
   testAsync("suspend Error unsummonError bimap unsafeRunAsync", onDone =>
     IO.suspend(() => Error("e!"))
     |> IO.unsummonError
-    |> IO.bimap(_ => fail("Failed"), error => expect(error) |> toEqual("e!"))
+    |> IO.bimap(_ => fail("Failed"), error => expect(error) -> toEqual("e!"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2892,7 +2892,7 @@ describe("IO unsummonError", () => {
   testAsync("suspendIO pure Ok unsummonError bimap unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.pure(Ok(42)))
     |> IO.unsummonError
-    |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("Failed"))
+    |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2904,7 +2904,7 @@ describe("IO unsummonError", () => {
   testAsync("suspendIO pure Error unsummonError bimap unsafeRunAsync", onDone =>
     IO.suspendIO(() => IO.pure(Error("e!")))
     |> IO.unsummonError
-    |> IO.bimap(_ => fail("Failed"), error => expect(error) |> toEqual("e!"))
+    |> IO.bimap(_ => fail("Failed"), error => expect(error) -> toEqual("e!"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -2918,7 +2918,7 @@ describe("IO unsummonError", () => {
       IO.pure(0)
       |> IO.flatMap(a => IO.pure(Ok(a + 42)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2931,7 +2931,7 @@ describe("IO unsummonError", () => {
       IO.suspend(() => 0)
       |> IO.flatMap(a => IO.pure(Ok(a + 42)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2944,7 +2944,7 @@ describe("IO unsummonError", () => {
       IO.suspendIO(() => IO.pure(0))
       |> IO.flatMap(a => IO.pure(Ok(a + 42)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2957,7 +2957,7 @@ describe("IO unsummonError", () => {
       IO.async(onDone => onDone(Result.ok(Result.ok(42))))
       |> IO.flatMap(a => IO.suspend(() => a))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(42), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(42), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2970,7 +2970,7 @@ describe("IO unsummonError", () => {
       IO.map(a => a + 1, IO.pure(0))
       |> IO.flatMap(a => IO.pure(Ok(a + 42)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(43), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(43), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2983,7 +2983,7 @@ describe("IO unsummonError", () => {
       IO.apply(IO.pure(a => a + 1), IO.pure(0))
       |> IO.flatMap(a => IO.pure(Ok(a + 42)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(43), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(43), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -2996,7 +2996,7 @@ describe("IO unsummonError", () => {
       IO.flatMap(a => IO.pure(a + 1), IO.pure(0))
       |> IO.flatMap(a => IO.pure(Ok(a + 42)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(43), _ => fail("fail"))
+      |> IO.bimap(a => expect(a) -> toEqual(43), _ => fail("fail"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3022,7 +3022,7 @@ describe("IO unsummonError", () => {
     testAsync("suspend", onDone =>
       IO.map(a => Ok(a + 1), IO.suspend(() => 0))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(1), _ => fail("Failed"))
+      |> IO.bimap(a => expect(a) -> toEqual(1), _ => fail("Failed"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3034,7 +3034,7 @@ describe("IO unsummonError", () => {
     testAsync("suspendIO", onDone =>
       IO.map(a => Ok(a + 1), IO.suspendIO(() => IO.pure(0)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(1), _ => fail("Failed"))
+      |> IO.bimap(a => expect(a) -> toEqual(1), _ => fail("Failed"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3046,7 +3046,7 @@ describe("IO unsummonError", () => {
     testAsync("async (ok)", onDone =>
       IO.map(a => Ok(a + 1), IO.async(onDone => onDone(Ok(0))))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(1), _ => fail("Failed"))
+      |> IO.bimap(a => expect(a) -> toEqual(1), _ => fail("Failed"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3058,7 +3058,7 @@ describe("IO unsummonError", () => {
     testAsync("map", onDone =>
       IO.map(a => Ok(a + 1), IO.map(a => a + 1, IO.pure(0)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(2), _ => fail("Failed"))
+      |> IO.bimap(a => expect(a) -> toEqual(2), _ => fail("Failed"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3070,7 +3070,7 @@ describe("IO unsummonError", () => {
     testAsync("apply", onDone =>
       IO.map(a => Ok(a + 1), IO.apply(IO.pure(a => a + 1), IO.pure(0)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(2), _ => fail("Failed"))
+      |> IO.bimap(a => expect(a) -> toEqual(2), _ => fail("Failed"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3082,7 +3082,7 @@ describe("IO unsummonError", () => {
     testAsync("flatMap", onDone =>
       IO.map(a => Ok(a + 1), IO.flatMap(a => IO.pure(a + 1), IO.pure(0)))
       |> IO.unsummonError
-      |> IO.bimap(a => expect(a) |> toEqual(2), _ => fail("Failed"))
+      |> IO.bimap(a => expect(a) -> toEqual(2), _ => fail("Failed"))
       |> IO.unsafeRunAsync(x =>
         switch x {
         | Ok(assertion) => onDone(assertion)
@@ -3098,7 +3098,7 @@ describe("IO unsummonError", () => {
     |> IO.flatMap(a => IO.pure(a + 11))
     |> IO.summonError
     |> IO.unsummonError
-    |> IO.bimap(a => expect(a) |> toEqual(63), _ => fail("Failed"))
+    |> IO.bimap(a => expect(a) -> toEqual(63), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -3113,7 +3113,7 @@ describe("IO unsummonError", () => {
     |> IO.summonError
     |> IO.apply(IO.pure(res => res |> Result.map(a => a * 3)))
     |> IO.unsummonError
-    |> IO.bimap(a => expect(a) |> toEqual(252), _ => fail("Failed"))
+    |> IO.bimap(a => expect(a) -> toEqual(252), _ => fail("Failed"))
     |> IO.unsafeRunAsync(res => res |> Result.merge |> onDone)
   )
 })
@@ -3134,7 +3134,7 @@ describe("IO delay", () => {
     |> IO.withDelay(10)
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(a) => onDone(expect(a) |> toEqual(42))
+      | Ok(a) => onDone(expect(a) -> toEqual(42))
       | Error(_) => onDone(fail("fail"))
       }
     )
@@ -3302,7 +3302,7 @@ describe("IO throttle", () => {
     })
     list{IO.pure(1), IO.pure(2), IO.pure(3)}
     |> IOE.all
-    |> IO.bimap(a => expect(a) |> toEqual(list{1, 2, 3}), _ => fail("Failed"))
+    |> IO.bimap(a => expect(a) -> toEqual(list{1, 2, 3}), _ => fail("Failed"))
     |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -3359,7 +3359,7 @@ describe("IO parallel", () =>
 
     let ioAll =
       (ioA, ioB, ioC) |> IOE.mapTuple3(((a1, a2), (b1, b2), (c1, c2)) =>
-        expect((a0, a1, a2, b1, b2, c1, c2)) |> toEqual((
+        expect((a0, a1, a2, b1, b2, c1, c2)) -> toEqual((
           (false, false, false), // before starting, none are running
           (true, false, false), // when a is run, a sees itself running, but not yet b and c
           (false, true, true), // after delay, a completes, but sees b and c still running (they have not completed yet)
@@ -3478,14 +3478,14 @@ let \">>=" = IOJsExn.Infix.\">>="
 let \">=>" = IOJsExn.Infix.\">=>"
 
 describe("IO FS examples", () => {
-  beforeAll(() => FS.IO.writeFileSync(testFilePath, "") |> IO.unsafeRunAsync(ignore))
+  beforeAll((.) => FS.IO.writeFileSync(testFilePath, "") |> IO.unsafeRunAsync(ignore))
 
   testAsync("read and writeFileSync", onDone =>
     \">>="(
       \">>="(FS.IO.writeFileSync(testFilePath, "IO Eff test"), _ =>
         FS.IO.readFileSync(testFilePath)
       ),
-      content => IO.pure(expect(content) |> toEqual("IO Eff test")),
+      content => IO.pure(expect(content) -> toEqual("IO Eff test")),
     ) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)
@@ -3503,7 +3503,7 @@ describe("IO FS examples", () => {
             Relude_Js_Exn.make("Failed to get non-empty file content")
           ),
       ),
-      content => IO.pure(expect(content) |> toEqual("IO Aff test")),
+      content => IO.pure(expect(content) -> toEqual("IO Aff test")),
     ) |> IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)

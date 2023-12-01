@@ -38,7 +38,7 @@ let user3 = {name: "Bob", age: 99}
 
 describe("Extensions_Eq", () => {
   testAll("notEq", list{(1, 1, false), (1, 2, true)}, ((a, b, expected)) =>
-    expect(Int.notEq(a, b)) |> toEqual(expected)
+    expect(Int.notEq(a, b)) -> toEqual(expected)
   )
 
   testAll(
@@ -54,7 +54,7 @@ describe("Extensions_Eq", () => {
       (user3, user2, false),
       (user3, user3, true),
     },
-    ((user1, user2, expected)) => expect(User.EqByName.eq(user1, user2)) |> toEqual(expected),
+    ((user1, user2, expected)) => expect(User.EqByName.eq(user1, user2)) -> toEqual(expected),
   )
 
   testAll(
@@ -70,7 +70,7 @@ describe("Extensions_Eq", () => {
       (user3, user2, true),
       (user3, user3, true),
     },
-    ((user1, user2, expected)) => expect(User.EqByAge.eq(user1, user2)) |> toEqual(expected),
+    ((user1, user2, expected)) => expect(User.EqByAge.eq(user1, user2)) -> toEqual(expected),
   )
 
   testAll(
@@ -86,16 +86,16 @@ describe("Extensions_Eq", () => {
       (user3, user2, false),
       (user3, user3, true),
     },
-    ((user1, user2, expected)) => expect(User.EqByNameAndAge.eq(user1, user2)) |> toEqual(expected),
+    ((user1, user2, expected)) => expect(User.EqByNameAndAge.eq(user1, user2)) -> toEqual(expected),
   )
 
   testAll("|=| operator", list{(1, 1, true), (1, 2, false), (2, 1, false)}, ((a, b, expected)) => {
     open Int.Infix
-    expect(\"|=|"(a, b)) |> toEqual(expected)
+    expect(\"|=|"(a, b)) -> toEqual(expected)
   })
 
   testAll("|!=| operator", list{(1, 1, false), (1, 2, true), (2, 1, true)}, ((a, b, expected)) => {
     open Int.Infix
-    expect(\"|!=|"(a, b)) |> toEqual(expected)
+    expect(\"|!=|"(a, b)) -> toEqual(expected)
   })
 })

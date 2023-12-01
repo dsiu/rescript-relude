@@ -90,7 +90,7 @@ describe("ContT Identity", () => {
 
   testAsync("pure", onDone =>
     \"<$$>"(
-      \"<$$>"(Cont.pure(42), value => expect(value) |> toEqual(42)),
+      \"<$$>"(Cont.pure(42), value => expect(value) -> toEqual(42)),
       onDone,
     ) |> Cont.runContT(() => ())
   )
@@ -100,7 +100,7 @@ describe("ContT Identity", () => {
     \"<$$>"(
       \"<$$>"(readFileSuccessCont(filePath), x =>
         switch x {
-        | Ok(value) => expect(value) |> toEqual("Read file: test.txt")
+        | Ok(value) => expect(value) -> toEqual("Read file: test.txt")
         | Error(_) => fail("Failed")
         }
       ),
@@ -125,7 +125,7 @@ describe("ContT Identity", () => {
                 switch x {
                 | Ok(content3) =>
                   let result = Relude.List.String.joinWith(", ", list{content1, content2, content3})
-                  expect(result) |> toEqual(expected)
+                  expect(result) -> toEqual(expected)
                 | Error(_) => fail("Failed 3")
                 }
               )
@@ -171,7 +171,7 @@ let stringToIntCont: string => ContIO.t<result<int, Error.t>> = str =>
 Simulates an effectful assertion function that compares two ints
 ")
 let assertIntIO = (expected: int, actual: int, onDone: assertion => unit): IO.t<unit, Error.t> => {
-  onDone(expect(actual) |> toEqual(expected))
+  onDone(expect(actual) -> toEqual(expected))
   IO.unit
 }
 

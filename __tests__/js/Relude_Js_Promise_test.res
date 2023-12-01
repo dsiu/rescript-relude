@@ -10,7 +10,7 @@ describe("Js.Promise", () => {
     |> Relude_Js_Promise.toIO
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("failed"))
       }
     )
@@ -25,7 +25,7 @@ describe("Js.Promise", () => {
       | Ok(_) => onDone(fail("failed"))
       | Error(e) =>
         let str: string = Relude_Unsafe.coerce(e)
-        onDone(expect(str) |> toEqual("my error toIO"))
+        onDone(expect(str) -> toEqual("my error toIO"))
       }
     )
   )
@@ -35,7 +35,7 @@ describe("Js.Promise", () => {
     |> Relude_Js_Promise.toIOLazy
     |> IO.unsafeRunAsync(x =>
       switch x {
-      | Ok(value) => onDone(expect(value) |> toEqual(42))
+      | Ok(value) => onDone(expect(value) -> toEqual(42))
       | Error(_) => onDone(fail("failed"))
       }
     )
@@ -50,7 +50,7 @@ describe("Js.Promise", () => {
       | Ok(_) => onDone(fail("failed"))
       | Error(e) =>
         let str: string = Relude_Unsafe.coerce(e)
-        onDone(expect(str) |> toEqual("my error toIOLazy"))
+        onDone(expect(str) -> toEqual("my error toIOLazy"))
       }
     )
   )
@@ -58,19 +58,19 @@ describe("Js.Promise", () => {
   testPromise("fromIOWithResult success", () =>
     Relude_IO.pure(42)
     |> Relude_Js_Promise.fromIOWithResult
-    |> Js.Promise.then_(actual => actual |> expect |> toEqual(Ok(42)) |> Js.Promise.resolve)
+    |> Js.Promise.then_(actual => actual -> expect -> toEqual(Ok(42)) -> Js.Promise.resolve)
   )
 
   testPromise("fromIOWithResult error", () =>
     Relude_IO.throw(42)
     |> Relude_Js_Promise.fromIOWithResult
-    |> Js.Promise.then_(actual => actual |> expect |> toEqual(Error(42)) |> Js.Promise.resolve)
+    |> Js.Promise.then_(actual => actual -> expect -> toEqual(Error(42)) |> Js.Promise.resolve)
   )
 
   testPromise("fromIO success", () =>
     Relude_IO.pure(42)
     |> Relude_Js_Promise.fromIO
-    |> Js.Promise.then_(actual => actual |> expect |> toEqual(42) |> Js.Promise.resolve)
+    |> Js.Promise.then_(actual => actual -> expect -> toEqual(42) |> Js.Promise.resolve)
   )
 
   testPromise("fromIO error", () =>
@@ -78,14 +78,14 @@ describe("Js.Promise", () => {
     |> Relude_Js_Promise.fromIO
     |> Js.Promise.then_(_ => fail("fail") |> Js.Promise.resolve)
     |> Js.Promise.catch(error =>
-      error |> Relude_Unsafe.coerce |> expect |> toEqual(42) |> Js.Promise.resolve
+      (error |> Relude_Unsafe.coerce) -> expect -> toEqual(42) |> Js.Promise.resolve
     )
   )
 
   testPromise("fromIOExn success", () =>
     Relude_IO.pure(42)
     |> Relude_Js_Promise.fromIOExn
-    |> Js.Promise.then_(actual => actual |> expect |> toEqual(42) |> Js.Promise.resolve)
+    |> Js.Promise.then_(actual => actual -> expect -> toEqual(42) |> Js.Promise.resolve)
   )
 
   testPromise("fromIOExn error", () =>
@@ -93,10 +93,10 @@ describe("Js.Promise", () => {
     |> Relude_Js_Promise.fromIOExn
     |> Js.Promise.then_(_ => fail("fail") |> Js.Promise.resolve)
     |> Js.Promise.catch(error =>
-      error
-      |> Relude_Unsafe.coerce
-      |> expect
-      |> toEqual(Relude_Js_Exn.make("exn") |> Relude_Js_Exn.unsafeToExn)
+      (error
+      |> Relude_Unsafe.coerce)
+      -> expect
+      -> toEqual(Relude_Js_Exn.make("exn") |> Relude_Js_Exn.unsafeToExn)
       |> Js.Promise.resolve
     )
   )
@@ -104,7 +104,7 @@ describe("Js.Promise", () => {
   testPromise("fromIOJsExn success", () =>
     Relude_IO.pure(42)
     |> Relude_Js_Promise.fromIOJsExn
-    |> Js.Promise.then_(actual => actual |> expect |> toEqual(42) |> Js.Promise.resolve)
+    |> Js.Promise.then_(actual => actual -> expect -> toEqual(42) |> Js.Promise.resolve)
   )
 
   testPromise("fromIOJsExn error", () =>
@@ -112,10 +112,10 @@ describe("Js.Promise", () => {
     |> Relude_Js_Promise.fromIOJsExn
     |> Js.Promise.then_(_ => fail("fail") |> Js.Promise.resolve)
     |> Js.Promise.catch(error =>
-      error
-      |> Relude_Unsafe.coerce
-      |> expect
-      |> toEqual(Relude_Js_Exn.make("js_exn"))
+      (error
+      |> Relude_Unsafe.coerce)
+      -> expect
+      -> toEqual(Relude_Js_Exn.make("js_exn"))
       |> Js.Promise.resolve
     )
   )

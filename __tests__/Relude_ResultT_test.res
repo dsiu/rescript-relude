@@ -21,7 +21,7 @@ module ResultIOE = ResultT.WithMonadAndError(IOE.Monad, Error)
 describe("ResultT", () => {
   testAsync("make", onDone =>
     ResultIOE.make(IOE.pure(Result.ok(42)))
-    |> ResultIOE.map(a => expect(a) |> toEqual(42))
+    |> ResultIOE.map(a => expect(a) -> toEqual(42))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -34,7 +34,7 @@ describe("ResultT", () => {
   testAsync("withResultT/mapError", onDone =>
     ResultIOE.make(IO.pure(Error({message: "hi"})))
     |> ResultIOE.withResultT(e => {message: e.message ++ e.message})
-    |> ResultIOE.mapError(e => expect(e.message) |> toEqual("hihi"))
+    |> ResultIOE.mapError(e => expect(e.message) -> toEqual("hihi"))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -46,7 +46,7 @@ describe("ResultT", () => {
 
   testAsync("map", onDone =>
     ResultIOE.pure(2)
-    |> ResultIOE.map(a => expect(a) |> toEqual(2))
+    |> ResultIOE.map(a => expect(a) -> toEqual(2))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -58,7 +58,7 @@ describe("ResultT", () => {
 
   testAsync("apply", onDone =>
     ResultIOE.pure(2)
-    |> ResultIOE.apply(ResultIOE.pure(a => expect(a) |> toEqual(2)))
+    |> ResultIOE.apply(ResultIOE.pure(a => expect(a) -> toEqual(2)))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -70,7 +70,7 @@ describe("ResultT", () => {
 
   testAsync("pure", onDone =>
     ResultIOE.pure(2)
-    |> ResultIOE.map(a => expect(a) |> toEqual(2))
+    |> ResultIOE.map(a => expect(a) -> toEqual(2))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -82,7 +82,7 @@ describe("ResultT", () => {
 
   testAsync("bind/flatMap", onDone =>
     ResultIOE.pure(2)
-    |> ResultIOE.flatMap(a => ResultIOE.pure(expect(a) |> toEqual(2)))
+    |> ResultIOE.flatMap(a => ResultIOE.pure(expect(a) -> toEqual(2)))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -95,7 +95,7 @@ describe("ResultT", () => {
   testAsync("subflatMap", onDone =>
     ResultIOE.pure(2)
     |> ResultIOE.subflatMap(a => Result.pure(a + 3))
-    |> ResultIOE.map(a => expect(a) |> toEqual(5))
+    |> ResultIOE.map(a => expect(a) -> toEqual(5))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -108,7 +108,7 @@ describe("ResultT", () => {
   testAsync("semiflatMap", onDone =>
     ResultIOE.pure(2)
     |> ResultIOE.semiflatMap(a => IO.pure(a + 3))
-    |> ResultIOE.map(a => expect(a) |> toEqual(5))
+    |> ResultIOE.map(a => expect(a) -> toEqual(5))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -121,7 +121,7 @@ describe("ResultT", () => {
   testAsync("cond", onDone =>
     ResultIOE.pure(500)
     |> ResultIOE.cond(a => 9000 > a, 100, {message: "It's over 9000"})
-    |> ResultIOE.map(a => expect(a) |> toEqual(100))
+    |> ResultIOE.map(a => expect(a) -> toEqual(100))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {
@@ -134,8 +134,8 @@ describe("ResultT", () => {
   testAsync("condError", onDone =>
     ResultIOE.pure(10000)
     |> ResultIOE.condError(a => 9000 > a, {message: "It's over 9000"})
-    |> ResultIOE.map(a => expect(a) |> toEqual(100))
-    |> ResultIOE.mapError(e => expect(e.message) |> toEqual("It's over 9000"))
+    |> ResultIOE.map(a => expect(a) -> toEqual(100))
+    |> ResultIOE.mapError(e => expect(e.message) -> toEqual("It's over 9000"))
     |> ResultIOE.runResultT
     |> IO.unsafeRunAsync(x =>
       switch x {

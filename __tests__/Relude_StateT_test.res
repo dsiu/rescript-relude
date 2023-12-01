@@ -27,17 +27,17 @@ module Stack = {
 describe("StateT", () => {
   test("pure", () => {
     let result = State.pure(2) |> State.runStateT(list{})
-    expect(result) |> toEqual((2, list{}))
+    expect(result) -> toEqual((2, list{}))
   })
 
   test("put", () => {
     let result = \">>="(State.pure(2), a => \"$>"(State.put(list{a}), a)) |> State.runStateT(list{})
-    expect(result) |> toEqual((2, list{2}))
+    expect(result) -> toEqual((2, list{2}))
   })
 
   test("stack example 1 (push)", () => {
     let result = \">>="(Stack.push(1), _ => Stack.push(2)) |> State.runStateT(list{})
-    expect(result) |> toEqual((2, list{2, 1}))
+    expect(result) -> toEqual((2, list{2, 1}))
   })
 
   test("stack example 2 (push, pop)", () => {
@@ -45,7 +45,7 @@ describe("StateT", () => {
       \">>="(Stack.push(1), _ =>
         \">>="(Stack.push(2), _ => \">>="(Stack.push(3), _ => Stack.pop))
       ) |> State.runStateT(list{})
-    expect(result) |> toEqual((Some(3), list{2, 1}))
+    expect(result) -> toEqual((Some(3), list{2, 1}))
   })
 
   test("stack example 3", () => {
@@ -60,7 +60,7 @@ describe("StateT", () => {
           )
         )
       ) |> State.runStateT(list{})
-    expect(result) |> toEqual((5, list{5, 4, 1}))
+    expect(result) -> toEqual((5, list{5, 4, 1}))
   })
 
   test("stack example 4", () => {
@@ -78,7 +78,7 @@ describe("StateT", () => {
         ),
         _ => \"<$$>"(Stack.push(5), a => a * 100),
       ) |> State.runStateT(list{})
-    expect(result) |> toEqual((500, list{5, 4, 1}))
+    expect(result) -> toEqual((500, list{5, 4, 1}))
   })
 
   test("*> loses state", () => {
@@ -87,6 +87,6 @@ describe("StateT", () => {
     // Not 100% sure if this is expected behavior, but the applicative behavior throws away the
     // state on the left side here.  It makes sense, because there is no attempt to merge the states
     // in apply.  I'll have to compare this with purescript/haskell to be sure.
-    expect(result) |> toEqual((3, list{3}))
+    expect(result) -> toEqual((3, list{3}))
   })
 })

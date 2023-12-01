@@ -25,6 +25,6 @@ describe("WriterT", () =>
         )
       )
     )
-    expect(writer |> Writer.runWriterT) |> toEqual((89, list{"a = 42", "a = 84", "a = 89"}))
+    expect(writer |> Writer.runWriterT) -> toEqual((89, list{"a = 42", "a = 84", "a = 89"}))
   })
 )

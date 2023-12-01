@@ -26,32 +26,32 @@ let show = (~indentSpaces: int=2, json: json): string =>
 @ocaml.doc("
 Checks if the Js.Json.t value is a null
 ")
-let isNull: json => bool = json => Js.Json.test(json, Js.Json.Null)
+let isNull: json => bool = json => Js.Json.test(json, Js.Json.Kind.Null)
 
 @ocaml.doc("
 Checks if the Js.Json.t value is a bool
 ")
-let isBool: json => bool = json => Js.Json.test(json, Js.Json.Boolean)
+let isBool: json => bool = json => Js.Json.test(json, Js.Json.Kind.Boolean)
 
 @ocaml.doc("
 Checks if the Js.Json.t value is a string
 ")
-let isString: json => bool = json => Js.Json.test(json, Js.Json.String)
+let isString: json => bool = json => Js.Json.test(json, Js.Json.Kind.String)
 
 @ocaml.doc("
 Checks if the Js.Json.t value is a number
 ")
-let isNumber: json => bool = json => Js.Json.test(json, Js.Json.Number)
+let isNumber: json => bool = json => Js.Json.test(json, Js.Json.Kind.Number)
 
 @ocaml.doc("
 Checks if the Js.Json.t value is a JSON object
 ")
-let isObject: json => bool = json => Js.Json.test(json, Js.Json.Object)
+let isObject: json => bool = json => Js.Json.test(json, Js.Json.Kind.Object)
 
 @ocaml.doc("
 Checks if the Js.Json.t value is a JSON array
 ")
-let isArray: json => bool = json => Js.Json.test(json, Js.Json.Array)
+let isArray: json => bool = json => Js.Json.test(json, Js.Json.Kind.Array)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor functions (encode values as Json)

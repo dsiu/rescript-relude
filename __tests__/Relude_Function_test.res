@@ -24,48 +24,48 @@ let ft4 = ((a, b, c, d)) => a + b + c + d
 let ft5 = ((a, b, c, d, e)) => a + b + c + d + e
 
 describe("Function", () => {
-  test("identity returns the input", () => expect(Function.identity(1)) |> toBe(1))
+  test("identity returns the input", () => expect(Function.identity(1)) -> toBe(1))
 
-  test("const returns the first arg", () => expect(Function.const(1, 2)) |> toBe(1))
+  test("const returns the first arg", () => expect(Function.const(1, 2)) -> toBe(1))
 
   test("flip", () => {
     let formula = (x, y) => x + 2 * y
-    expect(formula(3, 5)) |> toBe(13) |> ignore
-    expect(Function.flip(formula, 5, 3)) |> toBe(13)
+    expect(formula(3, 5)) -> toBe(13) |> ignore
+    expect(Function.flip(formula, 5, 3)) -> toBe(13)
   })
 
   test("compose combines functions from right to left", () => {
     let plus5 = a => a + 5
     let times3 = a => a * 3
-    expect(\"<<"(plus5, times3)(10)) |> toBe(35)
+    expect(\"<<"(plus5, times3)(10)) -> toBe(35)
   })
 
   test("flipCompose combines functions from left to right", () => {
     let plus5 = a => a + 5
     let times3 = a => a * 3
-    expect(\">>"(plus5, times3)(10)) |> toBe(45)
+    expect(\">>"(plus5, times3)(10)) -> toBe(45)
   })
 
-  test("curry2", () => expect(Function.curry2(ft2, 1, 2)) |> toEqual(3))
+  test("curry2", () => expect(Function.curry2(ft2, 1, 2)) -> toEqual(3))
 
-  test("curry3", () => expect(Function.curry3(ft3, 1, 2, 3)) |> toEqual(6))
+  test("curry3", () => expect(Function.curry3(ft3, 1, 2, 3)) -> toEqual(6))
 
-  test("curry4", () => expect(Function.curry4(ft4, 1, 2, 3, 4)) |> toEqual(10))
+  test("curry4", () => expect(Function.curry4(ft4, 1, 2, 3, 4)) -> toEqual(10))
 
-  test("curry5", () => expect(Function.curry5(ft5, 1, 2, 3, 4, 5)) |> toEqual(15))
+  test("curry5", () => expect(Function.curry5(ft5, 1, 2, 3, 4, 5)) -> toEqual(15))
 
-  test("uncurry2", () => expect(Function.uncurry2(f2, (1, 2))) |> toEqual(3))
+  test("uncurry2", () => expect(Function.uncurry2(f2, (1, 2))) -> toEqual(3))
 
-  test("uncurry3", () => expect(Function.uncurry3(f3, (1, 2, 3))) |> toEqual(6))
+  test("uncurry3", () => expect(Function.uncurry3(f3, (1, 2, 3))) -> toEqual(6))
 
-  test("uncurry4", () => expect(Function.uncurry4(f4, (1, 2, 3, 4))) |> toEqual(10))
+  test("uncurry4", () => expect(Function.uncurry4(f4, (1, 2, 3, 4))) -> toEqual(10))
 
-  test("uncurry5", () => expect(Function.uncurry5(f5, (1, 2, 3, 4, 5))) |> toEqual(15))
+  test("uncurry5", () => expect(Function.uncurry5(f5, (1, 2, 3, 4, 5))) -> toEqual(15))
 
   test("map", () => {
     let plus5 = a => a + 5
     let times3 = a => a * 3
-    expect(Function.map(plus5, times3, 10)) |> toBe(35)
+    expect(Function.map(plus5, times3, 10)) -> toBe(35)
   })
 
   test("apply", () => {
@@ -74,10 +74,10 @@ describe("Function", () => {
 
     let cube = x => float_of_int(x * x * x)
 
-    expect(Function.apply(showResult, cube, 5)) |> toBe("input 5 yields 125")
+    expect(Function.apply(showResult, cube, 5)) -> toBe("input 5 yields 125")
   })
 
-  test("pure returns the first arg", () => expect(Function.pure(1, 2)) |> toBe(1))
+  test("pure returns the first arg", () => expect(Function.pure(1, 2)) -> toBe(1))
 
   test("bind", () => {
     let showResult = (x, n: int) =>
@@ -85,7 +85,7 @@ describe("Function", () => {
 
     let cube = x => float_of_int(x * x * x)
 
-    expect(Function.bind(cube, showResult, 5)) |> toBe("input 5 yields 125")
+    expect(Function.bind(cube, showResult, 5)) -> toBe("input 5 yields 125")
   })
 
   test("flatMap", () => {
@@ -94,7 +94,7 @@ describe("Function", () => {
 
     let cube = x => float_of_int(x * x * x)
 
-    expect(Function.flatMap(showResult, cube, 5)) |> toBe("input 5 yields 125")
+    expect(Function.flatMap(showResult, cube, 5)) -> toBe("input 5 yields 125")
   })
 
   test("memoize0", () => {
@@ -107,7 +107,7 @@ describe("Function", () => {
     let result1 = memoized()
     let result2 = memoized()
     let result3 = memoized()
-    expect((calls.contents, result1, result2, result3)) |> toEqual((1, "1", "1", "1"))
+    expect((calls.contents, result1, result2, result3)) -> toEqual((1, "1", "1", "1"))
   })
 
   test("memoize1", () => {
@@ -123,7 +123,7 @@ describe("Function", () => {
     let result4 = memoized(22)
     let result5 = memoized(33)
     let result6 = memoized(33)
-    expect((calls.contents, result1, result2, result3, result4, result5, result6)) |> toEqual((
+    expect((calls.contents, result1, result2, result3, result4, result5, result6)) -> toEqual((
       list{33, 22, 11},
       "11",
       "11",
@@ -146,7 +146,7 @@ describe("Function", () => {
     let result3 = before()
     let result4 = before()
     let result5 = before()
-    expect((calls.contents, result1, result2, result3, result4, result5)) |> toEqual((
+    expect((calls.contents, result1, result2, result3, result4, result5)) -> toEqual((
       3,
       1,
       2,
@@ -168,7 +168,7 @@ describe("Function", () => {
     let result3 = after()
     let result4 = after()
     let result5 = after()
-    expect((calls.contents, result1, result2, result3, result4, result5)) |> toEqual((
+    expect((calls.contents, result1, result2, result3, result4, result5)) -> toEqual((
       2,
       None,
       None,
@@ -188,7 +188,7 @@ describe("Function", () => {
     let result1 = once()
     let result2 = once()
     let result3 = once()
-    expect((calls.contents, result1, result2, result3)) |> toEqual((1, 1, 1, 1))
+    expect((calls.contents, result1, result2, result3)) -> toEqual((1, 1, 1, 1))
   })
 
   test("wrap", () => {
@@ -197,7 +197,7 @@ describe("Function", () => {
     let after = str => str ++ "!"
     let f = Function.wrap(~before, ~after, f)
     let result = f(22)
-    expect(result) |> toEqual("260!")
+    expect(result) -> toEqual("260!")
   })
 
   test("negate", () => {
@@ -205,7 +205,7 @@ describe("Function", () => {
     let g = Function.negate(f)
     let resultF = f("")
     let resultG = g("")
-    expect((resultF, resultG)) |> toEqual((true, false))
+    expect((resultF, resultG)) -> toEqual((true, false))
   })
 
   test("WithArgument", () => {
@@ -213,6 +213,6 @@ describe("Function", () => {
     let plus5 = a => a + 5
     let times3 = a => (a |> int_of_string) * 3
     let actual = \"<$>"(plus5, times3)("10")
-    expect(actual) |> toBe(35)
+    expect(actual) -> toBe(35)
   })
 })

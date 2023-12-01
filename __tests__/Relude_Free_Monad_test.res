@@ -116,7 +116,7 @@ describe("Relude_Free_Monad", () =>
           Belt.Map.String.empty,
         )
 
-      expect(results) |> toEqual((Some(42), Some(5), Some(99)))
+      expect(results) -> toEqual((Some(42), Some(5), Some(99)))
     })
   )
 )

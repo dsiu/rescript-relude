@@ -37,7 +37,7 @@ describe("Reader IO", () =>
     )
     |> RIO.semiflatMap(c => Relude_IO.pure(c ++ "semi"))
     |> RIO.runRIO(testEnv)
-    |> Relude_IO.map(a => expect(a) |> toEqual("-42abcsemi"))
+    |> Relude_IO.map(a => expect(a) -> toEqual("-42abcsemi"))
     |> Relude_IO.unsafeRunAsync(x =>
       switch x {
       | Ok(assertion) => onDone(assertion)

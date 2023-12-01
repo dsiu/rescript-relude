@@ -8,101 +8,101 @@ describe("Set", () => {
     expect({
       open IntSet
       empty |> length
-    }) |> toEqual(0)
+    }) -> toEqual(0)
   )
 
   test("length of non-empty set", () =>
     expect({
       open IntSet
       singleton(1) |> length
-    }) |> toEqual(1)
+    }) -> toEqual(1)
   )
 
   test("isEmpty (empty set)", () =>
     expect({
       open IntSet
       empty |> isEmpty
-    }) |> toEqual(true)
+    }) -> toEqual(true)
   )
 
   test("isEmpty (nonempty set)", () =>
     expect({
       open IntSet
       singleton(1) |> isEmpty
-    }) |> toEqual(false)
+    }) -> toEqual(false)
   )
 
-  test("fromArray (empty)", () => expect(IntSet.fromArray([])) |> toEqual(IntSet.empty))
+  test("fromArray (empty)", () => expect(IntSet.fromArray([])) -> toEqual(IntSet.empty))
 
   test("fromArray (nonEmpty, unique)", () =>
     expect({
       open IntSet
       fromArray([1, 2, 3]) |> length
-    }) |> toEqual(3)
+    }) -> toEqual(3)
   )
 
   test("fromArray (nonEmpty, removes duplicates)", () =>
     expect({
       open IntSet
       fromArray([1, 2, 1]) |> length
-    }) |> toEqual(2)
+    }) -> toEqual(2)
   )
 
-  test("fromList (empty)", () => expect(IntSet.fromList(list{})) |> toEqual(IntSet.empty))
+  test("fromList (empty)", () => expect(IntSet.fromList(list{})) -> toEqual(IntSet.empty))
 
   test("fromList (nonEmpty)", () =>
     expect({
       open IntSet
       fromList(list{4, 4, 4, 4, 3}) |> length
-    }) |> toEqual(2)
+    }) -> toEqual(2)
   )
 
   test("contains (false)", () =>
     expect({
       open IntSet
       fromList(list{1, 3, 3, 4}) |> contains(5)
-    }) |> toEqual(false)
+    }) -> toEqual(false)
   )
 
   test("contains (true)", () =>
     expect({
       open IntSet
       fromList(list{1, 3, 3, 4}) |> contains(3)
-    }) |> toEqual(true)
+    }) -> toEqual(true)
   )
 
   test("add (new unique value)", () =>
     expect({
       open IntSet
       fromList(list{1, 2}) |> add(3)
-    }) |> toEqual(IntSet.fromList(list{1, 2, 3}))
+    }) -> toEqual(IntSet.fromList(list{1, 2, 3}))
   )
 
   test("add (duplicate value)", () =>
     expect({
       open IntSet
       fromList(list{1, 2}) |> add(1)
-    }) |> toEqual(IntSet.fromList(list{1, 2}))
+    }) -> toEqual(IntSet.fromList(list{1, 2}))
   )
 
   test("mergeMany (empty array to merge)", () =>
     expect({
       open IntSet
       singleton(1) |> mergeMany([])
-    }) |> toEqual(IntSet.fromList(list{1}))
+    }) -> toEqual(IntSet.fromList(list{1}))
   )
 
   test("mergeMany (all unique)", () =>
     expect({
       open IntSet
       singleton(1) |> mergeMany([2, 3]) |> eq(fromList(list{1, 2, 3}))
-    }) |> toEqual(true)
+    }) -> toEqual(true)
   )
 
   test("mergeMany (some duplicates)", () =>
     expect({
       open IntSet
       fromList(list{1, 2, 3}) |> mergeMany([2, 3, 4]) |> eq(fromList(list{1, 2, 3, 4}))
-    }) |> toEqual(true)
+    }) -> toEqual(true)
   )
 })
