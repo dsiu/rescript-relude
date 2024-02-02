@@ -82,9 +82,13 @@ describe("Timer", () => {
     Jest.advanceTimersByTime(40) // 200 (still 3)
     let runCount6 = runCount.contents
 
-    toEqual(
-      (0, 0, 1, 2, 3, 3),
-      expect((runCount1, runCount2, runCount3, runCount4, runCount5, runCount6)),
-    )
+    expect((runCount1, runCount2, runCount3, runCount4, runCount5, runCount6))->toEqual((
+      0,
+      0,
+      1,
+      2,
+      3,
+      3,
+    ))
   })
 })

@@ -24,22 +24,22 @@ let fromArray: 'a. array<'a> => option<('a, 'a, 'a, 'a, 'a)> = x =>
 Constructs a tuple-5 from an array of at least 5 values
 ")
 let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a, 'a, 'a, 'a)> = xs =>
-  Relude_Array.take(5, xs) |> fromArray
+  fromArray(Relude_Array.take(5, xs))
 
 @ocaml.doc("
 Constructs a tuple-5 from a list of exactly 5 values
 ")
 let fromList: 'a. list<'a> => option<('a, 'a, 'a, 'a, 'a)> = xs =>
-  {
+  fromArray({
     open Relude_List
-    take(6, xs) |> toArray
-  } |> fromArray
+    toArray(take(6, xs))
+  })
 
 @ocaml.doc("
 Constructs a tuple-5 from a list of at least 5 values
 ")
 let fromListAtLeast: 'a. list<'a> => option<('a, 'a, 'a, 'a, 'a)> = xs =>
-  Relude_List.take(5, xs) |> fromList
+  fromList(Relude_List.take(5, xs))
 
 @ocaml.doc("
 Applies a normal 5-argument function to arguments contained in a tuple-5
@@ -101,7 +101,7 @@ let eqBy: 'a 'b 'c 'd 'e. (
 
 module WithEqs = (EqA: EQ, EqB: EQ, EqC: EQ, EqD: EQ, EqE: EQ) => {
   type t = (EqA.t, EqB.t, EqC.t, EqD.t, EqE.t)
-  let eq = eqBy(EqA.eq, EqB.eq, EqC.eq, EqD.eq, EqE.eq)
+  let eq = eqBy(EqA.eq, EqB.eq, EqC.eq, EqD.eq, EqE.eq, ...)
 
   module Eq: EQ with type t = t = {
     type t = t
@@ -171,7 +171,7 @@ let compareBy: 'a 'b 'c 'd 'e. (
 
 module WithOrds = (OrdA: ORD, OrdB: ORD, OrdC: ORD, OrdD: ORD, OrdE: ORD) => {
   include WithEqs(OrdA, OrdB, OrdC, OrdD, OrdE)
-  let compare = compareBy(OrdA.compare, OrdB.compare, OrdC.compare, OrdD.compare, OrdE.compare)
+  let compare = compareBy(OrdA.compare, OrdB.compare, OrdC.compare, OrdD.compare, OrdE.compare, ...)
 
   module Ord: ORD with type t = t = {
     include Eq

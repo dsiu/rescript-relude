@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -113,7 +116,7 @@ let catThat: 'a 'b. list<t<'a, 'b>> => list<'b> = iors => Relude_List.foldRight(
 @ocaml.doc("
 Maps a pure function over the [this] channel of the Ior
 ")
-let mapThis: 'a 'b 'c. ('a => 'c, t<'a, 'b>) => t<'c, 'b> = (f, fa) =>
+let mapThis: 'a 'b 'c. (. 'a => 'c, t<'a, 'b>) => t<'c, 'b> = (f, fa) =>
   switch fa {
   | That(_) as e => e
   | This(a) => This(f(a))
@@ -249,7 +252,7 @@ let pure: 'a 'b. 'a => t<'a, 'b> = a => This(a)
 @ocaml.doc("
 Applies a monadic function to the success channel of the Ior
 ")
-let bind: (t<'a, 'b>, 'a => t<'c, 'b>) => t<'c, 'b> = (fa, f) =>
+let bind: (. t<'a, 'b>, 'a => t<'c, 'b>) => t<'c, 'b> = (fa, f) =>
   switch fa {
   | This(a) => f(a)
   | That(_) as that => that
@@ -269,7 +272,7 @@ let map2: (('x, 'x) => 'x, ('a, 'b) => 'c, t<'a, 'x>, t<'b, 'x>) => t<'c, 'x> = 
   f,
   fa,
   fb,
-) => applyWithAppendThats(appendThats, map(f, fa), fb)
+) => applyWithAppendThats(appendThats, map(x => f(x, _), fa), fb)
 
 @ocaml.doc("
 Maps the results of 3 Ior values using the given function
@@ -280,7 +283,7 @@ let map3: (('x, 'x) => 'x, ('a, 'b, 'c) => 'd, t<'a, 'x>, t<'b, 'x>, t<'c, 'x>) 
   fa,
   fb,
   fc,
-) => applyWithAppendThats(appendThats, map2(appendThats, f, fa, fb), fc)
+) => applyWithAppendThats(appendThats, map2(appendThats, (x, y) => f(x, y, _), fa, fb), fc)
 
 @ocaml.doc("
 Maps the results of 4 Ior values using the given function
@@ -293,7 +296,7 @@ let map4: (
   t<'c, 'x>,
   t<'d, 'x>,
 ) => t<'e, 'x> = (appendThats, f, fa, fb, fc, fd) =>
-  applyWithAppendThats(appendThats, map3(appendThats, f, fa, fb, fc), fd)
+  applyWithAppendThats(appendThats, map3(appendThats, (x, y, z) => f(x, y, z, _), fa, fb, fc), fd)
 
 @ocaml.doc("
 Maps the results of 5 Ior values using the given function
@@ -307,7 +310,11 @@ let map5: (
   t<'d, 'x>,
   t<'e, 'x>,
 ) => t<'f, 'x> = (appendThats, f, fa, fb, fc, fd, fe) =>
-  applyWithAppendThats(appendThats, map4(appendThats, f, fa, fb, fc, fd), fe)
+  applyWithAppendThats(
+    appendThats,
+    map4(appendThats, (w, x, y, z) => f(w, x, y, z, _), fa, fb, fc, fd),
+    fe,
+  )
 
 @ocaml.doc("
 Folds an Ior into a value by applying a function for each case
@@ -376,7 +383,7 @@ module WithThats = (Thats: SEMIGROUP_ANY, That: TYPE) => {
 
   module Apply: APPLY with type t<'a> = t<'a, Thats.t<That.t>> = {
     include Functor
-    let apply = (ff, fa) => applyWithAppendThats(Thats.append, ff, fa)
+    let apply = (. ff, fa) => applyWithAppendThats(Thats.append, ff, fa)
   }
   let apply = Apply.apply
   include Relude_Extensions_Apply.ApplyExtensions(Apply)

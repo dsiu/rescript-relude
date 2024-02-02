@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -18,22 +21,22 @@ let fromArray: 'a. array<'a> => option<('a, 'a, 'a, 'a)> = x =>
 Constructs a tuple-4 from an array of at least 4 values
 ")
 let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a, 'a, 'a)> = xs =>
-  Relude_Array.take(4, xs) |> fromArray
+  fromArray(Relude_Array.take(4, xs))
 
 @ocaml.doc("
 Constructs a tuple-4 from a list of exactly 4 values
 ")
 let fromList: 'a. list<'a> => option<('a, 'a, 'a, 'a)> = xs =>
-  {
+  fromArray({
     open Relude_List
-    take(5, xs) |> toArray
-  } |> fromArray
+    toArray(take(5, xs))
+  })
 
 @ocaml.doc("
 Constructs a tuple-4 from a list of at least 4 values
 ")
 let fromListAtLeast: 'a. list<'a> => option<('a, 'a, 'a, 'a)> = xs =>
-  Relude_List.take(4, xs) |> fromList
+  fromList(Relude_List.take(4, xs))
 
 @ocaml.doc("
 Gets the first value of a tuple-4
@@ -76,7 +79,7 @@ let eqBy: 'a 'b 'c 'd. (
 
 module WithEqs = (EqA: EQ, EqB: EQ, EqC: EQ, EqD: EQ) => {
   type t = (EqA.t, EqB.t, EqC.t, EqD.t)
-  let eq = eqBy(EqA.eq, EqB.eq, EqC.eq, EqD.eq)
+  let eq = eqBy(EqA.eq, EqB.eq, EqC.eq, EqD.eq, ...)
 
   module Eq: EQ with type t = t = {
     type t = t
@@ -137,7 +140,7 @@ let compareBy: 'a 'b 'c 'd. (
 
 module WithOrds = (OrdA: ORD, OrdB: ORD, OrdC: ORD, OrdD: ORD) => {
   include WithEqs(OrdA, OrdB, OrdC, OrdD)
-  let compare = compareBy(OrdA.compare, OrdB.compare, OrdC.compare, OrdD.compare)
+  let compare = compareBy(OrdA.compare, OrdB.compare, OrdC.compare, OrdD.compare, ...)
 
   module Ord: ORD with type t = t = {
     include Eq

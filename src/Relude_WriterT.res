@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -116,7 +119,7 @@ module WithMonad = (Monad: MONAD) => {
   @ocaml.doc("
   Maps a function over the result value a of the WriterT.  No change is made to the log.
   ")
-  let map: 'w 'a 'b. ('a => 'b, t<'a, 'w>) => t<'b, 'w> = (aToB, WriterT(mAW)) => WriterT(
+  let map: 'w 'a 'b. (. 'a => 'b, t<'a, 'w>) => t<'b, 'w> = (aToB, WriterT(mAW)) => WriterT(
     Monad.map(((a, w)) => (aToB(a), w), mAW),
   )
 
@@ -129,7 +132,7 @@ module WithMonad = (Monad: MONAD) => {
     WriterT(mAToBW),
     WriterT(mAW),
   ) => WriterT(
-    Monad.apply(Monad.map(((aToB, w1), (a, w2)) => (aToB(a), appendLog(w1, w2)), mAToBW), mAW),
+    Monad.apply(Monad.map(((aToB, w1)) => ((a, w2)) => (aToB(a), appendLog(w1, w2)), mAToBW), mAW),
   )
 
   @ocaml.doc("
@@ -177,7 +180,7 @@ module WithMonad = (Monad: MONAD) => {
 
     module Apply: APPLY with type t<'a> = t<'a, Log.t> = {
       include Functor
-      let apply = (ff, fa) => applyWithAppendLog(Log.Monoid.append, ff, fa)
+      let apply = (. ff, fa) => applyWithAppendLog(Log.Monoid.append, ff, fa)
     }
     let apply = Apply.apply
     include Relude_Extensions_Apply.ApplyExtensions(Apply)
@@ -191,7 +194,7 @@ module WithMonad = (Monad: MONAD) => {
 
     module Monad: MONAD with type t<'a> = t<'a, Log.t> = {
       include Applicative
-      let flat_map = (fa, f) => bindWithAppendLog(Log.Monoid.append, fa, f)
+      let flat_map = (. fa, f) => bindWithAppendLog(Log.Monoid.append, fa, f)
     }
     let bind = Monad.flat_map
     include Relude_Extensions_Monad.MonadExtensions(Monad)

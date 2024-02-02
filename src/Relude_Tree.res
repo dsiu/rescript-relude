@@ -42,7 +42,7 @@ Creates a tree using a seed value and a function to produce child seed values
 ")
 let rec fill: 'a. ('a => list<'a>, 'a) => t<'a> = (getChildrenSeeds, seed) => {
   value: seed,
-  children: seed |> getChildrenSeeds |> Relude_List.map(fill(getChildrenSeeds)),
+  children: seed->getChildrenSeeds->(Relude_List.map(fill(getChildrenSeeds, ...), _)),
 }
 
 @ocaml.doc("
@@ -75,7 +75,7 @@ let getChildren: 'a. t<'a> => list<t<'a>> = ({value: _, children}) => children
 Gets the child at the given index
 ")
 let getChildAt: 'a. (int, t<'a>) => option<t<'a>> = (index, {value: _, children}) =>
-  children |> Relude_List.at(index)
+  children->(Relude_List.at(index, _))
 
 @ocaml.doc("
 Replaces all the children with the given list of new children
@@ -152,7 +152,7 @@ let rec zipWith: 'a 'b 'c. (('a, 'b) => 'c, t<'a>, t<'b>) => t<'c> = (
   {value: valueB, children: childrenB},
 ) => {
   value: f(valueA, valueB),
-  children: Relude_List.zipWith(zipWith(f), childrenA, childrenB),
+  children: Relude_List.zipWith(zipWith(f, ...), childrenA, childrenB),
 }
 
 @ocaml.doc("
@@ -163,9 +163,9 @@ let zip: 'a 'b. (t<'a>, t<'b>) => t<('a, 'b)> = (ta, tb) => zipWith((a, b) => (a
 @ocaml.doc("
 Maps a function over all values of the tree
 ")
-let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, {value, children}) => {
+let rec map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, {value, children}) => {
   value: aToB(value),
-  children: children |> Relude_List.map(map(aToB)),
+  children: children->(Relude_List.map(map(aToB, _), _)),
 }
 
 module Functor: FUNCTOR with type t<'a> = t<'a> = {
@@ -177,14 +177,14 @@ include Relude_Extensions_Functor.FunctorExtensions(Functor)
 @ocaml.doc("
 Applies a tree of functions to a tree of values position-by-position, trimming off non-matching branches.
 ")
-let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (
+let rec apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (
   {value: aToB, children: aToBChildTrees},
   {value: a, children: aChildTrees} as aTree,
 ) => {
   value: aToB(a),
   children: Relude_List.concat(
-    aChildTrees |> List.map(aChildTree => map(aToB, aChildTree)),
-    aToBChildTrees |> Relude_List.map(aToBChildTree => apply(aToBChildTree, aTree)),
+    aChildTrees->(List.map(aChildTree => map(aToB, aChildTree), _)),
+    aToBChildTrees->(Relude_List.map(aToBChildTree => apply(aToBChildTree, aTree), _)),
   ),
 }
 
@@ -200,12 +200,12 @@ module Applicative: APPLICATIVE with type t<'a> = t<'a> = {
 }
 include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 
-let rec bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (
+let rec bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (
   {value: valueA, children: childTreesA},
   aToTreeB,
 ) => {
   let {value: valueB, children: childTreesB} = valueA |> aToTreeB
-  let otherChildTreesB = childTreesA |> Relude_List.map(childTreeA => bind(childTreeA, aToTreeB))
+  let otherChildTreesB = childTreesA->(Relude_List.map(childTreeA => bind(childTreeA, aToTreeB), _))
   {
     value: valueB,
     children: Relude_List.concat(childTreesB, otherChildTreesB),
@@ -222,8 +222,8 @@ let rec extend: 'a 'b. (t<'a> => 'b, t<'a>) => t<'b> = (
   treeAToB,
   {value: _, children: childrenA} as treeA,
 ) => {
-  value: treeA |> treeAToB,
-  children: childrenA |> Relude_List.map(extend(treeAToB)),
+  value: treeA->treeAToB,
+  children: childrenA->(Relude_List.map(extend(treeAToB, _), _)),
 }
 
 module Extend: EXTEND with type t<'a> = t<'a> = {
@@ -242,7 +242,7 @@ include Relude_Extensions_Comonad.ComonadExtensions(Comonad)
 Folds a tree from left to right, depth first
 ")
 let rec foldLeft: 'a 'b. (('b, 'a) => 'b, 'b, t<'a>) => 'b = (f, init, {value, children}) => {
-  let acc = children |> Relude_List.foldLeft((acc, child) => foldLeft(f, acc, child), init)
+  let acc = children->(Relude_List.foldLeft((acc, child) => foldLeft(f, acc, child), init, _))
   f(acc, value)
 }
 
@@ -250,7 +250,7 @@ let rec foldLeft: 'a 'b. (('b, 'a) => 'b, 'b, t<'a>) => 'b = (f, init, {value, c
 Folds a tree from right to left, depth first
 ")
 let rec foldRight: 'a 'b. (('a, 'b) => 'b, 'b, t<'a>) => 'b = (f, init, {value, children}) => {
-  let acc = children |> Relude_List.foldRight((child, acc) => foldRight(f, acc, child), init)
+  let acc = children->(Relude_List.foldRight((child, acc) => foldRight(f, acc, child), init, _))
   f(value, acc)
 }
 
@@ -261,17 +261,17 @@ module Foldable: FOLDABLE with type t<'a> = t<'a> = {
 
   module Fold_Map = (M: MONOID) => {
     let fold_map: ('a => M.t, t<'a>) => M.t = (f, tree) =>
-      tree |> foldLeft((acc, value) => M.append(acc, f(value)), M.empty)
+      tree->(foldLeft((acc, value) => M.append(acc, f(value)), M.empty, _))
   }
 
   module Fold_Map_Any = (M: MONOID_ANY) => {
     let fold_map: 'a 'b. ('a => M.t<'b>, t<'a>) => M.t<'b> = (f, tree) =>
-      tree |> foldLeft((acc, value) => M.append(acc, f(value)), M.empty)
+      tree->(foldLeft((acc, value) => M.append(acc, f(value)), M.empty, _))
   }
 
   module Fold_Map_Plus = (P: PLUS) => {
     let fold_map: 'a 'b. ('a => P.t<'b>, t<'a>) => P.t<'b> = (f, tree) =>
-      tree |> foldLeft((acc, value) => P.alt(acc, f(value)), P.empty)
+      tree->(foldLeft((acc, value) => P.alt(acc, f(value)), P.empty, _))
   }
 }
 include Relude_Extensions_Foldable.FoldableExtensions(Foldable)
@@ -299,7 +299,10 @@ module WithApplicative = (A: APPLICATIVE) => {
     let rec traverse: ('a => A.t<'b>, t<'a>) => A.t<t<'b>> = (f, {value, children}) => {
       let \"<$>" = A.map
       let \"<*>" = A.apply
-      \"<*>"(\"<$>"(make, f(value)), ListTraversable.traverse(traverse(f), children))
+      \"<*>"(
+        \"<$>"(x => make(x, _), f(value)),
+        ListTraversable.traverse(x => traverse(f, x), children),
+      )
     }
 
     let sequence: 'a. t<A.t<'a>> => A.t<t<'a>> = tree => traverse(a => a, tree)
@@ -314,7 +317,7 @@ let rec filter: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, {value, childr
   if pred(value) {
     Some({
       value,
-      children: children |> Relude_List.mapOption(filter(pred)),
+      children: children->(Relude_List.mapOption(x => filter(pred, x), _)),
     })
   } else {
     None
@@ -324,7 +327,7 @@ let rec filter: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, {value, childr
 Shows a tree using the given function for the contained values
 ")
 let rec showBy: 'a. ('a => string, t<'a>) => string = (showA, {value, children}) =>
-  "Tree " ++ (showA(value) ++ (" " ++ Relude_List.showBy(showBy(showA), children)))
+  "Tree " ++ (showA(value) ++ (" " ++ Relude_List.showBy(showBy(showA, ...), children)))
 
 module type SHOW_F = (ShowA: SHOW) => (SHOW with type t = t<ShowA.t>)
 
@@ -346,9 +349,9 @@ let showPrettyBy: 'a. ('a => string, t<'a>) => string = (showA, tree) => {
     }
     let childrenStr =
       tree
-      |> getChildren
-      |> Relude_List.map(showPrettyByWithIndent(level + 1, showA))
-      |> Relude_List.String.joinWith("")
+      ->getChildren
+      ->Relude_List.map(x => showPrettyByWithIndent(level + 1, showA, x), _)
+      ->(Relude_List.String.joinWith("", _))
     indent ++ (showA(tree |> getValue) ++ ("\n" ++ childrenStr))
   }
   showPrettyByWithIndent(0, showA, tree)
@@ -356,7 +359,7 @@ let showPrettyBy: 'a. ('a => string, t<'a>) => string = (showA, tree) => {
 
 module ShowPretty: SHOW_F = (ShowA: SHOW) => {
   type t = t<ShowA.t>
-  let show = showPrettyBy(ShowA.show)
+  let show = showPrettyBy(ShowA.show, ...)
 }
 
 @ocaml.doc("
@@ -366,7 +369,7 @@ let rec eqBy: 'a. (('a, 'a) => bool, t<'a>, t<'a>) => bool = (
   eqA,
   {value: value1, children: children1},
   {value: value2, children: children2},
-) => eqA(value1, value2) && Relude_List.eqBy(eqBy(eqA), children1, children2)
+) => eqA(value1, value2) && Relude_List.eqBy(eqBy(eqA, ...), children1, children2)
 
 module type EQ_F = (EqA: EQ) => (EQ with type t = t<EqA.t>)
 

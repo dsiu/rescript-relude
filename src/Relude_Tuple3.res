@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -68,7 +71,7 @@ let eqBy: 'a 'b 'c. (
 
 module WithEqs = (EqA: EQ, EqB: EQ, EqC: EQ) => {
   type t = (EqA.t, EqB.t, EqC.t)
-  let eq = eqBy(EqA.eq, EqB.eq, EqC.eq)
+  let eq = eqBy(EqA.eq, EqB.eq, EqC.eq, ...)
 
   module Eq: EQ with type t = t = {
     type t = t
@@ -114,7 +117,7 @@ let compareBy: 'a 'b 'c. (
 
 module WithOrds = (OrdA: ORD, OrdB: ORD, OrdC: ORD) => {
   include WithEqs(OrdA, OrdB, OrdC)
-  let compare = compareBy(OrdA.compare, OrdB.compare, OrdC.compare)
+  let compare = compareBy(OrdA.compare, OrdB.compare, OrdC.compare, ...)
 
   module Ord: ORD with type t = t = {
     include Eq

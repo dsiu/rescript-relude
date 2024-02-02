@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -17,22 +20,21 @@ let fromArray: 'a. array<'a> => option<('a, 'a)> = x =>
 @ocaml.doc("
 Constructs a tuple-2 from an array of at least 2 values
 ")
-let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a)> = xs =>
-  Relude_Array.take(2, xs) |> fromArray
+let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a)> = xs => fromArray(Relude_Array.take(2, xs))
 
 @ocaml.doc("
 Constructs a tuple-2 from a list of exactly 2 values
 ")
 let fromList: 'a. list<'a> => option<('a, 'a)> = xs =>
-  {
+  fromArray({
     open Relude_List
-    take(3, xs) |> toArray
-  } |> fromArray
+    toArray(take(3, xs))
+  })
 
 @ocaml.doc("
 Constructs a tuple-2 from a list of at least 2 values
 ")
-let fromListAtLeast: 'a. list<'a> => option<('a, 'a)> = xs => Relude_List.take(2, xs) |> fromList
+let fromListAtLeast: 'a. list<'a> => option<('a, 'a)> = xs => fromList(Relude_List.take(2, xs))
 
 @ocaml.doc("
 Gets the first value of a tuple-2
@@ -67,7 +69,7 @@ Creates a module containing helpers and an Eq module and extensions for the type
 ")
 module WithEqs = (EqA: EQ, EqB: EQ) => {
   type t = (EqA.t, EqB.t)
-  let eq = eqBy(EqA.eq, EqB.eq)
+  let eq = eqBy(EqA.eq, EqB.eq, ...)
   module Eq: EQ with type t = t = {
     type t = t
     let eq = eq
@@ -118,7 +120,7 @@ Creates an Ord module for [('a, 'b)], given Ord instances for ['a] and ['b].
 ")
 module WithOrds = (OrdA: ORD, OrdB: ORD) => {
   include WithEqs(OrdA, OrdB)
-  let compare = compareBy(OrdA.compare, OrdB.compare)
+  let compare = compareBy(OrdA.compare, OrdB.compare, ...)
   module Ord: ORD with type t = t = {
     include Eq
     let compare = compare

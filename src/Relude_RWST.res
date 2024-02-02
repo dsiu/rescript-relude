@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 module RWSResult = {
@@ -27,14 +30,14 @@ module WithMonad = (M: MONAD) => {
   result, and the writer log.
   ")
   let evalRWST: 'a 'r 's 'w. ('r, 's, t<'a, 'r, 's, 'w>) => M.t<('a, 'w)> = (r, s, RWST(f)) =>
-    f(r, s) |> M.map((RWSResult(a, _s, w)) => (a, w))
+    M.map((RWSResult(a, _s, w)) => (a, w), f(r, s))
 
   @ocaml.doc("
   Same as runRWST, but discards the final result value, only returning the final
   state, and the writer log.
   ")
   let execRWST: 'a 'r 's 'w. ('r, 's, t<'a, 'r, 's, 'w>) => M.t<('s, 'w)> = (r, s, RWST(f)) =>
-    f(r, s) |> M.map((RWSResult(_a, s, w)) => (s, w))
+    M.map((RWSResult(_a, s, w)) => (s, w), f(r, s))
 
   @ocaml.doc("
   Change the result type and writer log type.  Note: this should normally allow
@@ -58,12 +61,11 @@ module WithMonad = (M: MONAD) => {
     },
   )
 
-  let map: 'a 'b 'r 's 'w. ('a => 'b, t<'a, 'r, 's, 'w>) => t<'b, 'r, 's, 'w> = (
+  let map: 'a 'b 'r 's 'w. (. 'a => 'b, t<'a, 'r, 's, 'w>) => t<'b, 'r, 's, 'w> = (
     aToB,
     RWST(f),
   ) => RWST(
-    (r, s) =>
-      f(r, s) |> M.map((RWSResult.RWSResult(a, s, w)) => RWSResult.RWSResult(aToB(a), s, w)),
+    (r, s) => M.map((RWSResult.RWSResult(a, s, w)) => RWSResult.RWSResult(aToB(a), s, w), f(r, s)),
   )
 
   let applyWithAppendLog: 'a 'b 'r 's 'w. (
@@ -79,7 +81,7 @@ module WithMonad = (M: MONAD) => {
         s2,
         appendLog(w1, w2),
       )
-      M.apply(M.map(f, mAToB), mA)
+      M.apply(M.map(x => f(x, ...), mAToB), mA)
     },
   )
 
@@ -95,7 +97,7 @@ module WithMonad = (M: MONAD) => {
     (r1, s1) =>
       runA(r1, s1)->M.flat_map((RWSResult(a, s2, w1)) => {
         let RWST(runB) = aToRWSTB(a)
-        runB(r1, s2) |> M.map((RWSResult(b, s3, w2)) => RWSResult(b, s3, appendLog(w1, w2)))
+        M.map((RWSResult(b, s3, w2)) => RWSResult(b, s3, appendLog(w1, w2)), runB(r1, s2))
       }),
   )
 
@@ -115,7 +117,7 @@ module WithMonad = (M: MONAD) => {
 
     module Apply: APPLY with type t<'a> = t<'a, R.t, S.t, Log.t> = {
       include Functor
-      let apply = (ff, fa) => applyWithAppendLog(Log.Monoid.append, ff, fa)
+      let apply = (. ff, fa) => applyWithAppendLog(Log.Monoid.append, ff, fa)
     }
     let apply = Apply.apply
     include Relude_Extensions_Apply.ApplyExtensions(Apply)
@@ -129,7 +131,7 @@ module WithMonad = (M: MONAD) => {
 
     module Monad: MONAD with type t<'a> = t<'a, R.t, S.t, Log.t> = {
       include Applicative
-      let flat_map = (f, ma) => bindWithAppendLog(Log.Monoid.append, f, ma)
+      let flat_map = (. f, ma) => bindWithAppendLog(Log.Monoid.append, f, ma)
     }
     let bind = Monad.flat_map
     include Relude_Extensions_Monad.MonadExtensions(Monad)
