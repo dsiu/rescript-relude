@@ -16,7 +16,7 @@ This is the contravariant map for the [eq('a)] function.
   }
 ]}
 ")
-let by: 'a 'b. ('b => 'a, eq<'a>) => eq<'b> = (bToA, eqA, b1, b2) => eqA(bToA(b1), bToA(b2))
+let by: 'a 'b. ('b => 'a, eq<'a>) => eq<'b> = (bToA, eqA) => (b1, b2) => eqA(bToA(b1), bToA(b2))
 
 @ocaml.doc("
 [Eq.cmap] is the contravariant [map] for the equals function. It is an alias for
@@ -38,4 +38,4 @@ but with the returned boolean switched.
   stringNotEq(\"hello\", \"world\") == true;
 ]}
 ")
-let invert: 'a. eq<'a> => eq<'a> = (eqA, a1, a2) => !eqA(a1, a2)
+let invert: 'a. eq<'a> => eq<'a> = eqA => (a1, a2) => !eqA(a1, a2)

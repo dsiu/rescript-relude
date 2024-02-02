@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -69,13 +72,13 @@ module WithMonad = (M: MONAD) => {
   ")
   let modify_: 's. ('s => 's) => t<unit, 's> = sToS => StateT(s => M.pure(((), sToS(s))))
 
-  let map: 's 'a 'b. ('a => 'b, t<'a, 's>) => t<'b, 's> = (aToB, StateT(sToMAS)) => StateT(
-    s => sToMAS(s) |> M.map(((a, s)) => (aToB(a), s)),
+  let map: 's 'a 'b. (. 'a => 'b, t<'a, 's>) => t<'b, 's> = (aToB, StateT(sToMAS)) => StateT(
+    s => M.map(((a, s)) => (aToB(a), s), sToMAS(s)),
   )
 
   let pure: 's 'a. 'a => t<'a, 's> = a => StateT(s => M.pure((a, s)))
 
-  let apply: 's 'a 'b. (t<'a => 'b, 's>, t<'a, 's>) => t<'b, 's> = (
+  let apply: 's 'a 'b. (. t<'a => 'b, 's>, t<'a, 's>) => t<'b, 's> = (
     StateT(sToMAToBS),
     StateT(sToMAS),
   ) => StateT(
@@ -91,11 +94,11 @@ module WithMonad = (M: MONAD) => {
       ) = // Note: the states from the two sides are not merged here - we take the state from one side or the other.
       // State is intended to be a sequential data flow, not parallel.
       ((aToB, _s1), (a, s2)) => (aToB(a), s2)
-      M.apply(M.map(f, mAToBS), mAS)
+      M.apply(M.map(x => f(x, ...), mAToBS), mAS)
     },
   )
 
-  let bind: 's 'a 'b. (t<'a, 's>, 'a => t<'b, 's>) => t<'b, 's> = (
+  let bind: 's 'a 'b. (. t<'a, 's>, 'a => t<'b, 's>) => t<'b, 's> = (
     StateT(sToMAS),
     aToStateTBS,
   ) => StateT(

@@ -8,24 +8,28 @@ module ListEqExtensions = (E: EQ) => {
   @ocaml.doc("
   Gets the distinct items of the list, based on the given EQ module
   ")
-  let distinct = Relude_List_Base.distinctBy(E.eq)
+  let distinct =
+    Relude_List_Base.distinctBy(E.eq, ...)
 
   @ocaml.doc("
   Removes the first item of the list which equals the given item, based on the given EQ module
   ")
-  let removeFirst: (E.t, list<E.t>) => list<E.t> = Relude_List_Base.removeFirstBy(E.eq)
+  let removeFirst: (E.t, list<E.t>) => list<E.t> =
+    Relude_List_Base.removeFirstBy(E.eq, ...)
 
   @ocaml.doc("
   Removes all items of the list which equal the given item, based on the given
   EQ module
   ")
-  let removeEach: (E.t, list<E.t>) => list<E.t> = Relude_List_Base.removeEachBy(E.eq)
+  let removeEach: (E.t, list<E.t>) => list<E.t> =
+    Relude_List_Base.removeEachBy(E.eq, ...)
 
   @ocaml.doc("
   Indicates if all pairwise items in the given lists are equal, using the given
   EQ module
   ")
-  let eq: (list<E.t>, list<E.t>) => bool = Relude_List_Instances.eqBy(E.eq)
+  let eq: (list<E.t>, list<E.t>) => bool =
+    Relude_List_Instances.eqBy(E.eq, ...)
 }
 
 @ocaml.doc("
@@ -37,7 +41,8 @@ module ListOrdExtensions = (O: ORD) => {
   @ocaml.doc("
   Sorts the list using the given ORD module.
   ")
-  let sort = Relude_List_Base.sortBy(O.compare)
+  let sort =
+    Relude_List_Base.sortBy(O.compare, ...)
 }
 
 @ocaml.doc("
@@ -68,10 +73,11 @@ module String = {
   have a special-case implementation here that uses Js.Dict for faster
   comparison. This is O(n) instead of O(n{^ 2}).
   ")
-  let distinct: list<string> => list<string> = xs => Relude_List_Instances.foldLeft((acc, curr) => {
-      Js.Dict.set(acc, curr, 0)
-      acc
-    }, Js.Dict.empty(), xs) |> Js.Dict.keys |> Relude_List_Instances.fromArray
+  let distinct: list<string> => list<string> = xs =>
+    Relude_List_Instances.fromArray(Js.Dict.keys(Relude_List_Instances.foldLeft((acc, curr) => {
+          Js.Dict.set(acc, curr, 0)
+          acc
+        }, Js.Dict.empty(), xs)))
 }
 
 @ocaml.doc("
@@ -83,16 +89,14 @@ module Int = {
   @ocaml.doc("
   Finds the sum of all the ints in the list
   ")
-  let sum: list<int> => int = Relude_List_Instances.foldWithMonoid(
-    module(Relude_Int.Additive.Monoid),
-  )
+  let sum: list<int> => int =
+    Relude_List_Instances.foldWithMonoid(module(Relude_Int.Additive.Monoid), ...)
 
   @ocaml.doc("
   Finds the product of all the ints in the list
   ")
-  let product: list<int> => int = Relude_List_Instances.foldWithMonoid(
-    module(Relude_Int.Multiplicative.Monoid),
-  )
+  let product: list<int> => int =
+    Relude_List_Instances.foldWithMonoid(module(Relude_Int.Multiplicative.Monoid), ...)
 }
 
 @ocaml.doc("
@@ -104,16 +108,14 @@ module Float = {
   @ocaml.doc("
   Finds the sum of all the floats in the list
   ")
-  let sum: list<float> => float = Relude_List_Instances.foldWithMonoid(
-    module(Relude_Float.Additive.Monoid),
-  )
+  let sum: list<float> => float =
+    Relude_List_Instances.foldWithMonoid(module(Relude_Float.Additive.Monoid), ...)
 
   @ocaml.doc("
   Finds the product of all the floats in the list
   ")
-  let product: list<float> => float = Relude_List_Instances.foldWithMonoid(
-    module(Relude_Float.Multiplicative.Monoid),
-  )
+  let product: list<float> => float =
+    Relude_List_Instances.foldWithMonoid(module(Relude_Float.Multiplicative.Monoid), ...)
 }
 
 @ocaml.doc("

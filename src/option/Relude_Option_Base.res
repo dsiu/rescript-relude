@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 [Option.some] constructs an [option] from a value.
 ")
@@ -118,7 +121,7 @@ let getOrElseLazy: 'a. (unit => 'a, option<'a>) => 'a = (getDefault, x) =>
 
 This should only be used if you are absolutely sure there is a value in the option.
 ")
-let getOrThrow: 'a. option<'a> => 'a = Belt.Option.getExn
+let getOrThrow: 'a. option<'a> => 'a = o => Belt.Option.getExn(o)
 
 @ocaml.doc("
 Similar to alt, but with the arguments reversed and labelled for use with [|>]
@@ -197,13 +200,13 @@ let bitap: 'a. (unit => unit, 'a => unit, option<'a>) => option<'a> = (ifNone, i
   filter(isEven, None) == None;
 ]}
 ")
-let filter: 'a. ('a => bool, option<'a>) => option<'a> = fn =>
-  Relude_Option_Instances.foldLeft((default, v) => fn(v) ? Some(v) : default, empty)
+let filter: 'a. ('a => bool) => option<'a> => option<'a> = fn =>
+  Relude_Option_Instances.foldLeft((default, v) => fn(v) ? Some(v) : default, empty, ...)
 
 @ocaml.doc("
 [Option.keep] is an alias for {!val:filter}.
 ")
-let keep: 'a. ('a => bool, option<'a>) => option<'a> = filter
+let keep: 'a. ('a => bool) => option<'a> => option<'a> = o => filter(o)
 
 @ocaml.doc("
 [filterNot] is the inverse of [filter], meaning [Some] values are preserved if
@@ -215,9 +218,9 @@ the provided predicate function returns false.
   filterNot(isEven, Some(2)) == None;
 ]}
 ")
-let filterNot: 'a. ('a => bool, option<'a>) => option<'a> = f => filter(a => !f(a))
+let filterNot: 'a. ('a => bool) => option<'a> => option<'a> = f => filter(a => !f(a))
 
 @ocaml.doc("
 Alias of filterNot
 ")
-let reject: 'a. ('a => bool, option<'a>) => option<'a> = filterNot
+let reject: 'a. ('a => bool) => option<'a> => option<'a> = filterNot

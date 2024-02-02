@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -54,7 +57,7 @@ let flip: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
   compose(double, square, 3) == 18;
 ]}
 ")
-let compose: 'a 'b 'c. ('b => 'c, 'a => 'b, 'a) => 'c = (f, g, a) => f(g(a))
+let compose: 'a 'b 'c. (. 'b => 'c, 'a => 'b) => 'a => 'c = (f, g) => a => f(g(a))
 
 @ocaml.doc("
 [flipCompose(f, g, a)] is the equivalent of [g(f(a))].
@@ -156,7 +159,7 @@ let uncurry5: 'a 'b 'c 'd 'e 'f. (('a, 'b, 'c, 'd, 'e) => 'f, ('a, 'b, 'c, 'd, '
   map(double, square, 3) == 18;
 ]}
 ")
-let map: 'a 'b 'r. ('a => 'b, 'r => 'a, 'r) => 'b = (aToB, rToA, r) =>
+let map: 'a 'b 'r. (. 'a => 'b, 'r => 'a) => 'r => 'b = (aToB, rToA) => r =>
   aToB(rToA(r)) /* Same as compose */
 
 @ocaml.doc("
@@ -183,13 +186,19 @@ The result of [apply()] is equivalent to:
   apply(showResult, cube, 5) == \"input 5 yields 125\";
 ]}
 ")
-let apply: 'a 'b 'r. (('r, 'a) => 'b, 'r => 'a, 'r) => 'b = (rToAToB, rToA, r) =>
-  rToAToB(r, rToA(r))
+let apply_x = (rToAToB, rToA) => r => rToAToB(r)(rToA(r))
+
+let apply = (. rToAToB, rToA) => apply_x(rToAToB, rToA, ...)
+
+//let apply: 'a 'b 'r. (('r, 'a) => 'b, 'r => 'a, 'r) => 'b = (rToAToB, rToA, r) =>
+//  rToAToB(r, rToA(r))
 
 @ocaml.doc("
 [pure] is a synonym for [const]
 ")
-let pure: 'a 'r. ('a, 'r) => 'a = (a, _) => a
+let pure_x: 'a 'r. ('a, 'r) => 'a = (a, _) => a
+let pure = a => pure_x(a, ...)
+//let pure: 'a 'r. ('a, 'r) => 'a = (a, _) => a
 
 @ocaml.doc("
 In [bind(f, hof, a)], [hof] is a higher-order function that takes one argument
@@ -215,7 +224,11 @@ and returns a new function that also takes one argument.
   bind(cube, showResult, 5) == \"input 5 yields 125\";
 ]}
 ")
-let bind: 'a 'b 'r. ('r => 'a, ('a, 'r) => 'b, 'r) => 'b = (rToA, arToB, r) => arToB(rToA(r), r)
+let bind_x = (rToA, arToB, r) => arToB(rToA(r))(r)
+//let bind: 'a 'b 'r. ('r => 'a, ('a, 'r) => 'b) => 'r => 'b = (rToA, arToB) =>
+//  bind_x(rToA, arToB, ...)
+let bind = (. rToA, arToB) => bind_x(rToA, arToB, ...)
+//let bind: 'a 'b 'r. ('r => 'a, ('a, 'r) => 'b, 'r) => 'b = (rToA, arToB, r) => arToB(rToA(r), r)
 
 @ocaml.doc("
 In [flatMap(hof, f, a)], [hof] is a higher-order function that takes one
@@ -235,7 +248,9 @@ as [bind], but with the first two arguments in reverse order.
   flatMap(showResult, cube, 5) == \"input 5 yields 125\";
 ]}
 ")
-let flatMap: 'a 'b 'r. (('a, 'r) => 'b, 'r => 'a, 'r) => 'b = (f, fa) => bind(fa, f)
+let flatMap: 'a 'b 'r. (('a, 'r) => 'b, 'r => 'a) => 'r => 'b = {
+  (f, fa) => r => bind(fa, x => f(x, _))(r)
+}
 
 @ocaml.doc("
 [memoize0] takes a [unit => 'a] function and returns a new function

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -259,7 +262,7 @@ Because the option is already evaluated, no effort is made to suspend any
 effects.
 ")
 let fromOption: 'a 'e. (unit => 'e, option<'a>) => t<'a, 'e> = (getError, option) =>
-  option |> Relude_Option_Base.foldLazy(() => throw(getError()), pure)
+  option->(Relude_Option_Base.foldLazy(() => throw(getError()), pure, _))
 
 @ocaml.doc("
 [IO.fromResult] converts a [result('a, 'e)] to an [IO.t('a, 'e)].
@@ -267,13 +270,14 @@ let fromOption: 'a 'e. (unit => 'e, option<'a>) => t<'a, 'e> = (getError, option
 Because the result is already evaluated, no effort is made to suspend any
 effects.
 ")
-let fromResult: 'a 'e. result<'a, 'e> => t<'a, 'e> = res => res |> Relude_Result.fold(throw, pure)
+let fromResult: 'a 'e. result<'a, 'e> => t<'a, 'e> = res =>
+  res->(Relude_Result.fold(throw, pure, _))
 
 @ocaml.doc("
 [IO.map] applies a function ['a => 'b] on an [IO.t('a, 'e)] to produce an
 [IO.t('b, 'e)].
 ")
-let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, io) => Map(f, io)
+let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, io) => Map(f, io)
 
 let \"<$>" = map
 
@@ -285,16 +289,18 @@ the ['a] value unchanged.
 
 This is useful for doing things like logging the value inside the [IO].
 ")
-let tap: 'a 'e. ('a => unit, t<'a, 'e>) => t<'a, 'e> = f =>
-  map(a => {
+let tap: 'a 'e. ('a => unit, t<'a, 'e>) => t<'a, 'e> = (f, io) => map(a => {
     f(a)
     a
-  })
+  }, io)
 
 @ocaml.doc("
 Applicative [apply] function
 ")
-let apply: 'a 'b 'e. (t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (ioAToB, ioA) => Apply(ioAToB, ioA)
+let apply: 'a 'b 'e. (. t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (ioAToB, ioA) => Apply(
+  ioAToB,
+  ioA,
+)
 
 let \"<*>" = apply
 
@@ -311,7 +317,7 @@ let flatMap: 'a 'b 'e. ('a => t<'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (rToIOA, ioR)
 [IO.bind] is [flatMap] with the argument order reversed. It's also an alias for
 the [>>=] \"bind\" operator.
 ")
-let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (ioA, aToIOB) => FlatMap(
+let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (ioA, aToIOB) => FlatMap(
   aToIOB,
   ioA,
 )
@@ -326,7 +332,7 @@ into the [IO] and returned. If the [IO] was already an error, the predicate
 function isn't run and the existing error is preserved.
 ")
 let cond: 'a 'e. ('a => bool, 'a, 'e, t<'a, 'e>) => t<'a, 'e> = (f, newA, err, ioA) =>
-  ioA |> flatMap(a => f(a) ? pure(newA) : throw(err))
+  ioA->(flatMap(a => f(a) ? pure(newA) : throw(err), _))
 
 @ocaml.doc("
 [IO.condError] tests the success value against a provided predicate, as [cond]
@@ -334,7 +340,7 @@ does. Unlike [cond], if the predicate passes, the existing ['a] is returned. If
 the condition does not pass, the new error is used instead.
 ")
 let condError: 'a 'e. ('a => bool, 'e, t<'a, 'e>) => t<'a, 'e> = (f, err, ioA) =>
-  ioA |> flatMap(a => f(a) ? pure(a) : throw(err))
+  ioA->(flatMap(a => f(a) ? pure(a) : throw(err), _))
 
 @ocaml.doc("
 [IO.unsafeRunAsync] runs the [IO.t('a, 'e)] to produce a final [result('a, 'e)],
@@ -357,36 +363,35 @@ let rec unsafeRunAsync: 'a 'e. (result<'a, 'e> => unit, t<'a, 'e>) => unit = (on
   | Pure(a) => onDone(Ok(a))
   | Throw(e) => onDone(Error(e))
   | Suspend(getA) => onDone(Ok(getA()))
-  | SuspendIO(getIOA) => getIOA() |> unsafeRunAsync(onDone)
+  | SuspendIO(getIOA) => getIOA()->(unsafeRunAsync(onDone, _))
   | Async(onDoneA) => onDoneA(onDone)
-  | Map(r0ToA, ioR0) =>
-    ioR0 |> unsafeRunAsync(x =>
-      switch x {
-      | Error(_) as resultE => onDone(resultE)
-      | Ok(r0) => onDone(Ok(r0ToA(r0)))
-      }
-    )
+  | Map(r0ToA, ioR0) => ioR0->(unsafeRunAsync(x =>
+        switch x {
+        | Error(_) as resultE => onDone(resultE)
+        | Ok(r0) => onDone(Ok(r0ToA(r0)))
+        }
+      , _))
+
   | Apply(ioR0ToA, ioR0) =>
     unsafeRunAsyncPar2(
       (resultR0ToA, resultR0) => onDone(Relude_Result.apply(resultR0ToA, resultR0)),
       ioR0ToA,
       ioR0,
     )
-  | FlatMap(r0ToIOA, ioR0) =>
-    ioR0 |> unsafeRunAsync(x =>
-      switch x {
-      | Error(_) as resultE => onDone(resultE)
-      | Ok(r0) =>
-        r0
-        |> r0ToIOA
-        |> unsafeRunAsync(x =>
-          switch x {
-          | Error(_) as resultE => onDone(resultE)
-          | Ok(a) => onDone(Ok(a))
-          }
-        )
-      }
-    )
+  | FlatMap(r0ToIOA, ioR0) => ioR0->(unsafeRunAsync(x =>
+        switch x {
+        | Error(_) as resultE => onDone(resultE)
+        | Ok(r0) =>
+          r0
+          ->r0ToIOA
+          ->(unsafeRunAsync(x =>
+              switch x {
+              | Error(_) as resultE => onDone(resultE)
+              | Ok(a) => onDone(Ok(a))
+              }
+            , _))
+        }
+      , _))
   }
 
 @ocaml.doc("
@@ -403,18 +408,19 @@ and unsafeRunAsyncPar2: 'a 'b 'e. (
 ) => unit = (onDone, ioA, ioB) => {
   let refA = ref(None)
   let refB = ref(None)
-  ioA |> unsafeRunAsync(resultA =>
-    switch refB.contents {
-    | Some(resultB) => onDone(resultA, resultB)
-    | None => refA := Some(resultA)
-    }
-  )
-  ioB |> unsafeRunAsync(resultB =>
-    switch refA.contents {
-    | Some(resultA) => onDone(resultA, resultB)
-    | None => refB := Some(resultB)
-    }
-  )
+  ioA->(unsafeRunAsync(resultA =>
+      switch refB.contents {
+      | Some(resultB) => onDone(resultA, resultB)
+      | None => refA := Some(resultA)
+      }
+    , _))
+
+  ioB->(unsafeRunAsync(resultB =>
+      switch refA.contents {
+      | Some(resultA) => onDone(resultA, resultB)
+      | None => refB := Some(resultB)
+      }
+    , _))
 }
 
 @ocaml.doc("
@@ -434,24 +440,26 @@ and unsafeRunAsyncPar3: 'a 'b 'c 'e. (
   let refA = ref(None)
   let refB = ref(None)
   let refC = ref(None)
-  ioA |> unsafeRunAsync(resultA =>
-    switch (refB.contents, refC.contents) {
-    | (Some(resultB), Some(resultC)) => onDone(resultA, resultB, resultC)
-    | _ => refA := Some(resultA)
-    }
-  )
-  ioB |> unsafeRunAsync(resultB =>
-    switch (refA.contents, refC.contents) {
-    | (Some(resultA), Some(resultC)) => onDone(resultA, resultB, resultC)
-    | _ => refB := Some(resultB)
-    }
-  )
-  ioC |> unsafeRunAsync(resultC =>
-    switch (refA.contents, refB.contents) {
-    | (Some(resultA), Some(resultB)) => onDone(resultA, resultB, resultC)
-    | _ => refC := Some(resultC)
-    }
-  )
+  ioA->(unsafeRunAsync(resultA =>
+      switch (refB.contents, refC.contents) {
+      | (Some(resultB), Some(resultC)) => onDone(resultA, resultB, resultC)
+      | _ => refA := Some(resultA)
+      }
+    , _))
+
+  ioB->(unsafeRunAsync(resultB =>
+      switch (refA.contents, refC.contents) {
+      | (Some(resultA), Some(resultC)) => onDone(resultA, resultB, resultC)
+      | _ => refB := Some(resultB)
+      }
+    , _))
+
+  ioC->(unsafeRunAsync(resultC =>
+      switch (refA.contents, refB.contents) {
+      | (Some(resultA), Some(resultB)) => onDone(resultA, resultB, resultC)
+      | _ => refC := Some(resultC)
+      }
+    , _))
 }
 
 @ocaml.doc("
@@ -459,7 +467,7 @@ Creates a new IO value that contains the composition of functions from two
 input IO values. Composition is done from right-to-left with this function - see
 andThen for left-to-right.
 ")
-let rec compose: 'a 'b 'c 'e. (t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
+let rec compose: 'a 'b 'c 'e. (. t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
   ioBToC,
   ioAToB,
 ) =>
@@ -479,25 +487,25 @@ compose specialization for a left-hand-side Pure('a => 'b)
 ")
 and composePure: 'a 'b 'c 'e. ('a => 'b, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (aToB, ioBToC) =>
   switch ioBToC {
-  | Pure(bToC) => Pure(\">>"(aToB, bToC))
+  | Pure(bToC) => Pure(\">>"(aToB, bToC, ...))
   | Throw(_) as t => t
-  | Suspend(getBToC) => Suspend(() => \">>"(aToB, getBToC()))
-  | SuspendIO(getIOBToC) => SuspendIO(() => getIOBToC() |> map(bToC => \">>"(aToB, bToC)))
+  | Suspend(getBToC) => Suspend(() => \">>"(aToB, getBToC(), ...))
+  | SuspendIO(getIOBToC) => SuspendIO(() => getIOBToC()->(map(bToC => \">>"(aToB, bToC, ...), _)))
   | Async(onDoneBToC) =>
     Async(
       onDone =>
         onDoneBToC(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC)))
+          | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC, ...)))
           }
         ),
     )
-  | Map(r0ToBToC, ioR0) => ioR0 |> map(r0 => \">>"(aToB, r0ToBToC(r0)))
+  | Map(r0ToBToC, ioR0) => ioR0->(map(r0 => \">>"(aToB, r0ToBToC(r0), ...), _))
   | Apply(ioR0ToBToC, ioR0) =>
-    ioR0 |> apply(ioR0ToBToC |> map((r0ToBToC, r0) => \">>"(aToB, r0ToBToC(r0))))
+    ioR0->(apply(ioR0ToBToC->(map(r0ToBToC => r0 => \">>"(aToB, r0ToBToC(r0), ...), _)), _))
   | FlatMap(r0ToIOBToC, ioR0) =>
-    ioR0 |> flatMap(r0 => r0ToIOBToC(r0) |> map(bToC => \">>"(aToB, bToC)))
+    ioR0->(flatMap(r0 => r0ToIOBToC(r0)->(map(bToC => \">>"(aToB, bToC, ...), _)), _))
   }
 
 @ocaml.doc("
@@ -518,30 +526,34 @@ and composeThrow: 'a 'b 'c 'e. ('e, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (e, io
 @ocaml.doc("
 compose specialization for a left-hand-side Suspend
 ")
-and composeSuspend: 'a 'b 'c 'e. ((unit, 'a) => 'b, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (
+and composeSuspend: 'a 'b 'c 'e. ((. unit, 'a) => 'b, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (
   getAToB,
   ioBToC,
 ) =>
   switch ioBToC {
-  | Pure(bToC) => Suspend(() => \">>"(getAToB(), bToC))
+  | Pure(bToC) => Suspend(() => \">>"(x => getAToB()(x), bToC, ...))
   | Throw(_) as t => t
-  | Suspend(getBToC) => Suspend(() => \">>"(getAToB(), getBToC()))
-  | SuspendIO(getIOBToC) => SuspendIO(() => getIOBToC() |> map(bToC => \">>"(getAToB(), bToC)))
+  | Suspend(getBToC) => Suspend(() => \">>"(x => getAToB()(x), getBToC(), ...))
+  | SuspendIO(getIOBToC) =>
+    SuspendIO(() => getIOBToC()->(map(bToC => \">>"(x => getAToB()(x), bToC, ...), _)))
   | Async(onDoneBToC) =>
     Async(
       onDone =>
         onDoneBToC(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(bToC) => onDone(Ok(\">>"(getAToB(), bToC)))
+          | Ok(bToC) => onDone(Ok(\">>"(x => getAToB()(x), bToC, ...)))
           }
         ),
     )
-  | Map(r0ToBToC, ioR0) => ioR0 |> map(r0 => \">>"(getAToB(), r0ToBToC(r0)))
+  | Map(r0ToBToC, ioR0) => ioR0->(map(r0 => \">>"(x => getAToB()(x), r0ToBToC(r0), ...), _))
   | Apply(ioR0ToBToC, ioR0) =>
-    ioR0 |> apply(ioR0ToBToC |> map((r0ToBToC, r0) => \">>"(getAToB(), r0ToBToC(r0))))
+    ioR0->(
+      apply(ioR0ToBToC->(map(r0ToBToC => r0 => \">>"(x => getAToB()(x), r0ToBToC(r0), ...), _)), _)
+    )
+
   | FlatMap(r0ToIOBToC, ioR0) =>
-    ioR0 |> flatMap(r0 => r0ToIOBToC(r0) |> map(bToC => \">>"(getAToB(), bToC)))
+    ioR0->(flatMap(r0 => r0ToIOBToC(r0)->(map(bToC => \">>"(x => getAToB()(x), bToC, ...), _)), _))
   }
 
 @ocaml.doc("
@@ -552,41 +564,52 @@ and composeSuspendIO: 'a 'b 'c 'e. (unit => t<'a => 'b, 'e>, t<'b => 'c, 'e>) =>
   ioBToC,
 ) =>
   switch ioBToC {
-  | Pure(bToC) => SuspendIO(() => getIOAToB() |> map(aToB => \">>"(aToB, bToC)))
+  | Pure(bToC) => SuspendIO(() => getIOAToB()->(map(aToB => \">>"(aToB, bToC, ...), _)))
   | Throw(_) as t => t
-  | Suspend(getBToC) => SuspendIO(() => getIOAToB() |> map(aToB => \">>"(aToB, getBToC())))
+  | Suspend(getBToC) => SuspendIO(() => getIOAToB()->(map(aToB => \">>"(aToB, getBToC(), ...), _)))
   | SuspendIO(getIOBToC) =>
-    SuspendIO(() => getIOAToB() |> flatMap(aToB => getIOBToC() |> map(bToC => \">>"(aToB, bToC))))
-  | Async(onDoneBToC) =>
-    Async(
-      onDone =>
-        getIOAToB() |> unsafeRunAsync(x =>
-          switch x {
-          | Error(_) as resultE => onDone(resultE)
-          | Ok(aToB) =>
-            onDoneBToC(x =>
-              switch x {
-              | Error(_) as resultE => onDone(resultE)
-              | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC)))
-              }
-            )
-          }
-        ),
+    SuspendIO(
+      () =>
+        getIOAToB()->(flatMap(aToB => getIOBToC()->(map(bToC => \">>"(aToB, bToC, ...), _)), _)),
     )
+  | Async(onDoneBToC) => Async(onDone => getIOAToB()->(unsafeRunAsync(x =>
+            switch x {
+            | Error(_) as resultE => onDone(resultE)
+            | Ok(aToB) =>
+              onDoneBToC(x =>
+                switch x {
+                | Error(_) as resultE => onDone(resultE)
+                | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC, ...)))
+                }
+              )
+            }
+          , _)))
   | Map(r0ToBToC, ioR0) =>
-    SuspendIO(() => getIOAToB() |> flatMap(aToB => ioR0 |> map(r0 => \">>"(aToB, r0ToBToC(r0)))))
+    SuspendIO(
+      () => getIOAToB()->(flatMap(aToB => ioR0->(map(r0 => \">>"(aToB, r0ToBToC(r0), ...), _)), _)),
+    )
   | Apply(ioR0ToBToC, ioR0) =>
     SuspendIO(
       () =>
-        getIOAToB() |> flatMap(aToB =>
-          ioR0ToBToC |> flatMap(r0ToBToC => ioR0 |> map(r0 => \">>"(aToB, r0ToBToC(r0))))
+        getIOAToB()->(
+          flatMap(
+            aToB =>
+              ioR0ToBToC->(
+                flatMap(r0ToBToC => ioR0->(map(r0 => \">>"(aToB, r0ToBToC(r0), ...), _)), _)
+              ),
+            _,
+          )
         ),
     )
   | FlatMap(r0ToIOBToC, ioR0) =>
     SuspendIO(
       () =>
-        getIOAToB() |> flatMap(aToB =>
-          ioR0 |> flatMap(r0 => r0ToIOBToC(r0) |> map(bToC => \">>"(aToB, bToC)))
+        getIOAToB()->(
+          flatMap(
+            aToB =>
+              ioR0->(flatMap(r0 => r0ToIOBToC(r0)->(map(bToC => \">>"(aToB, bToC, ...), _)), _)),
+            _,
+          )
         ),
     )
   }
@@ -605,7 +628,7 @@ and composeAsync: 'a 'b 'c 'e. (
         onDoneAToB(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(aToB) => onDone(Ok(\">>"(aToB, bToC)))
+          | Ok(aToB) => onDone(Ok(\">>"(aToB, bToC, ...)))
           }
         ),
     )
@@ -616,7 +639,7 @@ and composeAsync: 'a 'b 'c 'e. (
         onDoneAToB(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(aToB) => onDone(Ok(\">>"(aToB, getBToC())))
+          | Ok(aToB) => onDone(Ok(\">>"(aToB, getBToC(), ...)))
           }
         ),
     )
@@ -626,13 +649,12 @@ and composeAsync: 'a 'b 'c 'e. (
         onDoneAToB(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(aToB) =>
-            getIOBToC() |> unsafeRunAsync(x =>
-              switch x {
-              | Error(_) as resultE => onDone(resultE)
-              | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC)))
-              }
-            )
+          | Ok(aToB) => getIOBToC()->(unsafeRunAsync(x =>
+                switch x {
+                | Error(_) as resultE => onDone(resultE)
+                | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC, ...)))
+                }
+              , _))
           }
         ),
     )
@@ -646,7 +668,7 @@ and composeAsync: 'a 'b 'c 'e. (
             onDoneBToC(x =>
               switch x {
               | Error(_) as resultE => onDone(resultE)
-              | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC)))
+              | Ok(bToC) => onDone(Ok(\">>"(aToB, bToC, ...)))
               }
             )
           }
@@ -658,7 +680,8 @@ and composeAsync: 'a 'b 'c 'e. (
         onDoneAToB(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(aToB) => ioR0 |> map(r0 => \">>"(aToB, r0ToBToC(r0))) |> unsafeRunAsync(onDone)
+          | Ok(aToB) =>
+            ioR0->map(r0 => \">>"(aToB, r0ToBToC(r0), ...), _)->(unsafeRunAsync(onDone, _))
           }
         ),
     )
@@ -670,8 +693,8 @@ and composeAsync: 'a 'b 'c 'e. (
           | Error(_) as resultE => onDone(resultE)
           | Ok(aToB) =>
             ioR0ToBToC
-            |> flatMap(r0ToBToC => ioR0 |> map(r0 => \">>"(aToB, r0ToBToC(r0))))
-            |> unsafeRunAsync(onDone)
+            ->flatMap(r0ToBToC => ioR0->(map(r0 => \">>"(aToB, r0ToBToC(r0), ...), _)), _)
+            ->(unsafeRunAsync(onDone, _))
           }
         ),
     )
@@ -683,8 +706,8 @@ and composeAsync: 'a 'b 'c 'e. (
           | Error(_) as resultE => onDone(resultE)
           | Ok(aToB) =>
             ioR0
-            |> flatMap(r0 => r0ToIOBToC(r0) |> map(bToC => \">>"(aToB, bToC)))
-            |> unsafeRunAsync(onDone)
+            ->flatMap(r0 => r0ToIOBToC(r0)->(map(bToC => \">>"(aToB, bToC, ...), _)), _)
+            ->(unsafeRunAsync(onDone, _))
           }
         ),
     )
@@ -694,23 +717,27 @@ and composeAsync: 'a 'b 'c 'e. (
 compose specialization for a left-hand-side Map
 ")
 and composeMap: 'a 'b 'c 'r0 'e. (
-  ('r0, 'a) => 'b,
+  (. 'r0, 'a) => 'b,
   t<'r0, 'e>,
   t<'b => 'c, 'e>,
 ) => t<'a => 'c, 'e> = (r0ToAToB, ioR0, ioBToC) =>
-  ioR0 |> flatMap(r0 => ioBToC |> map(bToC => \">>"(r0ToAToB(r0), bToC)))
+  ioR0->(flatMap(r0 => ioBToC->(map(bToC => \">>"(x => r0ToAToB(r0)(x), bToC, ...), _)), _))
 
 @ocaml.doc("
 compose specialization for a left-hand-side Apply
 ")
 and composeApply: 'a 'b 'c 'r0 'e. (
-  t<('r0, 'a) => 'b, 'e>,
+  t<(. 'r0, 'a) => 'b, 'e>,
   t<'r0, 'e>,
   t<'b => 'c, 'e>,
-) => t<'a => 'c, 'e> = (ioR0ToAToB, ioR0, ioBToC) =>
-  ioR0ToAToB |> flatMap(r0ToAToB =>
-    ioR0 |> flatMap(r0 => ioBToC |> map(bToC => \">>"(r0ToAToB(r0), bToC)))
-  )
+) => t<'a => 'c, 'e> = (ioR0ToAToB, ioR0, ioBToC) => {
+  // todo: this is a hack??
+  ioR0ToAToB->(flatMap(r0ToAToB => {
+      ioR0->(flatMap(r0 => {
+          ioBToC->(map(bToC => \">>"(a => r0ToAToB(r0, a, ...), bToC, ...), _))
+        }, _))
+    }, _))
+}
 
 @ocaml.doc("
 compose specialization for a left-hand-side FlatMap
@@ -719,8 +746,9 @@ and composeFlatMap: 'a 'b 'c 'r0 'e. (
   'r0 => t<'a => 'b, 'e>,
   t<'r0, 'e>,
   t<'b => 'c, 'e>,
-) => t<'a => 'c, 'e> = (r0ToIOAToB, ioR0, ioBToC) =>
-  ioR0 |> flatMap(r0 => r0ToIOAToB(r0) |> flatMap(aToB => ioBToC |> map(bToC => \">>"(aToB, bToC))))
+) => t<'a => 'c, 'e> = (r0ToIOAToB, ioR0, ioBToC) => ioR0->(flatMap(r0 => {
+      r0ToIOAToB(r0)->(flatMap(aToB => ioBToC->(map(bToC => \">>"(aToB, bToC, ...), _)), _))
+    }, _))
 
 @ocaml.doc("
 Operator for IO's compose right-to-left composition function
@@ -752,22 +780,22 @@ let rec mapError: 'a 'e1 'e2. ('e1 => 'e2, t<'a, 'e1>) => t<'a, 'e2> = (e1ToE2, 
   | Pure(a) => Pure(a)
   | Throw(e1) => Throw(e1ToE2(e1))
   | Suspend(getA) => Suspend(getA)
-  | SuspendIO(getIOA) => SuspendIO(() => getIOA() |> mapError(e1ToE2))
+  | SuspendIO(getIOA) => SuspendIO(() => getIOA()->(mapError(e1ToE2, _)))
   | Async(onDoneA) =>
-    Async(onDone => onDoneA(resultA => resultA |> Relude_Result.mapError(e1ToE2) |> onDone))
-  | Map(rToA, ioR) => ioR |> mapError(e1ToE2) |> map(rToA)
-  | Apply(ioRToA, ioR) => Apply(ioRToA |> mapError(e1ToE2), ioR |> mapError(e1ToE2))
-  | FlatMap(rToIOA, ioR) => ioR |> mapError(e1ToE2) |> flatMap(r => rToIOA(r) |> mapError(e1ToE2))
+    Async(onDone => onDoneA(resultA => resultA->Relude_Result.mapError(e1ToE2, _)->onDone))
+  | Map(rToA, ioR) => ioR->mapError(e1ToE2, _)->(map(rToA, _))
+  | Apply(ioRToA, ioR) => Apply(ioRToA->(mapError(e1ToE2, _)), ioR->(mapError(e1ToE2, _)))
+  | FlatMap(rToIOA, ioR) =>
+    ioR->mapError(e1ToE2, _)->(flatMap(r => rToIOA(r)->(mapError(e1ToE2, _)), _))
   }
 
 @ocaml.doc("
 Same as [tap], but operates on the error channel.
 ")
-let tapError: 'a 'e. ('e => unit, t<'a, 'e>) => t<'a, 'e> = (f, io) =>
-  io |> mapError(e => {
-    f(e)
-    e
-  })
+let tapError: 'a 'e. ('e => unit, t<'a, 'e>) => t<'a, 'e> = (f, io) => io->(mapError(e => {
+      f(e)
+      e
+    }, _))
 
 @ocaml.doc("
 Handles an error of types ['e1] from an [IO.t('a, 'e1)] and converts it into a
@@ -779,14 +807,14 @@ let rec catchError: 'a 'e1 'e2. ('e1 => t<'a, 'e2>, t<'a, 'e1>) => t<'a, 'e2> = 
   | Pure(a) => Pure(a)
   | Throw(e) => eToIOA(e)
   | Suspend(getA) => Suspend(getA)
-  | SuspendIO(getIOA) => SuspendIO(() => getIOA() |> catchError(eToIOA))
+  | SuspendIO(getIOA) => SuspendIO(() => getIOA()->(catchError(eToIOA, _)))
   | Async(onDoneA) =>
     Async(
       onDone =>
         onDoneA(x =>
           switch x {
           | Ok(a) => onDone(Ok(a))
-          | Error(e) => e |> eToIOA |> unsafeRunAsync(onDone)
+          | Error(e) => e->eToIOA->(unsafeRunAsync(onDone, _))
           }
         ),
     )
@@ -801,23 +829,24 @@ and catchErrorMap: 'a 'r0 'e1 'e2. ('e1 => t<'a, 'e2>, 'r0 => 'a, t<'r0, 'e1>) =
   ioR0,
 ) =>
   switch ioR0 {
-  | Pure(r0) => Pure(r0 |> r0ToA) |> catchError(eToIOA)
+  | Pure(r0) => Pure(r0->r0ToA)->(catchError(eToIOA, _))
   | Throw(e) => eToIOA(e)
-  | Suspend(getR0) => Suspend(() => getR0() |> r0ToA) |> catchError(eToIOA)
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> map(r0ToA)) |> catchError(eToIOA)
+  | Suspend(getR0) => Suspend(() => getR0()->r0ToA)->(catchError(eToIOA, _))
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->(map(r0ToA, _)))->(catchError(eToIOA, _))
   | Async(onDoneR0) =>
     Async(
       onDone =>
         onDoneR0(x =>
           switch x {
           | Ok(r0) => onDone(Ok(r0ToA(r0)))
-          | Error(e) => e |> eToIOA |> unsafeRunAsync(onDone)
+          | Error(e) => e->eToIOA->(unsafeRunAsync(onDone, _))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> map(\">>"(r1ToR0, r0ToA)) |> catchError(eToIOA)
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, pure(r0ToA))) |> catchError(eToIOA)
-  | FlatMap(r1ToIOR0, ioR1) => ioR1 |> flatMap(\">>"(r1ToIOR0, map(r0ToA))) |> catchError(eToIOA)
+  | Map(r1ToR0, ioR1) => ioR1->map(\">>"(r1ToR0, r0ToA, ...), _)->(catchError(eToIOA, _))
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, pure(r0ToA)), _)->(catchError(eToIOA, _))
+  | FlatMap(r1ToIOR0, ioR1) =>
+    ioR1->flatMap(\">>"(r1ToIOR0, x => map(r0ToA, x), ...), _)->(catchError(eToIOA, _))
   }
 
 and catchErrorApply: 'a 'r0 'e1 'e2. (
@@ -826,26 +855,26 @@ and catchErrorApply: 'a 'r0 'e1 'e2. (
   t<'r0, 'e1>,
 ) => t<'a, 'e2> = (eToIOA, ioR0ToA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => ioR0ToA |> map(r0ToA => r0 |> r0ToA) |> catchError(eToIOA)
+  | Pure(r0) => ioR0ToA->map(r0ToA => r0->r0ToA, _)->(catchError(eToIOA, _))
   | Throw(e) => eToIOA(e)
-  | Suspend(getR0) => ioR0ToA |> map(r0ToA => getR0() |> r0ToA) |> catchError(eToIOA)
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> apply(ioR0ToA)) |> catchError(eToIOA)
+  | Suspend(getR0) => ioR0ToA->map(r0ToA => getR0()->r0ToA, _)->(catchError(eToIOA, _))
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->(apply(ioR0ToA, _)))->(catchError(eToIOA, _))
   | Async(onDoneR0) =>
     Async(
       onDone =>
         onDoneR0(x =>
           switch x {
-          | Error(e) => e |> eToIOA |> unsafeRunAsync(onDone)
-          | Ok(r0) => Apply(ioR0ToA, pure(r0)) |> catchError(eToIOA) |> unsafeRunAsync(onDone)
+          | Error(e) => e->eToIOA->(unsafeRunAsync(onDone, _))
+          | Ok(r0) => Apply(ioR0ToA, pure(r0))->catchError(eToIOA, _)->(unsafeRunAsync(onDone, _))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> apply(\">>>"(pure(r1ToR0), ioR0ToA)) |> catchError(eToIOA)
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, ioR0ToA)) |> catchError(eToIOA)
+  | Map(r1ToR0, ioR1) => ioR1->apply(\">>>"(pure(r1ToR0), ioR0ToA), _)->(catchError(eToIOA, _))
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, ioR0ToA), _)->(catchError(eToIOA, _))
   | FlatMap(r1ToIOR0, ioR1) =>
     ioR0ToA
-    |> flatMap(r0ToA => ioR1 |> flatMap(r1 => r1 |> r1ToIOR0 |> map(r0 => r0 |> r0ToA)))
-    |> catchError(eToIOA)
+    ->flatMap(r0ToA => ioR1->(flatMap(r1 => r1->r1ToIOR0->(map(r0 => r0->r0ToA, _)), _)), _)
+    ->(catchError(eToIOA, _))
   }
 
 and catchErrorFlatMap: 'a 'r0 'e1 'e2. (
@@ -854,27 +883,27 @@ and catchErrorFlatMap: 'a 'r0 'e1 'e2. (
   t<'r0, 'e1>,
 ) => t<'a, 'e2> = (eToIOA, r0ToIOA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => r0 |> r0ToIOA |> catchError(eToIOA)
+  | Pure(r0) => r0->r0ToIOA->(catchError(eToIOA, _))
   | Throw(e) => eToIOA(e)
-  | Suspend(getR0) => SuspendIO(() => getR0() |> r0ToIOA) |> catchError(eToIOA)
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> flatMap(r0ToIOA)) |> catchError(eToIOA)
+  | Suspend(getR0) => SuspendIO(() => getR0()->r0ToIOA)->(catchError(eToIOA, _))
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->(flatMap(r0ToIOA, _)))->(catchError(eToIOA, _))
   | Async(onDoneR0) =>
     Async(
       onDone =>
         onDoneR0(x =>
           switch x {
-          | Ok(r0) => r0 |> r0ToIOA |> catchError(eToIOA) |> unsafeRunAsync(onDone)
-          | Error(e) => e |> eToIOA |> unsafeRunAsync(onDone)
+          | Ok(r0) => r0->r0ToIOA->catchError(eToIOA, _)->(unsafeRunAsync(onDone, _))
+          | Error(e) => e->eToIOA->(unsafeRunAsync(onDone, _))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> flatMap(\">>"(r1ToR0, r0ToIOA)) |> catchError(eToIOA)
+  | Map(r1ToR0, ioR1) => ioR1->flatMap(\">>"(r1ToR0, r0ToIOA, ...), _)->(catchError(eToIOA, _))
   | Apply(ioR1ToR0, ioR1) =>
     ioR1
-    |> flatMap(r1 => ioR1ToR0 |> flatMap(r1ToR0 => r1 |> r1ToR0 |> r0ToIOA))
-    |> catchError(eToIOA)
+    ->flatMap(r1 => ioR1ToR0->(flatMap(r1ToR0 => r1->r1ToR0->r0ToIOA, _)), _)
+    ->(catchError(eToIOA, _))
   | FlatMap(r1ToIOR0, ioR1) =>
-    ioR1 |> flatMap(r1 => r1 |> r1ToIOR0 |> flatMap(r0ToIOA)) |> catchError(eToIOA)
+    ioR1->flatMap(r1 => r1->r1ToIOR0->(flatMap(r0ToIOA, _)), _)->(catchError(eToIOA, _))
   }
 
 @ocaml.doc("
@@ -882,7 +911,7 @@ Uses a function to convert an error value to a success value, which serves to
 \"clear\" the error in the IO, thereby making the error type [Void.t].
 ")
 let handleError: 'a 'e. ('e => 'a, t<'a, 'e>) => t<'a, Relude_Void.t> = (eToA, ioA) =>
-  ioA |> catchError(e => Pure(eToA(e)))
+  ioA->(catchError(e => Pure(eToA(e)), _))
 
 @ocaml.doc("
 Maps the success channel and handles an error on the error channel to end up
@@ -892,27 +921,30 @@ let mapHandleError: 'a 'e 'b. ('a => 'b, 'e => 'b, t<'a, 'e>) => t<'b, Relude_Vo
   aToB,
   eToB,
   ioAE,
-) => ioAE |> map(aToB) |> handleError(eToB)
+) => ioAE->map(aToB, _)->(handleError(eToB, _))
 
 @ocaml.doc("
 Applies functions on both the success and error channels of the [IO].
 ")
 let bimap: 'a 'b 'e1 'e2. ('a => 'b, 'e1 => 'e2, t<'a, 'e1>) => t<'b, 'e2> = (aToB, e1ToE2, io) =>
-  io |> map(aToB) |> mapError(e1ToE2)
+  io->map(aToB, _)->(mapError(e1ToE2, _))
 
 @ocaml.doc("
 Same as [tap], but works on both the success and error channels simultaneously.
 ")
 let bitap: 'a 'e. ('a => unit, 'e => unit, t<'a, 'e>) => t<'a, 'e> = (f, g, io) =>
-  io |> bimap(
-    a => {
-      f(a)
-      a
-    },
-    e => {
-      g(e)
-      e
-    },
+  io->(
+    bimap(
+      a => {
+        f(a)
+        a
+      },
+      e => {
+        g(e)
+        e
+      },
+      _,
+    )
   )
 
 @ocaml.doc("
@@ -936,7 +968,7 @@ module functor, like this:
   );
 ]}
 ")
-let alt: 'a 'e. (t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (io1, io2) => io1 |> catchError(_ => io2)
+let alt: 'a 'e. (. t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (io1, io2) => io1->(catchError(_ => io2, _))
 
 @ocaml.doc("
 Creates a new IO that will run the two input IO effects in parallel, and resolve
@@ -966,7 +998,7 @@ let alignWith: 'a 'b 'c 'e. (Relude_Ior_Type.t<'a, 'b> => 'c, t<'a, 'e>, t<'b, '
   f,
   fa,
   fb,
-) => align(fa, fb) |> map(f)
+) => align(fa, fb)->(map(f, _))
 
 @ocaml.doc("
 Returns a new [IO] that when run, will attempt the [IO] given as the second,
@@ -1034,23 +1066,23 @@ and flipMap: 'a 'r0 'e. ('r0 => 'a, t<'r0, 'e>) => t<'e, 'a> = (r0ToA, ioR0) =>
   | Pure(r0) => Throw(r0ToA(r0))
   | Throw(e) => Pure(e)
   | Suspend(getR0) => SuspendIO(() => Throw(r0ToA(getR0())))
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> map(r0ToA) |> flip)
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->(map(r0ToA, _)) |> flip)
   | Async(onDoneR0) =>
     Async(
       onDone =>
-        onDoneR0(resultR0 => onDone(resultR0 |> Relude_Result.map(r0ToA) |> Relude_Result.flip)),
+        onDoneR0(resultR0 => onDone(resultR0->Relude_Result.map(r0ToA, _)->Relude_Result.flip)),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> map(\">>"(r1ToR0, r0ToA)) |> flip
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, pure(r0ToA))) |> flip
-  | FlatMap(rToIOR0, ioR) => ioR |> flatMap(r => rToIOR0(r) |> map(r0ToA)) |> flip
+  | Map(r1ToR0, ioR1) => ioR1->map(\">>"(r1ToR0, r0ToA, ...), _)->flip
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, pure(r0ToA)), _)->flip
+  | FlatMap(rToIOR0, ioR) => ioR->flatMap(r => rToIOR0(r)->(map(r0ToA, _)), _)->flip
   }
 
 and flipApply: 'a 'r0 'e. (t<'r0 => 'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (ioR0ToA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => ioR0ToA |> map(r0ToA => r0 |> r0ToA) |> flip
+  | Pure(r0) => ioR0ToA->map(r0ToA => r0->r0ToA, _)->flip
   | Throw(e) => Pure(e)
-  | Suspend(getR0) => ioR0ToA |> map(r0ToA => getR0() |> r0ToA) |> flip
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> apply(ioR0ToA) |> flip)
+  | Suspend(getR0) => ioR0ToA->map(r0ToA => getR0()->r0ToA, _)->flip
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->apply(ioR0ToA, _)->flip)
   | Async(onDoneR0) =>
     Async(
       onDone =>
@@ -1059,19 +1091,19 @@ and flipApply: 'a 'r0 'e. (t<'r0 => 'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (ioR0ToA
           | Error(e) => onDone(Ok(e))
           | Ok(r0) =>
             ioR0ToA
-            |> map(r0ToA => r0 |> r0ToA)
-            |> unsafeRunAsync(x =>
-              switch x {
-              | Error(e) => onDone(Ok(e))
-              | Ok(a) => onDone(Error(a))
-              }
-            )
+            ->map(r0ToA => r0 |> r0ToA, _)
+            ->(unsafeRunAsync(x =>
+                switch x {
+                | Error(e) => onDone(Ok(e))
+                | Ok(a) => onDone(Error(a))
+                }
+              , _))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> apply(\">>>"(pure(r1ToR0), ioR0ToA)) |> flip
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, ioR0ToA)) |> flip
-  | FlatMap(r1ToIOR0, ioR1) => ioR1 |> flatMap(r1 => r1 |> r1ToIOR0 |> apply(ioR0ToA)) |> flip
+  | Map(r1ToR0, ioR1) => ioR1->apply(\">>>"(pure(r1ToR0), ioR0ToA), _)->flip
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, ioR0ToA), _)->flip
+  | FlatMap(r1ToIOR0, ioR1) => ioR1->flatMap(r1 => r1->r1ToIOR0->(apply(ioR0ToA, _)), _)->flip
   }
 
 and flipFlatMap: 'a 'r0 'e. ('r0 => t<'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (r0ToIOA, ioR0) =>
@@ -1079,21 +1111,21 @@ and flipFlatMap: 'a 'r0 'e. ('r0 => t<'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (r0ToI
   | Pure(r0) => r0 |> r0ToIOA |> flip
   | Throw(e) => Pure(e)
   | Suspend(getR0) => SuspendIO(() => getR0() |> r0ToIOA |> flip)
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> flatMap(r0ToIOA) |> flip)
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->flatMap(r0ToIOA, _)->flip)
   | Async(onDoneR0) =>
     Async(
       onDone =>
         onDoneR0(resultR0 =>
           switch resultR0 {
-          | Ok(r0) => r0ToIOA(r0) |> flip |> unsafeRunAsync(onDone)
+          | Ok(r0) => r0ToIOA(r0)->flip->(unsafeRunAsync(onDone, _))
           | Error(e) => onDone(Ok(e))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> flatMap(\">>"(r1ToR0, r0ToIOA)) |> flip
+  | Map(r1ToR0, ioR1) => ioR1->flatMap(\">>"(r1ToR0, r0ToIOA, ...), _)->flip
   | Apply(ioR1ToR0, ioR1) =>
-    ioR1 |> flatMap(r1 => ioR1ToR0 |> flatMap(r1ToR0 => r1 |> r1ToR0 |> r0ToIOA)) |> flip
-  | FlatMap(rToIOR0, ioR) => ioR |> flatMap(r => rToIOR0(r) |> flatMap(r0ToIOA)) |> flip
+    ioR1->flatMap(r1 => ioR1ToR0->(flatMap(r1ToR0 => r1->r1ToR0->r0ToIOA, _)), _)->flip
+  | FlatMap(rToIOR0, ioR) => ioR->flatMap(r => rToIOR0(r)->(flatMap(r0ToIOA, _)), _)->flip
   }
 
 @ocaml.doc("
@@ -1121,12 +1153,12 @@ and summonErrorMap: 'a 'r0 'e. ('r0 => 'a, t<'r0, 'e>) => t<result<'a, 'e>, Relu
   | Pure(r0) => Pure(Ok(r0ToA(r0)))
   | Throw(e) => Pure(Error(e))
   | Suspend(getR0) => Suspend(() => Ok(r0ToA(getR0())))
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> map(r0ToA) |> summonError)
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->map(r0ToA, _)->summonError)
   | Async(onDoneR0) =>
     Async(onDone => onDoneR0(resR0 => onDone(Ok(Relude_Result.map(r0ToA, resR0)))))
-  | Map(r1ToR0, ioR1) => ioR1 |> map(\">>"(r1ToR0, r0ToA)) |> summonError
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, pure(r0ToA))) |> summonError
-  | FlatMap(r1ToIOR0, ioR1) => ioR1 |> flatMap(r1 => r1ToIOR0(r1) |> map(r0ToA)) |> summonError
+  | Map(r1ToR0, ioR1) => ioR1->map(\">>"(r1ToR0, r0ToA, ...), _)->summonError
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, pure(r0ToA)), _)->summonError
+  | FlatMap(r1ToIOR0, ioR1) => ioR1->flatMap(r1 => r1ToIOR0(r1)->(map(r0ToA, _)), _)->summonError
   }
 
 and summonErrorApply: 'a 'r0 'e. (
@@ -1134,27 +1166,27 @@ and summonErrorApply: 'a 'r0 'e. (
   t<'r0, 'e>,
 ) => t<result<'a, 'e>, Relude_Void.t> = (ioR0ToA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => ioR0ToA |> map(r0ToA => r0ToA(r0)) |> summonError
+  | Pure(r0) => ioR0ToA->map(r0ToA => r0ToA(r0), _)->summonError
   | Throw(e) => Pure(Error(e))
-  | Suspend(getR0) => SuspendIO(() => ioR0ToA |> map(r0ToA => r0ToA(getR0())) |> summonError)
+  | Suspend(getR0) => SuspendIO(() => ioR0ToA->map(r0ToA => r0ToA(getR0()), _)->summonError)
   | SuspendIO(getIOR0) =>
-    SuspendIO(() => ioR0ToA |> flatMap(r0ToA => getIOR0() |> map(r0ToA)) |> summonError)
+    SuspendIO(() => ioR0ToA->flatMap(r0ToA => getIOR0()->(map(r0ToA, _)), _)->summonError)
   | Async(onDoneR0) =>
     Async(
       onDone =>
         onDoneR0(x =>
           switch x {
           | Error(_) as resultE => onDone(Ok(resultE))
-          | Ok(r0) => ioR0ToA |> map(r0ToA => r0ToA(r0)) |> summonError |> unsafeRunAsync(onDone)
+          | Ok(r0) => ioR0ToA->map(r0ToA => r0ToA(r0), _)->summonError->(unsafeRunAsync(onDone, _))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> apply(\">>>"(pure(r1ToR0), ioR0ToA)) |> summonError
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, ioR0ToA)) |> summonError
+  | Map(r1ToR0, ioR1) => ioR1->apply(\">>>"(pure(r1ToR0), ioR0ToA), _)->summonError
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, ioR0ToA), _)->summonError
   | FlatMap(r1ToIOR0, ioR1) =>
     ioR1
-    |> flatMap(r1 => r1ToIOR0(r1) |> flatMap(r0 => ioR0ToA |> map(r0ToA => r0ToA(r0))))
-    |> summonError
+    ->flatMap(r1 => r1ToIOR0(r1)->(flatMap(r0 => ioR0ToA->(map(r0ToA => r0ToA(r0), _)), _)), _)
+    ->summonError
   }
 
 and summonErrorFlatMap: 'a 'r0 'e. (
@@ -1164,23 +1196,23 @@ and summonErrorFlatMap: 'a 'r0 'e. (
   switch ioR0 {
   | Pure(r0) => r0ToIOA(r0) |> summonError
   | Throw(e) => Pure(Error(e))
-  | Suspend(getR0) => SuspendIO(() => r0ToIOA(getR0()) |> summonError)
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> flatMap(r0ToIOA) |> summonError)
+  | Suspend(getR0) => SuspendIO(() => r0ToIOA(getR0())->summonError)
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->flatMap(r0ToIOA, _)->summonError)
   | Async(onDoneR0) =>
     Async(
       onDone =>
         onDoneR0(x =>
           switch x {
           | Error(e) => onDone(Ok(Error(e)))
-          | Ok(r0) => r0ToIOA(r0) |> summonError |> unsafeRunAsync(onDone)
+          | Ok(r0) => r0ToIOA(r0)->summonError->(unsafeRunAsync(onDone, _))
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> flatMap(\">>"(r1ToR0, r0ToIOA)) |> summonError
+  | Map(r1ToR0, ioR1) => ioR1->flatMap(\">>"(r1ToR0, r0ToIOA, ...), _)->summonError
   | Apply(ioR1ToR0, ioR1) =>
-    ioR1 |> flatMap(r1 => ioR1ToR0 |> flatMap(r1ToR0 => r1 |> r1ToR0 |> r0ToIOA)) |> summonError
+    ioR1->flatMap(r1 => ioR1ToR0->(flatMap(r1ToR0 => r1->r1ToR0->r0ToIOA, _)), _)->summonError
   | FlatMap(r1ToIOR0, ioR1) =>
-    ioR1 |> flatMap(r1 => r1ToIOR0(r1) |> flatMap(r0 => r0ToIOA(r0))) |> summonError
+    ioR1->flatMap(r1 => r1ToIOR0(r1)->(flatMap(r0 => r0ToIOA(r0), _)), _)->summonError
   }
 
 @ocaml.doc("
@@ -1189,10 +1221,10 @@ channel of the [IO].
 ")
 let rec unsummonError: 'a 'e. t<result<'a, 'e>, Relude_Void.t> => t<'a, 'e> = ioResultA =>
   switch ioResultA {
-  | Pure(resultA) => resultA |> Relude_Result.fold(throw, pure)
+  | Pure(resultA) => resultA->(Relude_Result.fold(throw, pure, _))
   | Throw(void) => Relude_Void.absurd(void)
-  | Suspend(getResultA) => SuspendIO(() => getResultA() |> Relude_Result.fold(throw, pure))
-  | SuspendIO(getIOResultA) => SuspendIO(() => getIOResultA() |> unsummonError)
+  | Suspend(getResultA) => SuspendIO(() => getResultA()->(Relude_Result.fold(throw, pure, _)))
+  | SuspendIO(getIOResultA) => SuspendIO(() => getIOResultA()->unsummonError)
   | Async(onDoneResultResultA) =>
     Async(
       onDoneResultA =>
@@ -1213,10 +1245,10 @@ and unsummonErrorMap: 'r0 'a 'e. ('r0 => result<'a, 'e>, t<'r0, Relude_Void.t>) 
   ioR0,
 ) =>
   switch ioR0 {
-  | Pure(r0) => r0ToResultA(r0) |> Relude_Result.fold(throw, pure)
+  | Pure(r0) => r0ToResultA(r0)->(Relude_Result.fold(throw, pure, _))
   | Throw(void) => Relude_Void.absurd(void)
-  | Suspend(getR0) => SuspendIO(() => getR0() |> r0ToResultA |> Relude_Result.fold(throw, pure))
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> map(r0ToResultA) |> unsummonError)
+  | Suspend(getR0) => SuspendIO(() => getR0()->r0ToResultA->(Relude_Result.fold(throw, pure, _)))
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->map(r0ToResultA, _)->unsummonError)
   | Async(onDoneR0) =>
     Async(
       onDoneResultA =>
@@ -1227,10 +1259,10 @@ and unsummonErrorMap: 'r0 'a 'e. ('r0 => result<'a, 'e>, t<'r0, Relude_Void.t>) 
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> map(r1 => r1 |> r1ToR0 |> r0ToResultA) |> unsummonError
-  | Apply(ioR1ToR0, ioR1) => ioR1 |> apply(\">>>"(ioR1ToR0, pure(r0ToResultA))) |> unsummonError
+  | Map(r1ToR0, ioR1) => ioR1->map(r1 => r1->r1ToR0->r0ToResultA, _)->unsummonError
+  | Apply(ioR1ToR0, ioR1) => ioR1->apply(\">>>"(ioR1ToR0, pure(r0ToResultA)), _)->unsummonError
   | FlatMap(r1ToIOR0, ioR1) =>
-    ioR1 |> flatMap(r1 => r1 |> r1ToIOR0 |> map(r0ToResultA)) |> unsummonError
+    ioR1->flatMap(r1 => r1->r1ToIOR0->(map(r0ToResultA, _)), _)->unsummonError
   }
 
 and unsummonErrorApply: 'r0 'a 'e. (
@@ -1238,35 +1270,35 @@ and unsummonErrorApply: 'r0 'a 'e. (
   t<'r0, Relude_Void.t>,
 ) => t<'a, 'e> = (ioR0ToResultA, ioR0) =>
   ioR0ToResultA
-  |> flatMap(r0ToResultA => ioR0 |> flatMap(r0 => r0 |> r0ToResultA |> pure))
-  |> unsummonError
+  ->flatMap(r0ToResultA => ioR0->(flatMap(r0 => r0->r0ToResultA->pure, _)), _)
+  ->unsummonError
 
 and unsummonErrorFlatMap: 'r0 'a 'e. (
   'r0 => t<result<'a, 'e>, Relude_Void.t>,
   t<'r0, Relude_Void.t>,
 ) => t<'a, 'e> = (r0ToIOResultA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => r0ToIOResultA(r0) |> unsummonError
+  | Pure(r0) => r0ToIOResultA(r0)->unsummonError
   | Throw(absurd) => Relude_Void.absurd(absurd)
-  | Suspend(getR0) => SuspendIO(() => getR0() |> r0ToIOResultA |> unsummonError)
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0() |> flatMap(r0ToIOResultA) |> unsummonError)
+  | Suspend(getR0) => SuspendIO(() => getR0()->r0ToIOResultA->unsummonError)
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->flatMap(r0ToIOResultA, _)->unsummonError)
   | Async(onDoneR0) =>
     Async(
       onDoneResultA =>
         onDoneR0(x =>
           switch x {
-          | Ok(r0) => r0 |> r0ToIOResultA |> unsummonError |> unsafeRunAsync(onDoneResultA)
+          | Ok(r0) => r0->r0ToIOResultA->unsummonError->(unsafeRunAsync(onDoneResultA, _))
           | Error(void) => Relude_Void.absurd(void)
           }
         ),
     )
-  | Map(r1ToR0, ioR1) => ioR1 |> flatMap(\">>"(r1ToR0, r0ToIOResultA)) |> unsummonError
+  | Map(r1ToR0, ioR1) => ioR1->flatMap(\">>"(r1ToR0, r0ToIOResultA, ...), _)->unsummonError
   | Apply(ioR1ToR0, ioR1) =>
     ioR1ToR0
-    |> flatMap(r1ToR0 => ioR1 |> flatMap(r1 => r1 |> r1ToR0 |> r0ToIOResultA |> flatMap(pure)))
-    |> unsummonError
+    ->flatMap(r1ToR0 => ioR1->(flatMap(r1 => r1->r1ToR0->r0ToIOResultA->(flatMap(pure, _)), _)), _)
+    ->unsummonError
   | FlatMap(r1ToIOR0, ioR1) =>
-    ioR1 |> flatMap(r1 => r1ToIOR0(r1) |> flatMap(r0 => r0ToIOResultA(r0))) |> unsummonError
+    ioR1->flatMap(r1 => r1ToIOR0(r1)->(flatMap(r0 => r0ToIOResultA(r0), _)), _)->unsummonError
   }
 
 @ocaml.doc("
@@ -1295,7 +1327,7 @@ IO finishes.
 ]}
 ")
 let withDelayAfter: 'a 'e. (int, t<'a, 'e>) => t<'a, 'e> = (millis, io) =>
-  io |> flatMap(a => delay(millis) |> map(_ => a))
+  io->(flatMap(a => delay(millis)->(map(_ => a, _)), _))
 
 @ocaml.doc("
 Alias for withDelayAfter
@@ -1308,7 +1340,7 @@ Injects a delay before the given IO.
 When run, the delay will be executed first, then the given IO
 ")
 let withDelayBefore: 'a 'e. (int, t<'a, 'e>) => t<'a, 'e> = (millis, io) =>
-  delay(millis) |> flatMap(_ => io)
+  delay(millis)->(flatMap(_ => io, _))
 
 @ocaml.doc("
 This will \"debounce\" an IO so that it will only allow the latest call within some interval to go through.
@@ -1331,39 +1363,47 @@ let debounce: 'r 'a 'e. (
   ~intervalMs: int=?,
   'r => t<'a, 'e>,
   'r,
-) => t<option<'a>, 'e> = (~immediate=false, ~intervalMs=150, io) => {
+) => t<option<'a>, 'e> = (~immediate=false, ~intervalMs=150, io, a) => {
   let currentlyDebouncedIO = ref(None)
   let startDebouncedIO = () => {
     let debouncedIO = delay(intervalMs)
-    currentlyDebouncedIO := debouncedIO |> Relude_Option_Instances.pure
-    debouncedIO |> map(() => {
-      let shouldRunIO =
-        currentlyDebouncedIO.contents |> Relude_Option_Base.fold(false, \"=="(debouncedIO))
-      if shouldRunIO {
-        currentlyDebouncedIO := None
-      }
-      shouldRunIO
-    })
+    currentlyDebouncedIO := debouncedIO->Relude_Option_Instances.pure
+    debouncedIO->(map(() => {
+        let shouldRunIO =
+          currentlyDebouncedIO.contents->(
+            Relude_Option_Base.fold(false, \"=="(debouncedIO, ...), _)
+          )
+        if shouldRunIO {
+          currentlyDebouncedIO := None
+        }
+        shouldRunIO
+      }, _))
   }
 
-  a => {
+  let f = a => {
     let immediatelyRanIO = switch (immediate, currentlyDebouncedIO.contents) {
     | (true, None) =>
-      suspendIO(() => a |> io |> map(Relude_Option_Instances.pure)) |> Relude_Option_Instances.pure
+      suspendIO(() => a->io->(map(Relude_Option_Instances.pure, _)))->Relude_Option_Instances.pure
     | (true, Some(_))
     | (false, None)
     | (false, Some(_)) =>
       None
     }
     let debouncedIO =
-      startDebouncedIO() |> flatMap(shouldRunIO =>
-        shouldRunIO && immediatelyRanIO |> Relude_Option_Base.isNone
-          ? a |> io |> map(Relude_Option_Instances.pure)
-          : None |> pure
+      startDebouncedIO()->(
+        flatMap(
+          shouldRunIO =>
+            shouldRunIO && immediatelyRanIO->Relude_Option_Base.isNone
+              ? a->io->(map(Relude_Option_Instances.pure, _))
+              : None->pure,
+          _,
+        )
       )
 
-    immediatelyRanIO |> Relude_Option_Base.getOrElse(debouncedIO)
+    immediatelyRanIO->(Relude_Option_Base.getOrElse(debouncedIO, _))
   }
+
+  f(a)
 }
 
 @ocaml.doc("
@@ -1385,20 +1425,22 @@ let throttledIoLog = IO.throttled(ioLog);
 let throttle: 'r 'a 'e. (~intervalMs: int=?, 'r => t<'a, 'e>, 'r) => t<option<'a>, 'e> = (
   ~intervalMs=150,
   io,
+  r,
 ) => {
   let currentlyThrottled = ref(false)
   let startThrottle = () => {
     currentlyThrottled := true
-    Js.Global.setTimeout(() => currentlyThrottled := false, intervalMs) |> ignore
+    Js.Global.setTimeout(() => currentlyThrottled := false, intervalMs)->ignore
   }
 
-  a =>
+  let f = a =>
     if currentlyThrottled.contents {
-      None |> pure
+      None->pure
     } else {
       startThrottle()
-      a |> io |> map(Relude_Option_Instances.pure)
+      a->io->(map(Relude_Option_Instances.pure, _))
     }
+  f(r)
 }
 
 module Bifunctor: BIFUNCTOR with type t<'a, 'e> = t<'a, 'e> = {

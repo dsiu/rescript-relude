@@ -1,3 +1,5 @@
+@@uncurried
+@@uncurried.swap
 // TODO: someday we should abstract the use of Js.Global timeout/interval from these functions, but
 // for now, there's not an immediately pressing reason to do so.
 
@@ -25,7 +27,7 @@ returns a function to cancel the repeat.
 ")
 let repeatTimes = (~delayMS: int, ~times: int, f: unit => unit): (unit => unit) => {
   let timerId = ref(None)
-  let cancel = () => timerId.contents |> Relude_Option.forEach(Js.Global.clearInterval)
+  let cancel = () => timerId.contents->(Relude_Option.forEach(x => Js.Global.clearInterval(x), _))
   let callCount = ref(0)
   timerId := Some(Js.Global.setInterval(() => {
         f()

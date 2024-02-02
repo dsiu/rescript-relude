@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -26,18 +29,18 @@ module WithError = (ERR: TYPE) => {
     r => rToMA(rToR(r)),
   )
 
-  let map: 'r 'a 'b. ('a => 'b, t<'r, 'a>) => t<'r, 'b> = (aToB, RIO(rToMA)) => RIO(
+  let map: 'r 'a 'b. (. 'a => 'b, t<'r, 'a>) => t<'r, 'b> = (aToB, RIO(rToMA)) => RIO(
     r => M.map(aToB, rToMA(r)),
   )
 
-  let apply: 'r 'a 'b. (t<'r, 'a => 'b>, t<'r, 'a>) => t<'r, 'b> = (
+  let apply: 'r 'a 'b. (. t<'r, 'a => 'b>, t<'r, 'a>) => t<'r, 'b> = (
     RIO(rToMAToB),
     RIO(rToMA),
   ) => RIO(r => M.apply(rToMAToB(r), rToMA(r)))
 
   let pure: 'r 'a. 'a => t<'r, 'a> = a => RIO(_ => M.pure(a))
 
-  let bind: 'r 'a 'b. (t<'r, 'a>, 'a => t<'r, 'b>) => t<'r, 'b> = (RIO(rToMA), aToReaderB) => RIO(
+  let bind: 'r 'a 'b. (. t<'r, 'a>, 'a => t<'r, 'b>) => t<'r, 'b> = (RIO(rToMA), aToReaderB) => RIO(
     r =>
       M.flat_map(rToMA(r), a => {
         let RIO(rToMB) = aToReaderB(a)

@@ -18,14 +18,14 @@
   ],
   "package-specs": {
     "module": "commonjs",
-    "in-source": false
+    "in-source": true
   },
   "suffix": ".bs.js",
   "bs-dependencies": [
     "bs-bastet"
   ],
   "bs-dev-dependencies": [
-    "@glennsl/bs-jest"
+    "@glennsl/rescript-jest",
   ],
   "warnings": {
     "number": "+A-4-29-40-42-60",

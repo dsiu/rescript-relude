@@ -1,12 +1,15 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
-let compose: 'a 'b 'c. (option<'b => 'c>, option<'a => 'b>) => option<'a => 'c> = (
+let compose: 'a 'b 'c. (. option<'b => 'c>, option<'a => 'b>) => option<'a => 'c> = (
   optionBToC,
   optionAToB,
 ) =>
   switch (optionAToB, optionBToC) {
-  | (Some(aToB), Some(bToC)) => Some(\">>"(aToB, bToC))
+  | (Some(aToB), Some(bToC)) => Some(\">>"(aToB, bToC, ...))
   | (Some(_), None) => None
   | (None, Some(_)) => None
   | (None, None) => None
@@ -27,7 +30,7 @@ include Relude_Extensions_Semigroupoid.SemigroupoidExtensions(Semigroupoid)
   map(x => x * x, None) == None;
 ]}
 ")
-let map: 'a 'b. ('a => 'b, option<'a>) => option<'b> = (f, x) =>
+let map: 'a 'b. (. 'a => 'b, option<'a>) => option<'b> = (f, x) =>
   switch x {
   | Some(x) => Some(f(x))
   | None => None
@@ -51,7 +54,7 @@ include Relude_Extensions_Functor.FunctorExtensions(Functor)
   apply(None, None) == None;
 ]}
 ")
-let apply: 'a 'b. (option<'a => 'b>, option<'a>) => option<'b> = BsBastet.Option.Apply.apply
+let apply: 'a 'b. (. option<'a => 'b>, option<'a>) => option<'b> = BsBastet.Option.Apply.apply
 
 module Apply: APPLY with type t<'a> = option<'a> = {
   include Functor
@@ -88,7 +91,7 @@ case, [f] is a function that takes a non-[option] argument and returns an
 
 [bind] is the same as [flatMap], but with the arguments in the reverse order.
 ")
-let bind: 'a 'b. (option<'a>, 'a => option<'b>) => option<'b> = (x, f) =>
+let bind: 'a 'b. (. option<'a>, 'a => option<'b>) => option<'b> = (x, f) =>
   switch x {
   | Some(v) => f(v)
   | None => None
@@ -112,7 +115,7 @@ let alignWith: 'a 'b 'c. (Relude_Ior_Type.t<'a, 'b> => 'c, option<'a>, option<'b
   f,
   fa,
   fb,
-) => align(fa, fb) |> map(f)
+) => map(f, align(fa, fb))
 
 module Semialign: Relude_Interface.SEMIALIGN with type t<'a> = option<'a> = {
   include Functor
@@ -143,8 +146,8 @@ If [opt] is [None], [foldLeft()] returns [accumulator].
   foldLeft(addLength, 0, None) == 0;
 ]}
 ")
-let foldLeft: 'a 'b. (('b, 'a) => 'b, 'b, option<'a>) => 'b = (fn, default) =>
-  BsBastet.Option.Foldable.fold_left(fn, default)
+let foldLeft: 'a 'b. (('b, 'a) => 'b, 'b) => option<'a> => 'b = (fn, default) =>
+  BsBastet.Option.Foldable.fold_left(fn, default, ...)
 
 @ocaml.doc("
 [foldRight(f, init, opt)] takes as its first argument a function [f]
@@ -162,8 +165,8 @@ If [opt] is [None], [foldLeft()] returns [accumulator].
   foldRight(addLength, 0, None) == 0;
 ]}
 ")
-let foldRight: 'a 'b. (('a, 'b) => 'b, 'b, option<'a>) => 'b = (fn, default) =>
-  BsBastet.Option.Foldable.fold_right(fn, default)
+let foldRight: 'a 'b. (('a, 'b) => 'b, 'b) => option<'a> => 'b = (fn, default) =>
+  BsBastet.Option.Foldable.fold_right(fn, default, ...)
 
 module Foldable = BsBastet.Option.Foldable
 include Relude_Extensions_Foldable.FoldableExtensions(Foldable)

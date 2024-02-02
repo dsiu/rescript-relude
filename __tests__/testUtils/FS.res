@@ -3,7 +3,7 @@ Fs.Native wraps a few functions from the node.js fs module with little to no
 modification to the fs API.
 ")
 module Native = {
-  let dirname: option<string> = %bs.node(__dirname)
+  let dirname: option<string> = %raw(` typeof __dirname === "undefined" ? undefined : __dirname `)
   let dirnameOrDot = Js.Option.getWithDefault(".", dirname)
 
   @val @module("fs") @warning("-103")
@@ -44,8 +44,7 @@ module IO = {
         switch (Js.Null.toOption(err), content) {
         | (Some(err'), _) =>
           Js.Console.error(
-            "Read failed: " ++
-            (Js.Exn.message(err') |> Relude_Option.getOrElseLazy(_ => "No error")),
+            "Read failed: " ++ Relude_Option.getOrElseLazy(_ => "No error", Js.Exn.message(err')),
           )
           onDone(Error(err'))
         | (_, content) => onDone(Ok(content))
@@ -59,8 +58,7 @@ module IO = {
         switch Js.Null.toOption(err) {
         | Some(err') =>
           Js.Console.error(
-            "Write failed: " ++
-            (Js.Exn.message(err') |> Relude_Option.getOrElseLazy(_ => "No error")),
+            "Write failed: " ++ Relude_Option.getOrElseLazy(_ => "No error", Js.Exn.message(err')),
           )
           onDone(Error(err'))
         | None => onDone(Ok())

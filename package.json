@@ -32,13 +32,13 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.7.0",
-    "bs-bastet": "github:dsiu/rescript-bastet#main",
+    "@glennsl/rescript-jest": "github:dsiu/rescript-jest#rescript-v11-curried-mode",
+    "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip",
     "docsify-cli": "~4.4.0",
-    "rescript": "^10.0.0"
+    "rescript": "^11.0.1"
   },
   "peerDependencies": {
-    "bs-bastet": "github:dsiu/rescript-bastet#main"
+    "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip"
   },
   "dependencies": {},
   "jest": {

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 type t<'value, 'id> = Belt.Set.t<'value, 'id>
 
 @ocaml.doc("
@@ -14,7 +17,7 @@ let empty: module(Belt.Id.Comparable with type t = 'value and type identity = 'i
 let singleton: (
   module(Belt.Id.Comparable with type t = 'value and type identity = 'id),
   'value,
-) => Belt.Set.t<'value, 'id> = (id, value) => Belt.Set.make(~id) |> Belt.Set.add(_, value)
+) => Belt.Set.t<'value, 'id> = (id, value) => (Belt.Set.add(_, value))(Belt.Set.make(~id))
 
 @ocaml.doc("
 [Set.fromArray] converts an array of values into a new set of those values,
@@ -37,7 +40,7 @@ let fromList: (
 @ocaml.doc("
 Determine whether a set is empty.
 ")
-let isEmpty: t<'value, 'id> => bool = Belt.Set.isEmpty
+let isEmpty: t<'value, 'id> => bool = s => Belt.Set.isEmpty(s)
 
 @ocaml.doc("
 Determine whether a set contains a given value.
@@ -104,7 +107,7 @@ Returns a new set representing the union of two sets.
   Set.union(s1, s2) |> toList == [0, 1, 2, 3, 4, 5, 9];
 ]}
 ")
-let union: (t<'value, 'id>, t<'value, 'id>) => t<'value, 'id> = Belt.Set.union
+let union: (t<'value, 'id>, t<'value, 'id>) => t<'value, 'id> = (a, b) => Belt.Set.union(a, b)
 
 @ocaml.doc("
 Returns a new set representing the intersection of two sets.
@@ -115,7 +118,8 @@ Returns a new set representing the intersection of two sets.
   Set.intersect(s1, s2) |> toList == [0, 3];
 ]}
 ")
-let intersect: (t<'value, 'id>, t<'value, 'id>) => t<'value, 'id> = Belt.Set.intersect
+let intersect: (t<'value, 'id>, t<'value, 'id>) => t<'value, 'id> = (a, b) =>
+  Belt.Set.intersect(a, b)
 
 @ocaml.doc("
 Returns a new set which contains all the elements of the first set that are not
@@ -131,14 +135,14 @@ Note: The argument order is significant for this function.
   diff(s2, s1) |> toList == [8, 9, 10];
 ]}
 ")
-let diff: (t<'value, 'id>, t<'value, 'id>) => t<'value, 'id> = Belt.Set.diff
+let diff: (t<'value, 'id>, t<'value, 'id>) => t<'value, 'id> = (a, b) => Belt.Set.diff(a, b)
 
 @ocaml.doc("
 [subset(s1, s2)] will return [true] if [s2] is a subset of [s1].
 
 Note: The argument order is significant for this function.
 ")
-let subset: (t<'value, 'id>, t<'value, 'id>) => bool = Belt.Set.subset
+let subset: (t<'value, 'id>, t<'value, 'id>) => bool = (a, b) => Belt.Set.subset(a, b)
 
 @ocaml.doc("
 Returns an integer value of [-1 | 0 | 1], representing the total ordering
@@ -162,12 +166,12 @@ Note: The argument order is significant for this function.
   Set.compare(s2, s3) == 1;
 ]}
 ")
-let compare: (t<'value, 'id>, t<'value, 'id>) => int = Belt.Set.cmp
+let compare: (t<'value, 'id>, t<'value, 'id>) => int = (a, b) => Belt.Set.cmp(a, b)
 
 @ocaml.doc("
 Determine whether two sets are equivalent.
 ")
-let eq: (t<'value, 'id>, t<'value, 'id>) => bool = Belt.Set.eq
+let eq: (t<'value, 'id>, t<'value, 'id>) => bool = (a, b) => Belt.Set.eq(a, b)
 
 @ocaml.doc("
 Apply a function to each element of a set, in increasing order.
@@ -238,31 +242,31 @@ let partition: ('value => bool, t<'value, 'id>) => (t<'value, 'id>, t<'value, 'i
 @ocaml.doc("
 Returns the total number of elements in a set.
 ")
-let length: t<'value, 'id> => int = Belt.Set.size
+let length: t<'value, 'id> => int = s => Belt.Set.size(s)
 
 @ocaml.doc("
 Creates a new array containing all elements of the set in ascending order based
 on the associated comparator function.
 ")
-let toArray: t<'value, 'id> => array<'value> = Belt.Set.toArray
+let toArray: t<'value, 'id> => array<'value> = s => Belt.Set.toArray(s)
 
 @ocaml.doc("
 Creates a new list containing all elements of the set in ascending order based
 on the associated comparator function.
 ")
-let toList: t<'value, 'id> => list<'value> = Belt.Set.toList
+let toList: t<'value, 'id> => list<'value> = s => Belt.Set.toList(s)
 
 @ocaml.doc("
 Optionally returns the lowest ordered element in a given set or [None] if the
 set is empty.
 ")
-let minimum: t<'value, 'id> => option<'value> = Belt.Set.minimum
+let minimum: t<'value, 'id> => option<'value> = s => Belt.Set.minimum(s)
 
 @ocaml.doc("
 Optionally returns the highest ordered element in a given set or [None] if the
 set is empty.
 ")
-let maximum: t<'value, 'id> => option<'value> = Belt.Set.maximum
+let maximum: t<'value, 'id> => option<'value> = s => Belt.Set.maximum(s)
 
 @ocaml.doc("
 Optionally returns an equivalent element from a set or [None] if no equivalent
@@ -336,15 +340,15 @@ module WithOrd = (M: BsBastet.Interface.ORD): (
 
   module Comparable = Belt.Id.MakeComparable({
     type t = value
-    let cmp = (a, b) => M.compare(a, b) |> Relude_Ordering.toInt
+    let cmp = (. a, b) => Relude_Ordering.toInt(M.compare(a, b))
   })
 
   type t = t<value, Comparable.identity>
 
   let empty: t = empty(module(Comparable))
-  let singleton: value => t = singleton(module(Comparable))
-  let fromArray: array<value> => t = fromArray(module(Comparable))
-  let fromList: list<value> => t = fromList(module(Comparable))
+  let singleton: value => t = singleton(module(Comparable), ...)
+  let fromArray: array<value> => t = fromArray(module(Comparable), ...)
+  let fromList: list<value> => t = fromList(module(Comparable), ...)
   let isEmpty: t => bool = isEmpty
   let contains: (value, t) => bool = contains
   let add: (value, t) => t = add

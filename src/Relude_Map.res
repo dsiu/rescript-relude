@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 type t<'key, 'value, 'id> = Belt.Map.t<'key, 'value, 'id>
@@ -16,8 +19,8 @@ will replace the value if the key exists.
 As with other operations that \"change\" a map, the original map is not
 mutated; instead a new immutable copy is returned.
 ")
-let set: ('key, 'value, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (key, value) =>
-  Belt.Map.set(_, key, value)
+let set: ('key, 'value, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (key, value, m) =>
+  Belt.Map.set(m, key, value)
 
 @ocaml.doc("
 Contruct a new map from the provided key and value.
@@ -26,17 +29,17 @@ let singleton: (Belt.Id.comparable<'key, 'id>, 'key, 'value) => t<'key, 'value, 
   comparable,
   key,
   value,
-) => Belt.Map.make(~id=comparable) |> Belt.Map.set(_, key, value)
+) => (Belt.Map.set(_, key, value))(Belt.Map.make(~id=comparable))
 
 @ocaml.doc("
 Determine whether a map is empty.
 ")
-let isEmpty: t<'key, 'value, 'id> => bool = Belt.Map.isEmpty
+let isEmpty: t<'key, 'value, 'id> => bool = m => Belt.Map.isEmpty(m)
 
 @ocaml.doc("
 Determine whether a map contains a given key.
 ")
-let contains: ('key, t<'key, 'value, 'id>) => bool = key => Belt.Map.has(_, key)
+let contains: ('key, t<'key, 'value, 'id>) => bool = (key, m) => Belt.Map.has(m, key)
 
 @ocaml.doc("
 Compare the ordering of two maps, given a comparator function capable of
@@ -61,7 +64,7 @@ let compareBy: (
   t<'key, 'value, 'id>,
   t<'key, 'value, 'id>,
 ) => ordering = (comparator, a, b) =>
-  compareInt((a, b) => Relude_Ordering.toInt(comparator(a, b)), a, b) |> Relude_Ordering.fromInt
+  Relude_Ordering.fromInt(compareInt((a, b) => Relude_Ordering.toInt(comparator(a, b)), a, b))
 
 @ocaml.doc("
 Given an equality function capable of testing values for equality,
@@ -78,47 +81,50 @@ let eqBy: (('value, 'value) => bool, t<'key, 'value, 'id>, t<'key, 'value, 'id>)
 Find (optionally) the first key/value pair in a map matching the provided
 predicate function.
 ")
-let find: (('key, 'value) => bool, t<'key, 'value, 'id>) => option<('key, 'value)> = by =>
-  Belt.Map.findFirstBy(_, by)
+let find: (('key, 'value) => bool, t<'key, 'value, 'id>) => option<('key, 'value)> = (by, m) =>
+  Belt.Map.findFirstBy(m, by)
 
 @ocaml.doc("
 Iterate over each key/value pair in the map, calling the provided function
 that probably performs some side effect and returns [unit]. Prefer [map] or
 [foldLeft] in most cases.
 ")
-let forEach: (('key, 'value) => unit, t<'key, 'value, 'id>) => unit = fn => Belt.Map.forEach(_, fn)
+let forEach: (('key, 'value) => unit, t<'key, 'value, 'id>) => unit = (fn, m) =>
+  Belt.Map.forEach(m, fn)
 
 @ocaml.doc("
 Accumulate a map of key/value pairs into a single value.
 ")
-let foldLeft: (('acc, 'key, 'value) => 'acc, 'acc, t<'key, 'value, 'id>) => 'acc = (fn, acc) =>
-  Belt.Map.reduce(_, acc, fn)
+let foldLeft: (('acc, 'key, 'value) => 'acc, 'acc, t<'key, 'value, 'id>) => 'acc = (fn, acc, m) =>
+  Belt.Map.reduce(m, acc, fn)
 
 @ocaml.doc("
 Given a predicate function to be called with key/value pairs, determine
 whether every pair in the map satisfies the predicate. This will always
 return [true] for empty maps.
 ")
-let all: (('key, 'value) => bool, t<'key, 'value, 'id>) => bool = cond => Belt.Map.every(_, cond)
+let all: (('key, 'value) => bool, t<'key, 'value, 'id>) => bool = (cond, m) =>
+  Belt.Map.every(m, cond)
 
 @ocaml.doc("
 Given a predicate function to be called with key/value pairs, determine
 whether at least one pair in the map satisfies the predicate. This will
 always return [false] for empty maps.
 ")
-let any: (('key, 'value) => bool, t<'key, 'value, 'id>) => bool = cond => Belt.Map.some(_, cond)
+let any: (('key, 'value) => bool, t<'key, 'value, 'id>) => bool = (cond, m) =>
+  Belt.Map.some(m, cond)
 
 @ocaml.doc("
 The count of keys in the map.
 ")
-let length: t<'key, 'value, 'id> => int = Belt.Map.size
+let length: t<'key, 'value, 'id> => int = m => Belt.Map.size(m)
 
 @ocaml.doc("
 Convert a map to an array of key/value pairs. Note that the resulting array
 will be sorted by the ordering of the key type, not necessarily the order
 in which values were added to the map.
 ")
-let toArray: t<'key, 'value, 'id> => array<('key, 'value)> = Belt.Map.toArray
+let toArray: t<'key, 'value, 'id> => array<('key, 'value)> = m => Belt.Map.toArray(m)
 
 @ocaml.doc("
 Convert an associated array (an array of (key, value) tuples) into a map.
@@ -137,15 +143,15 @@ let fromValueArray: (
   Belt.Id.comparable<'key, 'id>,
   'value => 'key,
   array<'value>,
-) => t<'key, 'value, 'id> = (comparable, toKey) =>
-  Relude_Array_Instances.foldLeft((map, v) => set(toKey(v), v, map), make(comparable))
+) => t<'key, 'value, 'id> = (comparable, toKey, m) =>
+  Relude_Array_Instances.foldLeft((map, v) => set(toKey(v), v, map), make(comparable), m)
 
 @ocaml.doc("
 Convert a map to an associated list (a list of key/value tuples). Note that
 the resulting list will be sorted according to the ordering of the key
 type, not necessarily in the order in which values were added to the map.
 ")
-let toList: t<'key, 'value, 'id> => list<('key, 'value)> = Belt.Map.toList
+let toList: t<'key, 'value, 'id> => list<('key, 'value)> = m => Belt.Map.toList(m)
 
 @ocaml.doc("
 Convert an associated list (a list of (key, value) tuples) into a map.
@@ -153,7 +159,7 @@ Convert an associated list (a list of (key, value) tuples) into a map.
 let fromList: (Belt.Id.comparable<'key, 'id>, list<('key, 'value)>) => t<'key, 'value, 'id> = (
   comparable,
   lst,
-) => Belt.Map.fromArray(lst |> Belt.List.toArray, ~id=comparable)
+) => Belt.Map.fromArray(Belt.List.toArray(lst), ~id=comparable)
 
 @ocaml.doc("
 Convert a list of values into a map, using the provided function from
@@ -164,73 +170,74 @@ let fromValueList: (
   Belt.Id.comparable<'key, 'id>,
   'value => 'key,
   list<'value>,
-) => t<'key, 'value, 'id> = (comparable, toKey) =>
-  Relude_List_Instances.foldLeft((map, v) => set(toKey(v), v, map), make(comparable))
+) => t<'key, 'value, 'id> = (comparable, toKey, l) =>
+  Relude_List_Instances.foldLeft((map, v) => set(toKey(v), v, map), make(comparable), l)
 
 @ocaml.doc("
 Return a sorted array containing each key in the map.
 ")
-let keyArray: t<'key, 'value, 'id> => array<'key> = Belt.Map.keysToArray
+let keyArray: t<'key, 'value, 'id> => array<'key> = m => Belt.Map.keysToArray(m)
 
 @ocaml.doc("
 Return a sorted list containing each key in the map
 ")
-let keys: t<'key, 'value, 'id> => list<'key> = map => keyArray(map) |> Belt.List.fromArray
+let keys: t<'key, 'value, 'id> => list<'key> = map => Belt.List.fromArray(keyArray(map))
 
 @ocaml.doc("
 Return an array of each value (sorted by key) in the map.
 ")
-let valueArray: t<'key, 'value, 'id> => array<'value> = Belt.Map.valuesToArray
+let valueArray: t<'key, 'value, 'id> => array<'value> = m => Belt.Map.valuesToArray(m)
 
 @ocaml.doc("
 Return a list of each value (sorted by key) in the map.
 ")
-let values: t<'key, 'value, 'id> => list<'value> = map => valueArray(map) |> Belt.List.fromArray
+let values: t<'key, 'value, 'id> => list<'value> = map => Belt.List.fromArray(valueArray(map))
 
 @ocaml.doc("
 Optionally find the smallest key, using the key ordering.
 ")
-let minKey: t<'key, 'value, 'id> => option<'key> = Belt.Map.minKey
+let minKey: t<'key, 'value, 'id> => option<'key> = m => Belt.Map.minKey(m)
 
 @ocaml.doc("
 Optionally find the largest key, using the key ordering.
 ")
-let maxKey: t<'key, 'value, 'id> => option<'key> = Belt.Map.maxKey
+let maxKey: t<'key, 'value, 'id> => option<'key> = m => Belt.Map.maxKey(m)
 
 @ocaml.doc("
 Optionally find the smallest key/value pair, using the key ordering.
 ")
-let min: t<'key, 'value, 'id> => option<('key, 'value)> = Belt.Map.minimum
+let min: t<'key, 'value, 'id> => option<('key, 'value)> = m => Belt.Map.minimum(m)
 
 @ocaml.doc("
 Optionally find the largest key/value pair, using the key ordering.
 ")
-let max: t<'key, 'value, 'id> => option<('key, 'value)> = Belt.Map.maximum
+let max: t<'key, 'value, 'id> => option<('key, 'value)> = m => Belt.Map.maximum(m)
 
 @ocaml.doc("
 Attempt to find a value in a map, given a key.
 ")
-let get: ('key, t<'key, 'value, 'id>) => option<'value> = key => Belt.Map.get(_, key)
+let get: ('key, t<'key, 'value, 'id>) => option<'value> = (key, m) => Belt.Map.get(m, key)
 
 @ocaml.doc("
 Attempt to find a value in a map, given a key. Use the provided fallback
 value if the key is not in the map.
 ")
-let getOrElse: ('key, 'value, t<'key, 'value, 'id>) => 'value = (key, default) =>
-  Belt.Map.getWithDefault(_, key, default)
+let getOrElse: ('key, 'value, t<'key, 'value, 'id>) => 'value = (key, default, m) =>
+  Belt.Map.getWithDefault(m, key, default)
 
 @ocaml.doc("
 Return a new copy of a map, with the provided key removed. Like other map
 functions that \"change\" a value, this returns an immutable copy. The
 original map is unchanged.
 ")
-let remove: ('key, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = key => Belt.Map.remove(_, key)
+let remove: ('key, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (key, m) =>
+  Belt.Map.remove(m, key)
 
 @ocaml.doc("
 Given a list of keys, remove each from the map, returning a new copy.
 ")
-let removeMany: (array<'key>, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = keys =>
-  Belt.Map.removeMany(_, keys)
+let removeMany: (array<'key>, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (keys, m) =>
+  Belt.Map.removeMany(m, keys)
 
 @ocaml.doc("
 At the given key, set or remove the value using the provided update
@@ -242,7 +249,7 @@ let update: (
   'key,
   option<'value> => option<'value>,
   t<'key, 'value, 'id>,
-) => t<'key, 'value, 'id> = (key, updateFn) => Belt.Map.update(_, key, updateFn)
+) => t<'key, 'value, 'id> = (key, updateFn, m) => Belt.Map.update(m, key, updateFn)
 
 @ocaml.doc("
 Combine two existing maps using the provided merge function. The merge
@@ -266,14 +273,14 @@ value in the array to the map.
 TODO: it's not clear from the Belt docs what happens in the case of key
 conflicts.
 ")
-let mergeMany: (array<('key, 'value)>, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = arr =>
-  Belt.Map.mergeMany(_, arr)
+let mergeMany: (array<('key, 'value)>, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (arr, m) =>
+  Belt.Map.mergeMany(m, arr)
 
 @ocaml.doc("
 Remove each key/value pair that doesn't pass the given predicate function.
 ")
-let filter: (('key, 'value) => bool, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = fn =>
-  Belt.Map.keep(_, fn)
+let filter: (('key, 'value) => bool, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (fn, m) =>
+  Belt.Map.keep(m, fn)
 
 @ocaml.doc("
 Alias of filter
@@ -283,8 +290,8 @@ let keep: (('key, 'value) => bool, t<'key, 'value, 'id>) => t<'key, 'value, 'id>
 @ocaml.doc("
 Remove each key/value pair that passes the given predicate function
 ")
-let filterNot: (('key, 'value) => bool, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = fn =>
-  Belt.Map.keep(_, (key, value) => !fn(key, value))
+let filterNot: (('key, 'value) => bool, t<'key, 'value, 'id>) => t<'key, 'value, 'id> = (fn, m) =>
+  Belt.Map.keep(m, (key, value) => !fn(key, value))
 @ocaml.doc("
 Alias of filterNot
 ")
@@ -293,36 +300,38 @@ let reject: (('key, 'value) => bool, t<'key, 'value, 'id>) => t<'key, 'value, 'i
 let partition: (
   ('key, 'value) => bool,
   t<'key, 'value, 'id>,
-) => (t<'key, 'value, 'id>, t<'key, 'value, 'id>) = fn => Belt.Map.partition(_, fn)
+) => (t<'key, 'value, 'id>, t<'key, 'value, 'id>) = (fn, m) => Belt.Map.partition(m, fn)
 
 @ocaml.doc("
 Transform each value in the map to a new value using the provided function.
 ")
-let map: ('v1 => 'v2, t<'key, 'v1, 'id>) => t<'key, 'v2, 'id> = fn => Belt.Map.map(_, fn)
+let map: ('v1 => 'v2, t<'key, 'v1, 'id>) => t<'key, 'v2, 'id> = (fn, m) => Belt.Map.map(m, fn)
 
-let mapWithKey: (('key, 'v1) => 'v2, t<'key, 'v1, 'id>) => t<'key, 'v2, 'id> = fn =>
-  Belt.Map.mapWithKey(_, fn)
+let mapWithKey: (('key, 'v1) => 'v2, t<'key, 'v1, 'id>) => t<'key, 'v2, 'id> = (fn, m) =>
+  Belt.Map.mapWithKey(m, fn)
 
 let groupListBy: (
   Belt.Id.comparable<'key, 'id>,
   'value => 'key,
   list<'value>,
-) => t<'key, list<'value>, 'id> = (comparable, groupBy) => {
+) => t<'key, list<'value>, 'id> = (comparable, groupBy, l) => {
   open Relude_Function.Infix
-  let addItemToGroup = x => \">>"(getOrElse(x |> groupBy, list{}), xs => list{x, ...xs})
-  let addItemToMap = (dict, x) => dict |> set(x |> groupBy, addItemToGroup(x, dict))
-  \">>"(Belt.List.reduce(_, make(comparable), addItemToMap), map(Belt.List.reverse))
+  let addItemToGroup = (x, dict) =>
+    \">>"(getOrElse(groupBy(x), list{}, ...), xs => list{x, ...xs}, dict)
+  let addItemToMap = (dict, x) => set(groupBy(x), addItemToGroup(x, dict), dict)
+  \">>"(Belt.List.reduce(_, make(comparable), addItemToMap), map(l => Belt.List.reverse(l), ...), l)
 }
 
 let groupArrayBy: (
   Belt.Id.comparable<'key, 'id>,
   'value => 'key,
   array<'value>,
-) => t<'key, array<'value>, 'id> = (comparable, groupBy) => {
+) => t<'key, array<'value>, 'id> = (comparable, groupBy, arr) => {
   open Relude_Function.Infix
-  let addItemToGroup = x => \">>"(getOrElse(x |> groupBy, []), Belt.Array.concat(_, [x]))
-  let addItemToMap = (dict, x) => dict |> set(x |> groupBy, addItemToGroup(x, dict))
-  Belt.Array.reduce(_, make(comparable), addItemToMap)
+  let addItemToGroup = (x, dict) =>
+    \">>"(getOrElse(groupBy(x), [], ...), Belt.Array.concat(_, [x]), dict)
+  let addItemToMap = (dict, x) => set(groupBy(x), addItemToGroup(x, dict), dict)
+  Belt.Array.reduce(arr, make(comparable), addItemToMap)
 }
 
 module type MAP = {
@@ -378,7 +387,7 @@ module type MAP = {
   let filterNot: ((key, 'value) => bool, t<'value>) => t<'value>
   let reject: ((key, 'value) => bool, t<'value>) => t<'value>
   let partition: ((key, 'value) => bool, t<'value>) => (t<'value>, t<'value>)
-  let map: ('v1 => 'v2, t<'v1>) => t<'v2>
+  let map: (. 'v1 => 'v2, t<'v1>) => t<'v2>
   let mapWithKey: ((key, 'v1) => 'v2, t<'v1>) => t<'v2>
   let groupListBy: ('a => key, list<'a>) => t<list<'a>>
   let groupArrayBy: ('a => key, array<'a>) => t<array<'a>>
@@ -389,13 +398,13 @@ module WithOrd = (M: ORD): (MAP with type key = M.t and type Comparable.t = M.t)
 
   module Comparable = Belt.Id.MakeComparable({
     type t = key
-    let cmp = (a, b) => M.compare(a, b) |> Relude_Ordering.toInt
+    let cmp = (. a, b) => Relude_Ordering.toInt(M.compare(a, b))
   })
 
   type t<'value> = t<key, 'value, Comparable.identity>
 
   let make: unit => t<'value> = () => make(module(Comparable))
-  let singleton: (key, 'value) => t<'value> = (key, value) => make() |> set(key, value)
+  let singleton: (key, 'value) => t<'value> = (key, value) => set(key, value, make())
   let fromArray: array<(key, 'value)> => t<'value> = arr => fromArray(module(Comparable), arr)
   let fromValueArray: ('value => key, array<'value>) => t<'value> = (toKey, arr) =>
     fromValueArray(module(Comparable), toKey, arr)
@@ -444,7 +453,7 @@ module WithOrd = (M: ORD): (MAP with type key = M.t and type Comparable.t = M.t)
   let filterNot: ((key, 'value) => bool, t<'value>) => t<'value> = filterNot
   let reject: ((key, 'value) => bool, t<'value>) => t<'value> = reject
   let partition: ((key, 'value) => bool, t<'value>) => (t<'value>, t<'value>) = partition
-  let map: ('v1 => 'v2, t<'v1>) => t<'v2> = map
+  let map: (. 'v1 => 'v2, t<'v1>) => t<'v2> = map
   let mapWithKey: ((key, 'v1) => 'v2, t<'v1>) => t<'v2> = mapWithKey
 
   module Functor: FUNCTOR with type t<'a> = t<'a> = {

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 type t = string
@@ -17,7 +20,7 @@ JavaScript [String.length] function, it works properly with Unicode characters.
   String.length({js|대한민국|js}) == 4;
 ]}
 ")
-let length: string => int = Js.String.length
+let length: string => int = s => Js.String.length(s)
 
 @ocaml.doc("
 [String.isEmpty] returns [true] if the provided string is the empty string [\"\"],
@@ -58,7 +61,7 @@ in <https://www.ecma-international.org/ecma-262/5.1/#sec-7.2>) removed from [s].
   trim({js|\n\u00a0 \t abc \f\r \t|js}) == \"abc\";
 ]}
 ")
-let trim: string => string = Js.String.trim
+let trim: string => string = s => Js.String.trim(s)
 
 // TODO
 //let trimLeft: string => string = ???
@@ -153,7 +156,7 @@ format for that data type.
   make([|1, 2, 3, 4|]) == \"1,2,3,4\";
 ]}
 ")
-let make: 'a => string = Js.String.make
+let make: 'a => string = f => Js.String.make(f)
 
 @ocaml.doc("
 [makeWithIndex(n, f)] returns a string that is the result of concatenating
@@ -198,7 +201,7 @@ capitalizes to two [\"S\"]es in a row.
   toUpperCase({js|πς|js}) == {js|ΠΣ|js}; // sigma in final position
 ]}
 ")
-let toUpperCase: string => string = Js.String.toUpperCase
+let toUpperCase: string => string = s => Js.String.toUpperCase(s)
 
 @ocaml.doc("
 [toLowerCase(str)] converts [str] to lower case using the locale-insensitive
@@ -215,7 +218,7 @@ single lowercase glyph [ß], but [toLowerCase()] will not do this transformation
   toLowerCase({js|ΠΣ|js}) == {js|πς|js}; // sigma in final position
 ]}
 ")
-let toLowerCase: string => string = Js.String.toLowerCase
+let toLowerCase: string => string = s => Js.String.toLowerCase(s)
 
 @ocaml.doc("
 [fromCharCode(n)] creates a string containing the character corresponding to
@@ -231,7 +234,7 @@ Thus, [fromCharCode(0x1F63A)] gives the same result as [fromCharCode(0xF63A)].
   fromCharCode(-64568) == {js|ψ|js};
 ]}
 ")
-let fromCharCode: int => string = Js.String.fromCharCode
+let fromCharCode: int => string = c => Js.String.fromCharCode(c)
 
 @ocaml.doc("
 [charCodeAt(n, str)] returns (optionally) the numeric character code at the
@@ -265,7 +268,7 @@ If [n] is out of bounds, [charAt()] returns [None].
 ]}
 ")
 let charAt: (int, string) => option<string> = (i, str) =>
-  Js.String.get(str, i) |> Js.Nullable.return |> Js.Nullable.toOption
+  Js.String.get(str, i)->Js.Nullable.return->Js.Nullable.toOption
 
 @ocaml.doc("
 [charAtOrEmpty(n, str)] returns the string containing the character at the
@@ -300,7 +303,7 @@ If [n] is out of bounds, [charAtNullable()] returns [Js.Nullable.undefined].
 ]}
 ")
 let charAtNullable: (int, string) => Js.Nullable.t<string> = (i, str) =>
-  Js.String.get(str, i) |> Js.Nullable.return
+  Js.String.get(str, i)->Js.Nullable.return
 
 @ocaml.doc("
 [charAtOrThrow(n, str)] returns a string consisting of the character at
@@ -618,7 +621,7 @@ returning a new string.
 ]}
 ")
 let mapChars: (string => string, string) => string = (f, str) =>
-  toList(str) |> Relude_List_Instances.foldMap(module(Monoid), f)
+  toList(str)->(Relude_List_Instances.foldMap(module(Monoid), f, _))
 
 @ocaml.doc("
 Pads the string to [targetLength] using [padWith] as a repeated padding on the
@@ -640,7 +643,7 @@ let padStart: (~targetLength: int, ~padWith: string=?, string) => string = (
   } else {
     let padLength = targetLength - inputLength
     let padTimes = padLength / padWithLength + 1 // Add one so we get one extra, which we'll truncate
-    let pad = repeat(padTimes, padWith) |> slice(0, padLength)
+    let pad = repeat(padTimes, padWith)->(slice(0, padLength, _))
     pad ++ input
   }
 }
@@ -665,7 +668,7 @@ let padEnd: (~targetLength: int, ~padWith: string=?, string) => string = (
   } else {
     let padLength = targetLength - inputLength
     let padTimes = padLength / padWithLength + 1 // Add one so we get one extra, which we'll truncate
-    let pad = repeat(padTimes, padWith) |> slice(0, padLength)
+    let pad = repeat(padTimes, padWith)->(slice(0, padLength, _))
     input ++ pad
   }
 }
@@ -692,7 +695,7 @@ let replaceFirst = (~search: string, ~replaceWith: string, input: string): strin
 ]}
 ")
 let replaceEach = (~search: string, ~replaceWith: string, input: string): string =>
-  splitList(~delimiter=search, input) |> String.concat(replaceWith)
+  splitList(~delimiter=search, input)->(String.concat(replaceWith, _))
 
 @ocaml.doc("
 [replaceRegex(targetRe, newValue, str)] replaces the matched regular expression
@@ -769,7 +772,7 @@ when specifying [x].
   fromFloat(1.0e3) == \"1000\";
 ]}
 ")
-let fromFloat: float => string = Js.Float.toString
+let fromFloat: float => string = f => Js.Float.toString(f)
 
 @ocaml.doc("
 [toFloat(str)] returns [Some(x)] if [str] is a valid string representation of

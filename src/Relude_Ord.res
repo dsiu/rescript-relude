@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -31,7 +34,7 @@ This is the contravariant map for the compare function.
   let userCompare: compare(user) = Ord.by(user => user.name, String.compare);
 ]}
 ")
-let by: 'a 'b. ('b => 'a, compare<'a>) => compare<'b> = (bToA, compareA, b1, b2) =>
+let by: 'a 'b. ('b => 'a, compare<'a>) => compare<'b> = (bToA, compareA) => (b1, b2) =>
   compareA(bToA(b1), bToA(b2))
 
 @ocaml.doc("
@@ -50,7 +53,7 @@ include Relude_Extensions_Contravariant.ContravariantExtensions(Contravariant)
 [Ord.reverse] creates a new compare function that returns the opposite of the
 given compare function.
 ")
-let reverse: 'a. compare<'a> => compare<'a> = (compare, a1, a2) =>
+let reverse: 'a. compare<'a> => compare<'a> = compare => (a1, a2) =>
   switch compare(a1, a2) {
   | #less_than => #greater_than
   | #equal_to => #equal_to

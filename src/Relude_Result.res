@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -283,12 +286,12 @@ let flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = x =>
   | Error(e) => Ok(e)
   }
 
-let compose: 'a 'b 'c 'e. (t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
+let compose: 'a 'b 'c 'e. (. t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
   resultBToC,
   resultAToB,
 ) =>
   switch (resultAToB, resultBToC) {
-  | (Ok(aToB), Ok(bToC)) => Ok(\">>"(aToB, bToC))
+  | (Ok(aToB), Ok(bToC)) => Ok(\">>"(aToB, bToC, ...))
   | (Error(e), Ok(_)) => Error(e)
   | (Ok(_), Error(e)) => Error(e)
   | (Error(e), Error(_)) => Error(e)
@@ -333,7 +336,7 @@ This is something we could have done with a simple [if] statement, but we will
 see [map()] become useful when we have several things to validate. (See
 [apply()] and [map2()], [map3()], etc.)
 ")
-let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, fa) =>
+let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, fa) =>
   switch fa {
   | Ok(a) => Ok(f(a))
   | Error(_) as e => e
@@ -436,7 +439,7 @@ Using [apply()] properly is somewhat complex. See the example in the
 Validation tests for more details. (It uses [VOk] and [VError], but the logic is
 identical.)
 ")
-let apply: 'a 'b 'e. (t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (rf, ra) =>
+let apply: 'a 'b 'e. (. t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (rf, ra) =>
   switch (rf, ra) {
   | (Ok(f), Ok(a)) => Ok(f(a))
   | (Ok(_), Error(e)) => Error(e)
@@ -467,7 +470,7 @@ only if the string is non-empty and the number is odd:
 ]}
 ")
 let map2: 'a 'b 'c 'x. (('a, 'b) => 'c, t<'a, 'x>, t<'b, 'x>) => t<'c, 'x> = (f, fa, fb) =>
-  apply(map(f, fa), fb)
+  apply(map(x => f(x, _), fa), fb)
 
 @ocaml.doc("
 [map3(f, x, y, z)] has as its first argument a function that takes three values.
@@ -493,7 +496,7 @@ let map3: 'a 'b 'c 'd 'x. (('a, 'b, 'c) => 'd, t<'a, 'x>, t<'b, 'x>, t<'c, 'x>) 
   fa,
   fb,
   fc,
-) => apply(map2(f, fa, fb), fc)
+) => apply(map2((x, y) => f(x, y, _), fa, fb), fc)
 
 @ocaml.doc("
 [map4(f, x, y, z, w)] has as its first argument a function that takes four
@@ -520,7 +523,7 @@ let map4: 'a 'b 'c 'd 'e 'x. (
   t<'b, 'x>,
   t<'c, 'x>,
   t<'d, 'x>,
-) => t<'e, 'x> = (f, fa, fb, fc, fd) => apply(map3(f, fa, fb, fc), fd)
+) => t<'e, 'x> = (f, fa, fb, fc, fd) => apply(map3((x, y, z) => f(x, y, z, ...), fa, fb, fc), fd)
 
 @ocaml.doc("
 [map5(f, x, y, z, w, q)] has as its first argument a function that takes five
@@ -552,7 +555,8 @@ let map5: 'a 'b 'c 'd 'e 'f 'x. (
   t<'c, 'x>,
   t<'d, 'x>,
   t<'e, 'x>,
-) => t<'f, 'x> = (f, fa, fb, fc, fd, fe) => apply(map4(f, fa, fb, fc, fd), fe)
+) => t<'f, 'x> = (f, fa, fb, fc, fd, fe) =>
+  apply(map4((w, x, y, z) => f(w, x, y, z, ...), fa, fb, fc, fd), fe)
 
 @ocaml.doc("
 [Result.pure] wraps its argument in the [Ok] constructor.
@@ -580,7 +584,7 @@ order.
 ]}
 
 ")
-let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
+let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
   switch fa {
   | Ok(a) => f(a)
   | Error(_) as fa => fa
@@ -625,7 +629,7 @@ the last one is returned.
   alt(Error(\"bad\"), Error(\"worse\")) == Error(\"worse\");
 ]}
 ")
-let alt: 'a 'e. (t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (fa1, fa2) =>
+let alt: 'a 'e. (. t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (fa1, fa2) =>
   switch fa1 {
   | Ok(_) => fa1
   | Error(_) => fa2
@@ -650,7 +654,7 @@ let alignWith: 'a 'b 'c 'e. (Relude_Ior_Type.t<'a, 'b> => 'c, t<'a, 'e>, t<'b, '
   f,
   fa,
   fb,
-) => align(fa, fb) |> map(f)
+) => map(f, align(fa, fb))
 
 @ocaml.doc("
 [catchError(f, r)] returns [f(e)] when [r] is of the form
@@ -688,7 +692,7 @@ let mapHandleError: 'a 'e 'b. ('a => 'b, 'e => 'b, t<'a, 'e>) => t<'b, Relude_Vo
   aToB,
   eToB,
   ioAE,
-) => ioAE |> map(aToB) |> handleError(eToB)
+) => handleError(eToB, map(aToB, ioAE))
 
 @ocaml.doc("
 [Result.recover] ensures that the returned result is [Ok] by returning the
@@ -716,7 +720,7 @@ empty by using {!val:handleError}.
   Result.recover(0.0, safeAvg([||])) == Ok(0.0);
 ]}
 ")
-let recover: 'a 'e. ('a, t<'a, 'e>) => t<'a, 'e> = (a, fa) => fa |> catchError(_ => Ok(a))
+let recover: 'a 'e. ('a, t<'a, 'e>) => t<'a, 'e> = (a, fa) => catchError(_ => Ok(a), fa)
 
 @ocaml.doc("
 [fromOption(defaultError, opt)] converts a value of the form [Some(v)] to
@@ -817,7 +821,8 @@ JavaScript's magic ability to construct a [string] from anything.
     Error(\"Failure,-2,int_of_string\");
 ]}
 ")
-let triesAsString: 'a. (unit => 'a) => t<'a, string> = fn => tries(fn) |> mapError(Js.String.make)
+let triesAsString: 'a. (unit => 'a) => t<'a, string> = fn =>
+  mapError(x => Js.String.make(x), tries(fn))
 
 @ocaml.doc("
 [toValidation(result)] converts [Ok(val)] to [VOk(val)] and [Error(err)] to

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -30,7 +33,7 @@ let unwrap: 'a. t<'a> => 'a = a => a
 @ocaml.doc("
 Maps a pure function over the value contained in the Identity.
 ")
-let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (f, fa) => f(fa)
+let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (f, fa) => f(fa)
 
 module Functor: FUNCTOR with type t<'a> = t<'a> = {
   type t<'a> = t<'a>
@@ -41,7 +44,7 @@ include Relude_Extensions_Functor.FunctorExtensions(Functor)
 @ocaml.doc("
 Applies a wrapped function to the value contained in the Identity.
 ")
-let apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) => ff(fa)
+let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) => ff(fa)
 
 module Apply: APPLY with type t<'a> = t<'a> = {
   include Functor
@@ -65,7 +68,7 @@ include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 @ocaml.doc("
 Applies a monadic function to the value contained in the Identity context.
 ")
-let bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (fa, f) => f(fa)
+let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (fa, f) => f(fa)
 
 module Monad: MONAD with type t<'a> = t<'a> = {
   include Applicative

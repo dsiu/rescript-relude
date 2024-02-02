@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -53,10 +56,9 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   Converts an array to a NonEmpty, failing if the list is empty
   ")
   let fromArray: 'a. array<'a> => option<t<'a>> = array =>
-    Relude_Array_Base.uncons(array) |> Relude_Option_Instances.map(((h, t)) => NonEmpty(
-      h,
-      TailSequence.fromArray(t),
-    ))
+    Relude_Array_Base.uncons(array)->(
+      Relude_Option_Instances.map(((h, t)) => NonEmpty(h, TailSequence.fromArray(t)), _)
+    )
 
   @ocaml.doc("
   Prepends a new head value to the NonEmpty
@@ -164,7 +166,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Maps a pure function over the NonEmpty
   ")
-  let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (f, NonEmpty(x, xs)) => NonEmpty(
+  let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (f, NonEmpty(x, xs)) => NonEmpty(
     f(x),
     TailSequence.Monad.map(f, xs),
   )
@@ -183,7 +185,8 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Applies a NonEmpty sequence of function to a NonEmpty sequence of values
   ")
-  let apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) => map(f => map(f, fa), ff) |> flatten
+  let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) =>
+    map(f => map(f, fa), ff) |> flatten
 
   module Apply: APPLY with type t<'a> = t<'a> = {
     include Functor
@@ -207,7 +210,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Applies a monadic function to a NonEmpty sequence of values
   ")
-  let bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (nonEmpty, f) => map(f, nonEmpty) |> flatten
+  let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (nonEmpty, f) => map(f, nonEmpty) |> flatten
 
   module Monad: MONAD with type t<'a> = t<'a> = {
     include Applicative
@@ -230,13 +233,16 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
     switch x {
     | NonEmpty(head, tail) =>
       tail
-      |> TailSequence.reverse
-      |> TailSequence.uncons
-      |> Relude_Option_Instances.map(((tailReversedHead, tailReversedTail)) => NonEmpty(
-        tailReversedHead,
-        tailReversedTail |> TailSequence.append(head),
-      ))
-      |> Relude_Option_Base.getOrElseLazy(() => pure(head))
+      ->TailSequence.reverse
+      ->TailSequence.uncons
+      ->Relude_Option_Instances.map(
+        ((tailReversedHead, tailReversedTail)) => NonEmpty(
+          tailReversedHead,
+          tailReversedTail->(TailSequence.append(head, _)),
+        ),
+        _,
+      )
+      ->(Relude_Option_Base.getOrElseLazy(() => pure(head), _))
     }
 
   @ocaml.doc("
@@ -282,7 +288,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
 
   module Show: SHOW_F = (S: SHOW) => {
     type t = t<S.t>
-    let show = showBy(S.show)
+    let show = showBy(S.show, _)
   }
 
   @ocaml.doc("
@@ -299,7 +305,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
       let traverse: 'a 'b. ('a => applicative_t<'b>, t<'a>) => applicative_t<t<'b>> = (
         f,
         NonEmpty(x, xs),
-      ) => A.apply(A.map(make, f(x)), TailTraversable.traverse(f, xs))
+      ) => A.apply(A.map(x => make(x, ...), f(x)), TailTraversable.traverse(f, xs))
 
       let sequence: t<applicative_t<'a>> => applicative_t<t<'a>> = fa => traverse(x => x, fa)
     }

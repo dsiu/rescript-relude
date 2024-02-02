@@ -70,7 +70,7 @@ Running time: O(n) where [n] is the provided size
   Array.makeWithIndex(-1, const(true)) == [||];
 ]}
 ")
-let makeWithIndex: 'a. (int, int => 'a) => array<'a> = Belt.Array.makeBy
+let makeWithIndex: 'a. (int, int => 'a) => array<'a> = (i, fn) => Belt.Array.makeBy(i, fn)
 
 @ocaml.doc("
 [Array.mapWithIndex] maps a pure function over the array which accepts both the
@@ -96,7 +96,7 @@ Running time: O(n)
   Array.reverse([|1, 2, 3|]) == [|3, 2, 1|];
 ]}
 ")
-let reverse: 'a. array<'a> => array<'a> = Belt.Array.reverse
+let reverse: 'a. array<'a> => array<'a> = xs => Belt.Array.reverse(xs)
 
 @ocaml.doc("
 [Array.shuffleInPlace] mutates the provided array by randomizing the positions
@@ -116,7 +116,7 @@ let shuffleInPlace: 'a. array<'a> => array<'a> = xs => {
 array. This is similar to [Array.shuffleInPlace] except the input array is left
 unchanged.
 ")
-let shuffle: 'a. array<'a> => array<'a> = Belt.Array.shuffle
+let shuffle: 'a. array<'a> => array<'a> = xs => Belt.Array.shuffle(xs)
 
 @ocaml.doc("
 [Array.length] returns the count of items in the array in O(1) time.
@@ -125,7 +125,7 @@ let shuffle: 'a. array<'a> => array<'a> = Belt.Array.shuffle
   Array.length([|\"a\", \"b\", \"c\"|]) == 3;
 ]}
 ")
-let length: 'a. array<'a> => int = Belt.Array.length
+let length: 'a. array<'a> => int = xs => Belt.Array.length(xs)
 
 @ocaml.doc("
 [Array.isEmpty] determines whether the array contains no values (has length 0)
@@ -425,7 +425,7 @@ let keepWithIndex: 'a. (('a, int) => bool, array<'a>) => array<'a> = filterWithI
 [Array.filterNot] returns a new array of items from the input array which do not
 satisfy the given predicate.
 ")
-let filterNot: 'a. ('a => bool, array<'a>) => array<'a> = f => filter(a => !f(a))
+let filterNot: 'a. ('a => bool, array<'a>) => array<'a> = (f, xs) => filter(a => !f(a), xs)
 
 @ocaml.doc("
 [Array.reject] is an alias for [filterNot].
@@ -436,8 +436,8 @@ let reject: 'a. ('a => bool, array<'a>) => array<'a> = filterNot
 [Array.filterNotWithIndex] returns a new array of items from the input array
 which do not satisfy the given indexed predicate.
 ")
-let filterNotWithIndex: 'a. (('a, int) => bool, array<'a>) => array<'a> = f =>
-  filterWithIndex((a, i) => !f(a, i))
+let filterNotWithIndex: 'a. (('a, int) => bool, array<'a>) => array<'a> = (f, xs) =>
+  filterWithIndex((a, i) => !f(a, i), xs)
 
 @ocaml.doc("
 [Array.rejectWithIndex] is an alias for [filterNotWithIndex].
@@ -551,7 +551,7 @@ let replicate: 'a. (int, array<'a>) => array<'a> = (i, xs) =>
 arrays as a tuple. If the two input arrays have different lengths, the returned
 array's length will match the shortest array.
 ")
-let zip: 'a 'b. (array<'a>, array<'b>) => array<('a, 'b)> = Belt.Array.zip
+let zip: 'a 'b. (array<'a>, array<'b>) => array<('a, 'b)> = (xs, ys) => Belt.Array.zip(xs, ys)
 
 @ocaml.doc("
 [Array.zipWith] creates a new array by combining pair-wise values from the two
@@ -579,7 +579,7 @@ containing the left values, and the other array containing the right values.
   Array.unzip([|(\"a\", 3), (\"b\", 1)|]) == ([|\"a\", \"b\"|], [|3, 1|]);
 ]}
 ")
-let unzip: 'a 'b. array<('a, 'b)> => (array<'a>, array<'b>) = Belt.Array.unzip
+let unzip: 'a 'b. array<('a, 'b)> => (array<'a>, array<'b>) = xs => Belt.Array.unzip(xs)
 
 @ocaml.doc("
 [Array.sortWithInt] sorts an array in ascending order using the provided
@@ -596,7 +596,7 @@ let sortWithInt: 'a. (('a, 'a) => int, array<'a>) => array<'a> = (f, xs) =>
 ]}
 ")
 let sortBy: 'a. (('a, 'a) => ordering, array<'a>) => array<'a> = (f, xs) =>
-  sortWithInt((a, b) => f(a, b) |> Relude_Ordering.toInt, xs)
+  sortWithInt((a, b) => Relude_Ordering.toInt(f(a, b)), xs)
 
 @ocaml.doc("
 [Array.sort] sorts an array in ascending order using an ORD module.
@@ -629,12 +629,14 @@ let distinctBy: 'a. (('a, 'a) => bool, array<'a>) => array<'a> = (eq, xs) =>
 array, using the given equality function.
 ")
 let removeFirstBy: 'a. (('a, 'a) => bool, 'a, array<'a>) => array<'a> = (innerEq, v, xs) =>
-  Relude_Array_Instances.foldLeft(
-    ((found, ys), x) =>
-      found ? (true, append(x, ys)) : innerEq(v, x) ? (true, ys) : (false, append(x, ys)),
-    (false, []),
-    xs,
-  ) |> snd
+  snd(
+    Relude_Array_Instances.foldLeft(
+      ((found, ys), x) =>
+        found ? (true, append(x, ys)) : innerEq(v, x) ? (true, ys) : (false, append(x, ys)),
+      (false, []),
+      xs,
+    ),
+  )
 
 @ocaml.doc("
 [Array.removeEachBy] removes all occurrences of the given value from the array,
@@ -690,13 +692,13 @@ Running time: O(n)
 ]}
 ")
 let replaceAt: 'a. (int, 'a, array<'a>) => array<'a> = (targetIndex, newX, xs) =>
-  xs |> mapWithIndex((x, currentIndex) =>
+  mapWithIndex((x, currentIndex) =>
     if currentIndex == targetIndex {
       newX
     } else {
       x
     }
-  )
+  , xs)
 
 @ocaml.doc("
 [Array.scanLeft] folds an array from left-to-right, collecting the results of
@@ -758,7 +760,7 @@ Running time: O(n)
 ]}
 ")
 let updateAt: 'a. (int, 'a => 'a, array<'a>) => array<'a> = (targetIndex, f, xs) =>
-  xs |> mapWithIndex((x, index) => index == targetIndex ? f(x) : x)
+  mapWithIndex((x, index) => index == targetIndex ? f(x) : x, xs)
 
 @ocaml.doc("
 [Array.swapAt] creates a new array with the elements at the two given indexes
@@ -773,7 +775,7 @@ Running time: O(n)
 ")
 let swapAt: 'a. (int, int, array<'a>) => array<'a> = (i, j, xs) =>
   switch (at(i, xs), at(j, xs)) {
-  | (Some(a), Some(b)) => xs |> mapWithIndex((x, k) => i == k ? b : j == k ? a : x)
+  | (Some(a), Some(b)) => mapWithIndex((x, k) => i == k ? b : j == k ? a : x, xs)
   | _ => xs
   }
 
@@ -789,7 +791,7 @@ Running time: O(n)
 ]}
 ")
 let removeAt: 'a. (int, array<'a>) => array<'a> = (targetIndex, xs) =>
-  xs |> filterWithIndex((_, i) => i != targetIndex)
+  filterWithIndex((_, i) => i != targetIndex, xs)
 
 @ocaml.doc("
 [Array.chunk] returns an array of arrays, where each of the inner arrays has
@@ -812,6 +814,6 @@ This runs in O(n{^2}) time and is not stack safe.
 let rec chunk: 'a. (int, array<'a>) => array<array<'a>> = (size, xs) =>
   size < 1
     ? [xs]
-    : xs |> length <= size
+    : length(xs) <= size
     ? [xs]
-    : xs |> drop(size) |> chunk(size) |> Relude_Array_Instances.concat([xs |> take(size)])
+    : Relude_Array_Instances.concat([take(size, xs)], chunk(size, drop(size, xs)))

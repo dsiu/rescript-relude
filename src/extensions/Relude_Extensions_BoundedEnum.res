@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 let listAppend = (value, list) => List.concat(list{list, list{value}})
 //let arrayAppend = (value, array) => Array.concat([array, [|value|]]);
 
@@ -59,17 +62,17 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
    Running time of the returned lookup function: O(n)
    ")
   let inverseMapEqBy:
-    type a. ((a, a) => bool, E.t => a, a) => option<E.t> =
+    type a. ((a, a) => bool, E.t => a) => a => option<E.t> =
     (eqA, eToA) => {
       // Create a list of tuples [a, E.t] used for doign lookup
       let lookupList: list<(a, E.t)> =
-        upFromIncludingAsList(E.bottom) |> Relude_List_Instances.map(e => (eToA(e), e))
+        upFromIncludingAsList(E.bottom)->(Relude_List_Instances.map(e => (eToA(e), e), _))
 
       // Create the lookup function which closes over the lookupList
       let lookup = a =>
         lookupList
-        |> Relude_List_Instances.find(((a', _)) => eqA(a', a))
-        |> Relude_Option_Instances.map(snd)
+        ->Relude_List_Instances.find(((a', _)) => eqA(a', a), _)
+        ->(Relude_Option_Instances.map(snd, _))
 
       lookup
     }
@@ -97,7 +100,7 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
    Running time of the returned lookup function: O(n)
    ")
   let inverseMapEq:
-    type a. (~eqA: module(BsBastet.Interface.EQ with type t = a), E.t => a, a) => option<E.t> =
+    type a. (~eqA: module(BsBastet.Interface.EQ with type t = a), E.t => a) => a => option<E.t> =
     (~eqA, eToA) => {
       let module(EqA) = (eqA: module(BsBastet.Interface.EQ with type t = a))
       inverseMapEqBy(EqA.eq, eToA)
@@ -117,14 +120,14 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
    Running time for returned lookup function: O(log(n))
    ")
   let inverseMapOrdBy:
-    type a. ((a, a) => BsBastet.Interface.ordering, E.t => a, a) => option<E.t> =
+    type a. ((a, a) => BsBastet.Interface.ordering, E.t => a) => a => option<E.t> =
     (compareA, eToA) => {
       // Create the Map module used for doing lookups of a => E.t
       // This is necessary because of how OCaml maps work
       let module(M) = module(
         Map.Make({
           type t = a
-          let compare = (a, b) =>
+          let compare = (. a, b) =>
             switch compareA(a, b) {
             | #equal_to => 0
             | #less_than => -1
@@ -135,9 +138,8 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
 
       // Enumerate the E.t values and create the lookup map
       let lookupMap =
-        upFromIncludingAsList(E.bottom) |> Relude_List_Instances.foldRight(
-          (e, acc) => M.add(eToA(e), e, acc),
-          M.empty,
+        upFromIncludingAsList(E.bottom)->(
+          Relude_List_Instances.foldRight((e, acc) => M.add(eToA(e), e, acc), M.empty, _)
         )
 
       // Lookup function which closes over the lookup map
@@ -158,7 +160,7 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
    Running time for returned lookup function: O(log(n))
    ")
   let inverseMapOrd:
-    type a. (~ordA: module(BsBastet.Interface.ORD with type t = a), E.t => a, a) => option<E.t> =
+    type a. (~ordA: module(BsBastet.Interface.ORD with type t = a), E.t => a) => a => option<E.t> =
     (~ordA, eToA) => {
       let module(OrdA) = (ordA: module(BsBastet.Interface.ORD with type t = a))
       inverseMapOrdBy(OrdA.compare, eToA)
@@ -174,6 +176,6 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
    Running time for staging: O(n)
    Running time for returned lookup function: O(log(n))
    ")
-  let inverseMapString: (E.t => string, string) => option<E.t> = (eToString: E.t => string) =>
+  let inverseMapString: (E.t => string) => string => option<E.t> = (eToString: E.t => string) =>
     inverseMapOrdBy(BsBastet.String.Ord.compare, eToString)
 }

@@ -24,7 +24,7 @@ module ApplicativeExtensions = (A: BsBastet.Interface.APPLICATIVE) => {
 
   let rec all: 'a. list<A.t<'a>> => A.t<list<'a>> = x =>
     switch x {
-    | list{x, ...xs} => xs |> all |> A.apply(x |> A.map((result, rest) => list{result, ...rest}))
+    | list{x, ...xs} => A.apply(A.map(result => rest => list{result, ...rest}, x), all(xs))
     | list{} => A.pure(list{})
     }
 }

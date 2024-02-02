@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 // Inspired by https://github.com/dbuenzli/hmap
 
 @ocaml.doc("
@@ -120,7 +123,7 @@ module type HMAP_TYPE = {
     @ocaml.doc("
     Compares two keys
     ")
-    let compare: (t, t) => int
+    let compare: (. t, t) => int
   }
 
   @ocaml.doc("
@@ -136,7 +139,7 @@ module type HMAP_TYPE = {
   @ocaml.doc("
   Indicates if the HMap is empty
   ")
-  let isEmpty: t => bool
+  let isEmpty: (. t) => bool
 
   @ocaml.doc("
   Indicates if the HMap has a value for the given key
@@ -255,7 +258,7 @@ module WithKeyMeta = (KeyMeta: KEY_META): (HMAP_TYPE with type Key.keyMeta<'a> =
     let create: keyMeta<'a> => keyImpl<'a> = keyMeta => {
       let intId = uniqueInt()
       let witness = makeWitness()
-      {intId: intId, witness: witness, keyMeta: keyMeta}
+      {intId, witness, keyMeta}
     }
 
     @ocaml.doc("
@@ -282,7 +285,8 @@ module WithKeyMeta = (KeyMeta: KEY_META): (HMAP_TYPE with type Key.keyMeta<'a> =
     @ocaml.doc("
     Compares keys using the unique int ID assigned to the key type
     ")
-    let compare: (t, t) => int = (Key(a), Key(b)) => (compare: (int, int) => int)(a.intId, b.intId)
+    let compare: (. t, t) => int = (Key(a), Key(b)) =>
+      (compare: (int, int) => int)(a.intId, b.intId)
   }
 
   type keyImpl<'a> = Key.keyImpl<'a>

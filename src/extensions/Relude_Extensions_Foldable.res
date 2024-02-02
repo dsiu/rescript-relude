@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -42,7 +45,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   Indicates if the foldable contains the given item, using the given equality
   function.
   ")
-  let containsBy: 'a. (('a, 'a) => bool, 'a, F.t<'a>) => bool = (f, x, xs) => any(f(x), xs)
+  let containsBy: 'a. (('a, 'a) => bool, 'a, F.t<'a>) => bool = (f, x, xs) => any(f(x, _), xs)
 
   @ocaml.doc("
   Indicates if the foldable contains the given item, using the given EQ module.
@@ -59,11 +62,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   If the item is not found, the result is None.
   ")
   let indexOfBy: 'a. (('a, 'a) => bool, 'a, F.t<'a>) => option<int> = (f, x, xs) =>
-    F.fold_left(
-      ((i, v), y) => (i + 1, optionAlt(v, f(x, y) ? Some(i) : None)),
-      (0, None),
-      xs,
-    ) |> snd
+    snd(F.fold_left(((i, v), y) => (i + 1, optionAlt(v, f(x, y) ? Some(i) : None)), (0, None), xs))
 
   @ocaml.doc("
   Finds the index of the given item in the foldable using the given EQ module.
@@ -142,27 +141,23 @@ module FoldableExtensions = (F: FOLDABLE) => {
   also providing the item's index to the function.
   ")
   let forEachWithIndex: 'a. (('a, int) => unit, F.t<'a>) => unit = (f, xs) =>
-    F.fold_left((i, x) => {
-      f(x, i)
-      i + 1
-    }, 0, xs) |> ignore
+    ignore(F.fold_left((i, x) => {
+        f(x, i)
+        i + 1
+      }, 0, xs))
 
   @ocaml.doc("
   [find] returns the first item in the foldable which satisfies the given
   predicate, if any.
   ")
-  let find: 'a. ('a => bool, F.t<'a>) => option<'a> = f =>
-    F.fold_left((v, x) => optionAlt(v, f(x) ? Some(x) : None), None)
+  let find: 'a. ('a => bool, F.t<'a>) => option<'a> = (f, a) =>
+    F.fold_left((v, x) => optionAlt(v, f(x) ? Some(x) : None), None, a)
 
   @ocaml.doc("
   Finds the first indexed item in the foldable which satisfies the given predicate.
   ")
   let findWithIndex: 'a. (('a, int) => bool, F.t<'a>) => option<'a> = (f, xs) =>
-    F.fold_left(
-      ((i, v), x) => (i + 1, optionAlt(v, f(x, i) ? Some(x) : None)),
-      (0, None),
-      xs,
-    ) |> snd
+    snd(F.fold_left(((i, v), x) => (i + 1, optionAlt(v, f(x, i) ? Some(x) : None)), (0, None), xs))
 
   @ocaml.doc("
   Converts the foldable into a list
@@ -213,11 +208,13 @@ module FoldableExtensions = (F: FOLDABLE) => {
     elements using the specified separator.
     ")
     let intercalate: (M.t, F.t<M.t>) => M.t = (sep, xs) =>
-      F.fold_left(
-        ((init, acc), x) => init ? (false, x) : (false, M.append(acc, M.append(sep, x))),
-        (true, M.empty),
-        xs,
-      ) |> snd
+      snd(
+        F.fold_left(
+          ((init, acc), x) => init ? (false, x) : (false, M.append(acc, M.append(sep, x))),
+          (true, M.empty),
+          xs,
+        ),
+      )
   }
 
   @ocaml.doc("
@@ -293,12 +290,14 @@ module FoldableExtensions = (F: FOLDABLE) => {
     @ocaml.doc("
     Indicates of the foldable contains the given item using the given EQ module.
     ")
-    let contains: (E.t, F.t<E.t>) => bool = containsBy(E.eq)
+    let contains: (E.t, F.t<E.t>) => bool =
+      containsBy(E.eq, ...)
 
     @ocaml.doc("
     Returns the index of the item in the foldable, using the given EQ module.
     ")
-    let indexOf: (E.t, F.t<E.t>) => option<int> = indexOfBy(E.eq)
+    let indexOf: (E.t, F.t<E.t>) => option<int> =
+      indexOfBy(E.eq, ...)
   }
 
   @ocaml.doc("
@@ -308,11 +307,13 @@ module FoldableExtensions = (F: FOLDABLE) => {
     @ocaml.doc("
     Gets the minimum value of the foldable, using the given ORD module.
     ")
-    let min: F.t<O.t> => option<O.t> = minBy(O.compare)
+    let min: F.t<O.t> => option<O.t> =
+      minBy(O.compare, ...)
 
     @ocaml.doc("
     Gets the maximum value of the foldable, using the given ORD module.
     ")
-    let max: F.t<O.t> => option<O.t> = maxBy(O.compare)
+    let max: F.t<O.t> => option<O.t> =
+      maxBy(O.compare, ...)
   }
 }

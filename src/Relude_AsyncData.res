@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -278,7 +281,7 @@ let foldByValueLazy: 'a 'b. (unit => 'b, 'a => 'b, t<'a>) => 'b = (onNoValue, on
 @ocaml.doc("
 Maps a pure function over the value contained by Reloading or Complete
 ")
-let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (f, fa) =>
+let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (f, fa) =>
   switch fa {
   | Init => Init
   | Loading => Loading
@@ -414,7 +417,7 @@ let tapByValue: 'a. (unit => unit, 'a => unit, t<'a>) => t<'a> = (ifEmpty, ifNot
 @ocaml.doc("
 Applies a wrapped function to the value contained by Reloading or Complete
 ")
-let apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) =>
+let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) =>
   switch (ff, fa) {
   | (Init, Init) => Init
   | (Init, Loading) => Loading
@@ -457,7 +460,7 @@ include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 @ocaml.doc("
 Applies a monadic function to the value contained by Reloading or Complete
 ")
-let bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (fa, f) =>
+let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (fa, f) =>
   switch fa {
   | Init => Init
   | Loading => Loading
@@ -475,7 +478,7 @@ include Relude_Extensions_Monad.MonadExtensions(Monad)
 alt for AsyncData tries to find the most advanced state between
 two AsyncData values in terms of completeness.
 ")
-let alt: 'a. (t<'a>, t<'a>) => t<'a> = (fa, fb) =>
+let alt: 'a. (. t<'a>, t<'a>) => t<'a> = (fa, fb) =>
   switch (fa, fb) {
   | (Init, Init) => Init
   | (Init, Loading) => Loading
@@ -522,7 +525,7 @@ let eqBy: 'a. (('a, 'a) => bool, t<'a>, t<'a>) => bool = (innerEq, a, b) =>
 
 module Eq = (E: EQ): EQ => {
   type t = t<E.t>
-  let eq = eqBy(E.eq)
+  let eq = eqBy(E.eq, ...)
 }
 
 @ocaml.doc("
@@ -539,7 +542,7 @@ let showBy: 'a. ('a => string, t<'a>) => string = (showA, fa) =>
 
 module Show = (S: SHOW): SHOW => {
   type t = t<S.t>
-  let show = showBy(S.show)
+  let show = showBy(S.show, ...)
 }
 
 module Infix = {

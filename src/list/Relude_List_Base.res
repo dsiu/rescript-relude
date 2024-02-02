@@ -26,7 +26,7 @@ Running time: O(1)
 ]}
 ")
 let consOption: 'a. (option<'a>, list<'a>) => list<'a> = (x, xs) =>
-  x |> Relude_Option_Base.fold(xs, x => list{x, ...xs})
+  Relude_Option_Base.fold(xs, x => list{x, ...xs}, x)
 
 @ocaml.doc("
 [List.prepend] is an alias for {!val:cons}.
@@ -79,7 +79,7 @@ Running time: O(n)
 ]}
 ")
 let appendOption: 'a. (option<'a>, list<'a>) => list<'a> = (x, xs) =>
-  x |> Relude_Option_Base.fold(xs, append(_, xs))
+  Relude_Option_Base.fold(xs, append(_, xs), x)
 
 @ocaml.doc("
 [List.repeat] accepts a count and a value, and it creates a new list that
@@ -99,7 +99,7 @@ let repeat: 'a. (int, 'a) => list<'a> = (i, x) => Belt.List.make(i, x)
 @ocaml.doc("
 Makes a list by mapping a function over a range of ints from [0] to [[n - 1]].
 ")
-let makeWithIndex: 'a. (int, int => 'a) => list<'a> = Belt.List.makeBy
+let makeWithIndex: 'a. (int, int => 'a) => list<'a> = (i, f) => Belt.List.makeBy(i, f)
 
 @ocaml.doc("
 Maps an indexed function over the values of a list to produce a new list.
@@ -110,12 +110,12 @@ let mapWithIndex: 'a 'b. (('a, int) => 'b, list<'a>) => list<'b> = (f, xs) =>
 @ocaml.doc("
 Reverses the given list
 ")
-let reverse: 'a. list<'a> => list<'a> = Belt.List.reverse
+let reverse: 'a. list<'a> => list<'a> = l => Belt.List.reverse(l)
 
 @ocaml.doc("
 Shuffles the given list to create a new list
 ")
-let shuffle: 'a. list<'a> => list<'a> = Belt.List.shuffle
+let shuffle: 'a. list<'a> => list<'a> = l => Belt.List.shuffle(l)
 
 @ocaml.doc("
 Indicates if the given list is empty ([length == 0]).
@@ -158,7 +158,7 @@ let tail: 'a. list<'a> => option<list<'a>> = x =>
 @ocaml.doc("
 Gets all but the first items in the list, or [[]] if the list is empty.
 ")
-let tailOrEmpty: 'a. list<'a> => list<'a> = xs => tail(xs) |> Relude_Option_Base.getOrElse(list{})
+let tailOrEmpty: 'a. list<'a> => list<'a> = xs => Relude_Option_Base.getOrElse(list{}, tail(xs))
 
 @ocaml.doc("
 Gets all but the last item in the list, or None if the list is empty
@@ -199,7 +199,7 @@ let take: 'a. (int, list<'a>) => list<'a> = (i, xs) => {
     | list{} => acc
     | list{y, ...ys} => go(list{y, ...acc}, count - 1, ys)
     }
-  go(list{}, i, xs) |> reverse
+  reverse(go(list{}, i, xs))
 }
 
 @ocaml.doc("
@@ -214,7 +214,7 @@ let takeExactly: 'a. (int, list<'a>) => option<list<'a>> = (i, xs) => {
     | list{y, ...ys} => go(list{y, ...acc}, count - 1, ys)
     }
   if i >= 0 {
-    go(list{}, i, xs) |> Relude_Option_Instances.map(reverse)
+    Relude_Option_Instances.map(reverse, go(list{}, i, xs))
   } else {
     None
   }
@@ -231,7 +231,7 @@ let takeWhile: 'a. ('a => bool, list<'a>) => list<'a> = (f, xs) => {
     | list{y, ..._} if !f(y) => acc
     | list{y, ...ys} => go(list{y, ...acc}, ys)
     }
-  go(list{}, xs) |> reverse
+  reverse(go(list{}, xs))
 }
 
 @ocaml.doc("
@@ -287,7 +287,7 @@ let keepWithIndex: 'a. (('a, int) => bool, list<'a>) => list<'a> = filterWithInd
 Creates a new list containing only the items from the given list that do not
 satisfy the given predicate.
 ")
-let filterNot: 'a. ('a => bool, list<'a>) => list<'a> = f => filter(a => !f(a))
+let filterNot: 'a. ('a => bool, list<'a>) => list<'a> = (f, l) => filter(a => !f(a), l)
 
 @ocaml.doc("
 Alias of filterNot
@@ -298,8 +298,8 @@ let reject: 'a. ('a => bool, list<'a>) => list<'a> = filterNot
 Creates a new list containing only the items from the given list that do not
 satisfy the given indexed predicate.
 ")
-let filterNotWithIndex: 'a. (('a, int) => bool, list<'a>) => list<'a> = f =>
-  filterWithIndex((a, i) => !f(a, i))
+let filterNotWithIndex: 'a. (('a, int) => bool, list<'a>) => list<'a> = (f, l) =>
+  filterWithIndex((a, i) => !f(a, i), l)
 
 @ocaml.doc("
 Alias of filterNotWithIndex
@@ -311,11 +311,13 @@ Maps a option-creating function over the list, and keeps the [Some] values
 without the [Some] structure.
 ")
 let mapOption: 'a 'b. ('a => option<'b>, list<'a>) => list<'b> = (f, xs) =>
-  Relude_List_Instances.foldLeft(
-    (acc, curr) => Relude_Option_Base.fold(acc, v => list{v, ...acc}, f(curr)),
-    list{},
-    xs,
-  ) |> reverse
+  reverse(
+    Relude_List_Instances.foldLeft(
+      (acc, curr) => Relude_Option_Base.fold(acc, v => list{v, ...acc}, f(curr)),
+      list{},
+      xs,
+    ),
+  )
 
 @ocaml.doc("
 Keeps all the Some values from the list, and removes the Some structure.
@@ -347,7 +349,7 @@ let prependToAll: 'a. ('a, list<'a>) => list<'a> = (delim, xs) => {
     | list{y, ...ys} => go(list{y, delim, ...acc}, ys)
     }
 
-  go(list{}, xs) |> reverse
+  reverse(go(list{}, xs))
 }
 
 @ocaml.doc("
@@ -375,7 +377,7 @@ let replicate: 'a. (int, list<'a>) => list<'a> = (i, xs) => {
 @ocaml.doc("
 Combines two lists pair-wise into a list of tuple-2
 ")
-let zip: 'a 'b. (list<'a>, list<'b>) => list<('a, 'b)> = Belt.List.zip
+let zip: 'a 'b. (list<'a>, list<'b>) => list<('a, 'b)> = (a, b) => Belt.List.zip(a, b)
 
 @ocaml.doc("
 Combines two lists using a function to combine pair-wise values.
@@ -391,7 +393,7 @@ let zipWithIndex: 'a. list<'a> => list<('a, int)> = xs => mapWithIndex((v, i) =>
 @ocaml.doc("
 Creates two lists by splitting a list of tuple-2 on the left and right.
 ")
-let unzip: 'a 'b. list<('a, 'b)> => (list<'a>, list<'b>) = Belt.List.unzip
+let unzip: 'a 'b. list<('a, 'b)> => (list<'a>, list<'b>) = l => Belt.List.unzip(l)
 
 @ocaml.doc("
 Sorts a list with the given int-based compare function.
@@ -402,7 +404,7 @@ let sortWithInt: 'a. (('a, 'a) => int, list<'a>) => list<'a> = (f, xs) => Belt.L
 Sorts a list with the given ordering-based compare function.
 ")
 let sortBy: 'a. (('a, 'a) => ordering, list<'a>) => list<'a> = (f, xs) =>
-  sortWithInt((a, b) => f(a, b) |> Relude_Ordering.toInt, xs)
+  sortWithInt((a, b) => Relude_Ordering.toInt(f(a, b)), xs)
 
 @ocaml.doc("
 Sorts a list with the given ORD module.
@@ -417,11 +419,13 @@ Creates a new list containing only the distinct items of the given list, using
 the given equality function.
 ")
 let distinctBy: 'a. (('a, 'a) => bool, list<'a>) => list<'a> = (eq, xs) =>
-  Relude_List_Instances.foldLeft(
-    (ys, x) => Relude_List_Instances.containsBy(eq, x, ys) ? ys : list{x, ...ys},
-    list{},
-    xs,
-  ) |> reverse
+  reverse(
+    Relude_List_Instances.foldLeft(
+      (ys, x) => Relude_List_Instances.containsBy(eq, x, ys) ? ys : list{x, ...ys},
+      list{},
+      xs,
+    ),
+  )
 
 @ocaml.doc("
 Removes the first occurrence of the given item from the list, based on the given
@@ -430,7 +434,7 @@ equality function.
 let removeFirstBy: 'a. (('a, 'a) => bool, 'a, list<'a>) => list<'a> = (innerEq, v, xs) => {
   let go = ((found, ys), x) =>
     found ? (true, list{x, ...ys}) : innerEq(v, x) ? (true, ys) : (false, list{x, ...ys})
-  Relude_List_Instances.foldLeft(go, (false, list{}), xs) |> snd |> reverse
+  reverse(snd(Relude_List_Instances.foldLeft(go, (false, list{}), xs)))
 }
 
 @ocaml.doc("
@@ -438,11 +442,9 @@ Removes all occurrences of the given item from the list, based on the given
 equality function.
 ")
 let removeEachBy: 'a. (('a, 'a) => bool, 'a, list<'a>) => list<'a> = (innerEq, x, xs) =>
-  Relude_List_Instances.foldLeft(
-    (ys, y) => innerEq(x, y) ? ys : list{y, ...ys},
-    list{},
-    xs,
-  ) |> reverse
+  reverse(
+    Relude_List_Instances.foldLeft((ys, y) => innerEq(x, y) ? ys : list{y, ...ys}, list{}, xs),
+  )
 
 @ocaml.doc("
 Creates a new list containing only the distinct values of the list, based on the
@@ -476,33 +478,33 @@ Creates a new list that replaces the item at the given index with the given
 value. If the index is out of range, no replacement is made.
 ")
 let replaceAt: 'a. (int, 'a, list<'a>) => list<'a> = (targetIndex, newX, xs) =>
-  xs |> mapWithIndex((x, currentIndex) =>
+  mapWithIndex((x, currentIndex) =>
     if currentIndex == targetIndex {
       newX
     } else {
       x
     }
-  )
+  , xs)
 
 @ocaml.doc("
 Similar to foldLeft, but collects the results from each iteration,
 rather than accumulating a single final result.
 ")
 let scanLeft: (('b, 'a) => 'b, 'b, list<'a>) => list<'b> = (f, init, xs) =>
-  Relude_List_Instances.foldLeft(((acc, result), curr) => {
-    let nextAcc = f(acc, curr)
-    (nextAcc, list{nextAcc, ...result})
-  }, (init, list{}), xs) |> snd |> Belt.List.reverse // TODO use our own implementation
+  Belt.List.reverse(snd(Relude_List_Instances.foldLeft(((acc, result), curr) => {
+        let nextAcc = f(acc, curr)
+        (nextAcc, list{nextAcc, ...result})
+      }, (init, list{}), xs))) // TODO use our own implementation
 
 @ocaml.doc("
 Similar to foldRight, but collects the results from each iteration,
 rather than accumulating a single final result.
 ")
 let scanRight: (('a, 'b) => 'b, 'b, list<'a>) => list<'b> = (f, init, xs) =>
-  Relude_List_Instances.foldRight((curr, (acc, result)) => {
-    let nextAcc = f(curr, acc)
-    (nextAcc, list{nextAcc, ...result})
-  }, (init, list{}), xs) |> snd
+  snd(Relude_List_Instances.foldRight((curr, (acc, result)) => {
+      let nextAcc = f(curr, acc)
+      (nextAcc, list{nextAcc, ...result})
+    }, (init, list{}), xs))
 
 @ocaml.doc("
 Creates a new list that inserts the given value at the given index.
@@ -519,7 +521,7 @@ Creates a new list that modifies the value at the given index with the given
 function. If the index is out of range, no change is made.
 ")
 let updateAt: 'a. (int, 'a => 'a, list<'a>) => list<'a> = (targetIndex, f, xs) =>
-  xs |> mapWithIndex((x, index) => index == targetIndex ? f(x) : x)
+  mapWithIndex((x, index) => index == targetIndex ? f(x) : x, xs)
 
 @ocaml.doc("
 Creates a new list with the elements at the two given indexes swapped.
@@ -527,7 +529,7 @@ If either index is out of range, no change is made.
 ")
 let swapAt: 'a. (int, int, list<'a>) => list<'a> = (i, j, xs) =>
   switch (at(i, xs), at(j, xs)) {
-  | (Some(a), Some(b)) => xs |> mapWithIndex((x, k) => i == k ? b : j == k ? a : x)
+  | (Some(a), Some(b)) => mapWithIndex((x, k) => i == k ? b : j == k ? a : x, xs)
   | _ => xs
   }
 
@@ -536,13 +538,13 @@ Creates a new list without the element at the given index. If the index is out
 of range, no change is made.
 ")
 let removeAt: 'a. (int, list<'a>) => list<'a> = (targetIndex, xs) =>
-  xs |> filterWithIndex((_, i) => i != targetIndex)
+  filterWithIndex((_, i) => i != targetIndex, xs)
 
 @ocaml.doc("
 Creates a list of elements split into groups the length of size. If the list
 can't be split evenly, the final chunk will be the remaining elements.
 ")
 let rec chunk: 'a. (int, list<'a>) => list<list<'a>> = (size, xs) =>
-  xs |> Relude_List_Instances.length <= size
+  Relude_List_Instances.length(xs) <= size
     ? list{xs}
-    : list{xs |> take(size), ...xs |> drop(size) |> chunk(size)}
+    : list{take(size, xs), ...chunk(size, drop(size, xs))}

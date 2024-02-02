@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -61,7 +64,7 @@ It returns [VError(e)] if [x] is of the form [VError(e)].
   map((x) => {sqrt(float_of_int(x))}, VError(\"bad\")) == VError(\"bad\");
 ]}
 ")
-let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, x) =>
+let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, x) =>
   switch x {
   | VOk(a) => VOk(f(a))
   | VError(_) as e => e
@@ -111,7 +114,7 @@ let mapErrorsNea: 'a 'e1 'e2. (
 ) => t<'a, Relude_NonEmpty.Array.t<'e2>> = (f, x) =>
   switch x {
   | VOk(_) as ok => ok
-  | VError(nea) => VError(nea |> Relude_NonEmpty.Array.map(f))
+  | VError(nea) => VError(Relude_NonEmpty.Array.map(f, nea))
   }
 
 @ocaml.doc("
@@ -124,7 +127,7 @@ let mapErrorsNel: 'a 'e1 'e2. (
 ) => t<'a, Relude_NonEmpty.List.t<'e2>> = (f, x) =>
   switch x {
   | VOk(_) as ok => ok
-  | VError(nea) => VError(nea |> Relude_NonEmpty.List.map(f))
+  | VError(nea) => VError(Relude_NonEmpty.List.map(f, nea))
   }
 
 @ocaml.doc("
@@ -232,7 +235,7 @@ let alignWithWithAppendErrors: 'a 'b 'c 'e. (
   Relude_Ior_Type.t<'a, 'b> => 'c,
   t<'a, 'e>,
   t<'b, 'e>,
-) => t<'c, 'e> = (appendErrors, f, fa, fb) => alignWithAppendErrors(appendErrors, fa, fb) |> map(f)
+) => t<'c, 'e> = (appendErrors, f, fa, fb) => map(f, alignWithAppendErrors(appendErrors, fa, fb))
 
 @ocaml.doc("
 [pure(val)] wraps its argument in a [VOk()].
@@ -260,7 +263,7 @@ errors to be discarded.
   flatMapV(VError(\"not an int\"), mustBeEven) == VError(\"not an int\");
 ]}
 ")
-let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
+let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
   switch fa {
   | VOk(a) => f(a)
   | VError(e) => VError(e)
@@ -359,14 +362,14 @@ let fold: 'a 'e 'c. ('e => 'c, 'a => 'c, t<'a, 'e>) => 'c = (ec, ac, x) =>
   flip(VError(-1)) == VOk(-1);
 ]}
 ")
-let flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = fa => fa |> fold(e => VOk(e), a => VError(a))
+let flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = fa => fold(e => VOk(e), a => VError(a), fa)
 
 let map2: (('x, 'x) => 'x, ('a, 'b) => 'c, t<'a, 'x>, t<'b, 'x>) => t<'c, 'x> = (
   appendErrors,
   f,
   fa,
   fb,
-) => applyWithAppendErrors(appendErrors, map(f, fa), fb)
+) => applyWithAppendErrors(appendErrors, map(x => f(x, _), fa), fb)
 
 let map3: (('x, 'x) => 'x, ('a, 'b, 'c) => 'd, t<'a, 'x>, t<'b, 'x>, t<'c, 'x>) => t<'d, 'x> = (
   appendErrors,
@@ -374,7 +377,7 @@ let map3: (('x, 'x) => 'x, ('a, 'b, 'c) => 'd, t<'a, 'x>, t<'b, 'x>, t<'c, 'x>) 
   fa,
   fb,
   fc,
-) => applyWithAppendErrors(appendErrors, map2(appendErrors, f, fa, fb), fc)
+) => applyWithAppendErrors(appendErrors, map2(appendErrors, (x, y) => f(x, y, ...), fa, fb), fc)
 
 let map4: (
   ('x, 'x) => 'x,
@@ -384,7 +387,11 @@ let map4: (
   t<'c, 'x>,
   t<'d, 'x>,
 ) => t<'e, 'x> = (appendErrors, f, fa, fb, fc, fd) =>
-  applyWithAppendErrors(appendErrors, map3(appendErrors, f, fa, fb, fc), fd)
+  applyWithAppendErrors(
+    appendErrors,
+    map3(appendErrors, (x, y, z) => f(x, y, z, ...), fa, fb, fc),
+    fd,
+  )
 
 let map5: (
   ('x, 'x) => 'x,
@@ -395,7 +402,11 @@ let map5: (
   t<'d, 'x>,
   t<'e, 'x>,
 ) => t<'f, 'x> = (appendErrors, f, fa, fb, fc, fd, fe) =>
-  applyWithAppendErrors(appendErrors, map4(appendErrors, f, fa, fb, fc, fd), fe)
+  applyWithAppendErrors(
+    appendErrors,
+    map4(appendErrors, (w, x, y, z) => f(w, x, y, z, ...), fa, fb, fc, fd),
+    fe,
+  )
 
 module WithErrors = (Errors: SEMIGROUP_ANY, Error: TYPE) => {
   type t<'a> = t<'a, Errors.t<Error.t>>
@@ -409,7 +420,7 @@ module WithErrors = (Errors: SEMIGROUP_ANY, Error: TYPE) => {
 
   module Apply: APPLY with type t<'a> = t<'a> = {
     include Functor
-    let apply = (ff, fa) => applyWithAppendErrors(Errors.append, ff, fa)
+    let apply = (. ff, fa) => applyWithAppendErrors(Errors.append, ff, fa)
   }
   let apply = Apply.apply
   include Relude_Extensions_Apply.ApplyExtensions(Apply)

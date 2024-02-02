@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 module WithFunctor = (F: FUNCTOR) => {
@@ -5,10 +8,10 @@ module WithFunctor = (F: FUNCTOR) => {
     | Pure('a)
     | FlatMap(F.t<t<'a>>)
 
-  let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
+  let rec map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
     switch freeA {
     | Pure(a) => Pure(aToB(a))
-    | FlatMap(fFreeA) => FlatMap(fFreeA |> F.map(freeA => freeA |> map(aToB)))
+    | FlatMap(fFreeA) => FlatMap(fFreeA->(F.map(freeA => freeA->(map(aToB, _)), _)))
     }
 
   module Functor: FUNCTOR with type t<'a> = t<'a> = {
@@ -17,10 +20,10 @@ module WithFunctor = (F: FUNCTOR) => {
   }
   include Relude_Extensions_Functor.FunctorExtensions(Functor)
 
-  let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
+  let rec apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {
-    | Pure(aToB) => freeA |> map(aToB)
-    | FlatMap(fFreeAToB) => FlatMap(fFreeAToB |> F.map(freeAToB => apply(freeAToB, freeA)))
+    | Pure(aToB) => freeA->(map(aToB, _))
+    | FlatMap(fFreeAToB) => FlatMap(fFreeAToB->(F.map(freeAToB => apply(freeAToB, freeA), _)))
     }
 
   module Apply: APPLY with type t<'a> = t<'a> = {
@@ -37,10 +40,10 @@ module WithFunctor = (F: FUNCTOR) => {
   }
   include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 
-  let rec bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (freeA, aToFreeB) =>
+  let rec bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (freeA, aToFreeB) =>
     switch freeA {
     | Pure(a) => aToFreeB(a)
-    | FlatMap(fFreeA) => FlatMap(fFreeA |> F.map(freeA => bind(freeA, aToFreeB)))
+    | FlatMap(fFreeA) => FlatMap(fFreeA->(F.map(freeA => bind(freeA, aToFreeB), _)))
     }
 
   module Monad: MONAD with type t<'a> = t<'a> = {
@@ -54,7 +57,7 @@ module WithFunctor = (F: FUNCTOR) => {
 
   This is useful to creating \"smart constructors\" for our algebra
   ")
-  let liftF: 'a. F.t<'a> => t<'a> = fa => FlatMap(fa |> F.map(a => Pure(a)))
+  let liftF: 'a. F.t<'a> => t<'a> = fa => FlatMap(fa->(F.map(a => Pure(a), _)))
 
   @ocaml.doc("
   Specifies a monad into which we will interpret our free monadic program
@@ -67,7 +70,7 @@ module WithFunctor = (F: FUNCTOR) => {
     let rec foldFree: (F.t<'x> => M.t<'x>, t<'a>) => M.t<'a> = (nat, freeA) =>
       switch freeA {
       | Pure(a) => M.pure(a)
-      | FlatMap(fFreeA) => M.flat_map(nat(fFreeA), foldFree(nat))
+      | FlatMap(fFreeA) => M.flat_map(nat(fFreeA), foldFree(nat, ...))
       }
   }
 

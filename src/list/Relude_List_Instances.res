@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -148,7 +151,7 @@ module Eq = (EqA: EQ) => {
 Converts a list to a string using the given show function
 ")
 let showBy: ('a => string, list<'a>) => string = (innerShow, xs) => {
-  let join = intercalate(module(BsBastet.String.Monoid))
+  let join = intercalate(module(BsBastet.String.Monoid), ...)
   "[" ++ (join(", ", map(innerShow, xs)) ++ "]")
 }
 
@@ -168,15 +171,15 @@ module Show = (ShowA: SHOW) => {
 @ocaml.doc("
 Converts the given array to a list
 ")
-let fromArray = Belt.List.fromArray
+let fromArray = a => Belt.List.fromArray(a)
 
 @ocaml.doc("
 Converts the given list to an array
 ")
-let toArray = Belt.List.toArray
+let toArray = l => Belt.List.toArray(l)
 
 module IsoArray: Relude_Interface.ISO_ARRAY with type t<'a> = list<'a> = {
   type t<'a> = list<'a>
-  let fromArray = fromArray
-  let toArray = toArray
+  let fromArray = a => fromArray(a)
+  let toArray = l => toArray(l)
 }

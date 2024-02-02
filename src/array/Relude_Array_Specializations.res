@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -8,24 +11,28 @@ module ArrayEqExtensions = (E: EQ) => {
   @ocaml.doc("
   Finds the distinct items of the array, based on the given EQ module.
   ")
-  let distinct: array<E.t> => array<E.t> = Relude_Array_Base.distinctBy(E.eq)
+  let distinct: array<E.t> => array<E.t> =
+    Relude_Array_Base.distinctBy(E.eq, ...)
 
   @ocaml.doc("
   Removes the first item of the array which equals the given item, based on the
   given EQ module.
   ")
-  let removeFirst: (E.t, array<E.t>) => array<E.t> = Relude_Array_Base.removeFirstBy(E.eq)
+  let removeFirst: (E.t, array<E.t>) => array<E.t> =
+    Relude_Array_Base.removeFirstBy(E.eq, ...)
 
   @ocaml.doc("
   Removes all item of the array which equal the given item, based on the given
   EQ module.
   ")
-  let removeEach: (E.t, array<E.t>) => array<E.t> = Relude_Array_Base.removeEachBy(E.eq)
+  let removeEach: (E.t, array<E.t>) => array<E.t> =
+    Relude_Array_Base.removeEachBy(E.eq, ...)
 
   @ocaml.doc("
   Indicates if the two arrays are pairwise equal, based on the given EQ module.
   ")
-  let eq: (array<E.t>, array<E.t>) => bool = Relude_Array_Instances.eqBy(E.eq)
+  let eq: (array<E.t>, array<E.t>) => bool =
+    Relude_Array_Instances.eqBy(E.eq, ...)
 }
 
 @ocaml.doc("
@@ -38,7 +45,8 @@ module ArrayOrdExtensions = (O: ORD) => {
   @ocaml.doc("
   Sorts the array using the given ORD module.
   ")
-  let sort = Relude_Array_Base.sortBy(O.compare)
+  let sort =
+    Relude_Array_Base.sortBy(O.compare, ...)
 }
 
 @ocaml.doc("
@@ -77,7 +85,7 @@ module String = {
   let distinct = xs => Relude_Array_Instances.foldLeft((acc, curr) => {
       Js.Dict.set(acc, curr, 0)
       acc
-    }, Js.Dict.empty(), xs) |> Js.Dict.keys
+    }, Js.Dict.empty(), xs)->Js.Dict.keys
 }
 
 @ocaml.doc("
@@ -89,12 +97,14 @@ module Int = {
   @ocaml.doc("
   Finds the sum of all the ints in the array
   ")
-  let sum = Relude_Array_Instances.foldWithMonoid(module(Relude_Int.Additive.Monoid))
+  let sum =
+    Relude_Array_Instances.foldWithMonoid(module(Relude_Int.Additive.Monoid), ...)
 
   @ocaml.doc("
   Finds the product of all the ints in the array
   ")
-  let product = Relude_Array_Instances.foldWithMonoid(module(Relude_Int.Multiplicative.Monoid))
+  let product =
+    Relude_Array_Instances.foldWithMonoid(module(Relude_Int.Multiplicative.Monoid), ...)
 }
 
 @ocaml.doc("
@@ -105,12 +115,14 @@ module Float = {
   @ocaml.doc("
   Finds the sum of all the floats in the array
   ")
-  let sum = Relude_Array_Instances.foldWithMonoid(module(Relude_Float.Additive.Monoid))
+  let sum =
+    Relude_Array_Instances.foldWithMonoid(module(Relude_Float.Additive.Monoid), ...)
 
   @ocaml.doc("
   Finds the product of all the floats in the array
   ")
-  let product = Relude_Array_Instances.foldWithMonoid(module(Relude_Float.Multiplicative.Monoid))
+  let product =
+    Relude_Array_Instances.foldWithMonoid(module(Relude_Float.Multiplicative.Monoid), ...)
 }
 
 @ocaml.doc("

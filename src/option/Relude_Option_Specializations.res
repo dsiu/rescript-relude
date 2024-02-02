@@ -1,5 +1,8 @@
+@@uncurried
+@@uncurried.swap
+
 module OptionEqExtensions = (E: BsBastet.Interface.EQ) => {
-  let eq: (option<E.t>, option<E.t>) => bool = Relude_Option_Instances.eqBy(E.eq)
+  let eq: (option<E.t>, option<E.t>) => bool = Relude_Option_Instances.eqBy(E.eq, ...)
 }
 
 module OptionOrdExtensions = (O: BsBastet.Interface.ORD) => {

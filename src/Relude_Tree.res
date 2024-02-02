@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -27,7 +30,7 @@ let isSingleton: 'a. t<'a> => bool = ({value: _, children}) => Relude_List.isEmp
 @ocaml.doc("
 Constructs a tree from a value and children
 ")
-let make: 'a. ('a, list<t<'a>>) => t<'a> = (value, children) => {value: value, children: children}
+let make: 'a. ('a, list<t<'a>>) => t<'a> = (value, children) => {value, children}
 
 @ocaml.doc("
 Destructures a tree into a tuple of the value and children
@@ -52,7 +55,7 @@ Replaces only the top value of the tree
 ")
 let setValue: 'a. ('a, t<'a>) => t<'a> = (newValue, {value: _, children}) => {
   value: newValue,
-  children: children,
+  children,
 }
 
 @ocaml.doc("
@@ -60,7 +63,7 @@ Updates only the top value of the tree
 ")
 let modifyValue: 'a. ('a => 'a, t<'a>) => t<'a> = (f, {value, children}) => {
   value: f(value),
-  children: children,
+  children,
 }
 
 @ocaml.doc("
@@ -78,7 +81,7 @@ let getChildAt: 'a. (int, t<'a>) => option<t<'a>> = (index, {value: _, children}
 Replaces all the children with the given list of new children
 ")
 let setChildren: 'a. (list<t<'a>>, t<'a>) => t<'a> = (newChildren, {value, children: _}) => {
-  value: value,
+  value,
   children: newChildren,
 }
 
@@ -86,7 +89,7 @@ let setChildren: 'a. (list<t<'a>>, t<'a>) => t<'a> = (newChildren, {value, child
 Modifies the children using the given function
 ")
 let modifyChildren: 'a. (list<t<'a>> => list<t<'a>>, t<'a>) => t<'a> = (f, {value, children}) => {
-  value: value,
+  value,
   children: f(children),
 }
 
@@ -94,7 +97,7 @@ let modifyChildren: 'a. (list<t<'a>> => list<t<'a>>, t<'a>) => t<'a> = (f, {valu
 Adds a child on the left side
 ")
 let prependChild: 'a. (~child: t<'a>, t<'a>) => t<'a> = (~child, {value, children}) => {
-  value: value,
+  value,
   children: Relude_List.prepend(child, children),
 }
 
@@ -102,7 +105,7 @@ let prependChild: 'a. (~child: t<'a>, t<'a>) => t<'a> = (~child, {value, childre
 Adds a child on the right side
 ")
 let appendChild: 'a. (~child: t<'a>, t<'a>) => t<'a> = (~child, {value, children}) => {
-  value: value,
+  value,
   children: Relude_List.append(child, children),
 }
 
@@ -110,7 +113,7 @@ let appendChild: 'a. (~child: t<'a>, t<'a>) => t<'a> = (~child, {value, children
 Prepends new children to the left side of the existing children
 ")
 let prependChildren: 'a. (list<t<'a>>, t<'a>) => t<'a> = (newChildren, {value, children}) => {
-  value: value,
+  value,
   children: Relude_List.concat(newChildren, children),
 }
 
@@ -118,7 +121,7 @@ let prependChildren: 'a. (list<t<'a>>, t<'a>) => t<'a> = (newChildren, {value, c
 Appends new children to the right side of the existing children
 ")
 let appendChildren: 'a. (list<t<'a>>, t<'a>) => t<'a> = (newChildren, {value, children}) => {
-  value: value,
+  value,
   children: Relude_List.concat(children, newChildren),
 }
 
@@ -310,7 +313,7 @@ doesn't pass the predicate, the entire subtree is trimmed.
 let rec filter: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, {value, children}) =>
   if pred(value) {
     Some({
-      value: value,
+      value,
       children: children |> Relude_List.mapOption(filter(pred)),
     })
   } else {

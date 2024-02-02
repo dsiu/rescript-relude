@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -6,10 +9,10 @@ module WithFunctor = (F: FUNCTOR) => {
     | Pure('a): t<'a>
     | Apply(F.t<'x>, t<'x => 'a>): t<'a>
 
-  let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
+  let rec map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
     switch freeA {
     | Pure(a) => Pure(aToB(a))
-    | Apply(fx, freeXToA) => Apply(fx, freeXToA |> map(xToA => \">>"(xToA, aToB)))
+    | Apply(fx, freeXToA) => Apply(fx, map(xToA => \">>"(xToA, aToB, ...), freeXToA))
     }
 
   module Functor: FUNCTOR with type t<'a> = t<'a> = {
@@ -20,9 +23,9 @@ module WithFunctor = (F: FUNCTOR) => {
 
   let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {
-    | Pure(aToB) => freeA |> map(aToB)
+    | Pure(aToB) => freeA->(map(aToB, _))
     | Apply(fx, freeXToAToB) =>
-      let freeAToXToB = freeXToAToB |> map(Relude_Function.flip)
+      let freeAToXToB = map(x => Relude_Function.flip(x, ...), freeXToAToB)
       let freeXToB = apply(freeAToXToB, freeA)
       Apply(fx, freeXToB)
     }

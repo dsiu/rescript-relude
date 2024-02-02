@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -24,7 +27,7 @@ module WithMonad = (M: MONAD) => {
 
   let liftF: 'a 'e. M.t<'a> => t<'a, 'e> = mA => ResultT(M.map(a => Ok(a), mA))
 
-  let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (aToB, ResultT(mResultA)) => ResultT(
+  let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (aToB, ResultT(mResultA)) => ResultT(
     M.map(resultA => Relude_Result.map(aToB, resultA), mResultA),
   )
 
@@ -72,19 +75,19 @@ module WithMonad = (M: MONAD) => {
     ResultT(mResultAE1),
   ) => ResultT(M.map(resultAE1 => Relude_Result.bimap(aToB, e1ToE2, resultAE1), mResultAE1))
 
-  let apply: 'a 'b 'e. (t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (
+  let apply: 'a 'b 'e. (. t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (
     ResultT(mResultAToB),
     ResultT(mResultA),
   ) => ResultT(
     M.apply(
-      M.map((resultAToB, resultA) => Relude_Result.apply(resultAToB, resultA), mResultAToB),
+      M.map(resultAToB => resultA => Relude_Result.apply(resultAToB, resultA), mResultAToB),
       mResultA,
     ),
   )
 
   let pure: 'a 'e. 'a => t<'a, 'e> = a => ResultT(M.pure(Relude_Result.ok(a)))
 
-  let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (
+  let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (
     ResultT(mResultA),
     aToResultTB,
   ) => ResultT(
