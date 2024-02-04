@@ -139,7 +139,7 @@ module type HMAP_TYPE = {
   @ocaml.doc("
   Indicates if the HMap is empty
   ")
-  let isEmpty: (. t) => bool
+  let isEmpty: t => bool
 
   @ocaml.doc("
   Indicates if the HMap has a value for the given key
@@ -307,7 +307,7 @@ module WithKeyMeta = (KeyMeta: KEY_META): (HMAP_TYPE with type Key.keyMeta<'a> =
 
   let empty = HMap.empty
 
-  let isEmpty = HMap.is_empty
+  let isEmpty = m => HMap.is_empty(m)
 
   let hasKey = (k, m) => HMap.mem(Key.Key(k), m)
 

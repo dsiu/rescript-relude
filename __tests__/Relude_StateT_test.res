@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 
@@ -26,41 +29,50 @@ module Stack = {
 
 describe("StateT", () => {
   test("pure", () => {
-    let result = State.pure(2) |> State.runStateT(list{})
-    expect(result) |> toEqual((2, list{}))
+    let result = State.pure(2)->(State.runStateT(list{}, _))
+    expect(result)->toEqual((2, list{}))
   })
 
   test("put", () => {
-    let result = \">>="(State.pure(2), a => \"$>"(State.put(list{a}), a)) |> State.runStateT(list{})
-    expect(result) |> toEqual((2, list{2}))
+    let result =
+      \">>="(State.pure(2), a => \"$>"(State.put(list{a}), a))->(State.runStateT(list{}, _))
+    expect(result)->toEqual((2, list{2}))
   })
 
   test("stack example 1 (push)", () => {
-    let result = \">>="(Stack.push(1), _ => Stack.push(2)) |> State.runStateT(list{})
-    expect(result) |> toEqual((2, list{2, 1}))
+    let result = \">>="(Stack.push(1), _ => Stack.push(2))->(State.runStateT(list{}, _))
+    expect(result)->toEqual((2, list{2, 1}))
   })
 
   test("stack example 2 (push, pop)", () => {
     let result =
-      \">>="(Stack.push(1), _ =>
-        \">>="(Stack.push(2), _ => \">>="(Stack.push(3), _ => Stack.pop))
-      ) |> State.runStateT(list{})
-    expect(result) |> toEqual((Some(3), list{2, 1}))
+      \">>="(
+        Stack.push(1),
+        _ => \">>="(Stack.push(2), _ => \">>="(Stack.push(3), _ => Stack.pop)),
+      )->(State.runStateT(list{}, _))
+    expect(result)->toEqual((Some(3), list{2, 1}))
   })
 
   test("stack example 3", () => {
     // do notation :(
     let result =
-      \">>="(Stack.push(1), _ =>
-        \">>="(Stack.push(2), _ =>
-          \">>="(Stack.push(3), _ =>
-            \">>="(Stack.pop, _ =>
-              \">>="(Stack.pop, _ => \">>="(Stack.push(4), _ => Stack.push(5)))
-            )
-          )
-        )
-      ) |> State.runStateT(list{})
-    expect(result) |> toEqual((5, list{5, 4, 1}))
+      \">>="(
+        Stack.push(1),
+        _ =>
+          \">>="(
+            Stack.push(2),
+            _ =>
+              \">>="(
+                Stack.push(3),
+                _ =>
+                  \">>="(
+                    Stack.pop,
+                    _ => \">>="(Stack.pop, _ => \">>="(Stack.push(4), _ => Stack.push(5))),
+                  ),
+              ),
+          ),
+      )->(State.runStateT(list{}, _))
+    expect(result)->toEqual((5, list{5, 4, 1}))
   })
 
   test("stack example 4", () => {
@@ -69,24 +81,25 @@ describe("StateT", () => {
       \">>="(
         \">>="(
           \">>="(
-            \">>="(\">>="(\">>="(Stack.push(1), _ => Stack.push(2)), _ => Stack.push(3)), _ =>
-              Stack.pop
+            \">>="(
+              \">>="(\">>="(Stack.push(1), _ => Stack.push(2)), _ => Stack.push(3)),
+              _ => Stack.pop,
             ),
             _ => Stack.pop,
           ),
           _ => Stack.push(4),
         ),
         _ => \"<$$>"(Stack.push(5), a => a * 100),
-      ) |> State.runStateT(list{})
-    expect(result) |> toEqual((500, list{5, 4, 1}))
+      )->(State.runStateT(list{}, _))
+    expect(result)->toEqual((500, list{5, 4, 1}))
   })
 
   test("*> loses state", () => {
     let result =
-      \"*>"(\"*>"(Stack.push(1), Stack.push(2)), Stack.push(3)) |> State.runStateT(list{})
+      \"*>"(\"*>"(Stack.push(1), Stack.push(2)), Stack.push(3))->(State.runStateT(list{}, _))
     // Not 100% sure if this is expected behavior, but the applicative behavior throws away the
     // state on the left side here.  It makes sense, because there is no attempt to merge the states
     // in apply.  I'll have to compare this with purescript/haskell to be sure.
-    expect(result) |> toEqual((3, list{3}))
+    expect(result)->toEqual((3, list{3}))
   })
 })

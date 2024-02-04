@@ -114,7 +114,7 @@ let mapErrorsNea: 'a 'e1 'e2. (
 ) => t<'a, Relude_NonEmpty.Array.t<'e2>> = (f, x) =>
   switch x {
   | VOk(_) as ok => ok
-  | VError(nea) => VError(Relude_NonEmpty.Array.map(f, nea))
+  | VError(nea) => VError(nea->(Relude_NonEmpty.Array.map(f, _)))
   }
 
 @ocaml.doc("
@@ -127,7 +127,7 @@ let mapErrorsNel: 'a 'e1 'e2. (
 ) => t<'a, Relude_NonEmpty.List.t<'e2>> = (f, x) =>
   switch x {
   | VOk(_) as ok => ok
-  | VError(nea) => VError(Relude_NonEmpty.List.map(f, nea))
+  | VError(nea) => VError(nea->(Relude_NonEmpty.List.map(f, _)))
   }
 
 @ocaml.doc("
@@ -235,7 +235,8 @@ let alignWithWithAppendErrors: 'a 'b 'c 'e. (
   Relude_Ior_Type.t<'a, 'b> => 'c,
   t<'a, 'e>,
   t<'b, 'e>,
-) => t<'c, 'e> = (appendErrors, f, fa, fb) => map(f, alignWithAppendErrors(appendErrors, fa, fb))
+) => t<'c, 'e> = (appendErrors, f, fa, fb) =>
+  alignWithAppendErrors(appendErrors, fa, fb)->(map(f, _))
 
 @ocaml.doc("
 [pure(val)] wraps its argument in a [VOk()].
@@ -362,7 +363,7 @@ let fold: 'a 'e 'c. ('e => 'c, 'a => 'c, t<'a, 'e>) => 'c = (ec, ac, x) =>
   flip(VError(-1)) == VOk(-1);
 ]}
 ")
-let flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = fa => fold(e => VOk(e), a => VError(a), fa)
+let flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = fa => fa->(fold(e => VOk(e), a => VError(a), _))
 
 let map2: (('x, 'x) => 'x, ('a, 'b) => 'c, t<'a, 'x>, t<'b, 'x>) => t<'c, 'x> = (
   appendErrors,

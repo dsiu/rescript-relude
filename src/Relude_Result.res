@@ -654,7 +654,7 @@ let alignWith: 'a 'b 'c 'e. (Relude_Ior_Type.t<'a, 'b> => 'c, t<'a, 'e>, t<'b, '
   f,
   fa,
   fb,
-) => map(f, align(fa, fb))
+) => align(fa, fb)->(map(f, _))
 
 @ocaml.doc("
 [catchError(f, r)] returns [f(e)] when [r] is of the form
@@ -692,7 +692,7 @@ let mapHandleError: 'a 'e 'b. ('a => 'b, 'e => 'b, t<'a, 'e>) => t<'b, Relude_Vo
   aToB,
   eToB,
   ioAE,
-) => handleError(eToB, map(aToB, ioAE))
+) => ioAE->map(aToB, _)->(handleError(eToB, _))
 
 @ocaml.doc("
 [Result.recover] ensures that the returned result is [Ok] by returning the
@@ -822,7 +822,7 @@ JavaScript's magic ability to construct a [string] from anything.
 ]}
 ")
 let triesAsString: 'a. (unit => 'a) => t<'a, string> = fn =>
-  mapError(x => Js.String.make(x), tries(fn))
+  tries(fn)->(mapError(x => Js.String.make(x), _))
 
 @ocaml.doc("
 [toValidation(result)] converts [Ok(val)] to [VOk(val)] and [Error(err)] to

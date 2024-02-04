@@ -20,21 +20,21 @@ let fromArray: 'a. array<'a> => option<('a, 'a)> = x =>
 @ocaml.doc("
 Constructs a tuple-2 from an array of at least 2 values
 ")
-let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a)> = xs => fromArray(Relude_Array.take(2, xs))
+let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a)> = xs => Relude_Array.take(2, xs)->fromArray
 
 @ocaml.doc("
 Constructs a tuple-2 from a list of exactly 2 values
 ")
 let fromList: 'a. list<'a> => option<('a, 'a)> = xs =>
-  fromArray({
+  {
     open Relude_List
-    toArray(take(3, xs))
-  })
+    take(3, xs)->toArray
+  }->fromArray
 
 @ocaml.doc("
 Constructs a tuple-2 from a list of at least 2 values
 ")
-let fromListAtLeast: 'a. list<'a> => option<('a, 'a)> = xs => fromList(Relude_List.take(2, xs))
+let fromListAtLeast: 'a. list<'a> => option<('a, 'a)> = xs => Relude_List.take(2, xs)->fromList
 
 @ocaml.doc("
 Gets the first value of a tuple-2

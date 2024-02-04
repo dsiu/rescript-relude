@@ -24,22 +24,22 @@ let fromArray: 'a. array<'a> => option<('a, 'a, 'a, 'a, 'a)> = x =>
 Constructs a tuple-5 from an array of at least 5 values
 ")
 let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a, 'a, 'a, 'a)> = xs =>
-  fromArray(Relude_Array.take(5, xs))
+  Relude_Array.take(5, xs)->fromArray
 
 @ocaml.doc("
 Constructs a tuple-5 from a list of exactly 5 values
 ")
 let fromList: 'a. list<'a> => option<('a, 'a, 'a, 'a, 'a)> = xs =>
-  fromArray({
+  {
     open Relude_List
-    toArray(take(6, xs))
-  })
+    take(6, xs)->toArray
+  }->fromArray
 
 @ocaml.doc("
 Constructs a tuple-5 from a list of at least 5 values
 ")
 let fromListAtLeast: 'a. list<'a> => option<('a, 'a, 'a, 'a, 'a)> = xs =>
-  fromList(Relude_List.take(5, xs))
+  Relude_List.take(5, xs)->fromList
 
 @ocaml.doc("
 Applies a normal 5-argument function to arguments contained in a tuple-5

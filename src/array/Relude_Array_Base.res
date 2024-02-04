@@ -1,4 +1,9 @@
+@@uncurry
+@@uncurry.swap
+
 open BsBastet.Interface
+
+module Fn = Relude_Function
 
 @ocaml.doc("
 [Array.cons] prepends a single item to the start of an array. This is an
@@ -596,7 +601,7 @@ let sortWithInt: 'a. (('a, 'a) => int, array<'a>) => array<'a> = (f, xs) =>
 ]}
 ")
 let sortBy: 'a. (('a, 'a) => ordering, array<'a>) => array<'a> = (f, xs) =>
-  sortWithInt((a, b) => Relude_Ordering.toInt(f(a, b)), xs)
+  sortWithInt((a, b) => f(a, b)->Relude_Ordering.toInt, xs)
 
 @ocaml.doc("
 [Array.sort] sorts an array in ascending order using an ORD module.
@@ -629,14 +634,12 @@ let distinctBy: 'a. (('a, 'a) => bool, array<'a>) => array<'a> = (eq, xs) =>
 array, using the given equality function.
 ")
 let removeFirstBy: 'a. (('a, 'a) => bool, 'a, array<'a>) => array<'a> = (innerEq, v, xs) =>
-  snd(
-    Relude_Array_Instances.foldLeft(
-      ((found, ys), x) =>
-        found ? (true, append(x, ys)) : innerEq(v, x) ? (true, ys) : (false, append(x, ys)),
-      (false, []),
-      xs,
-    ),
-  )
+  Relude_Array_Instances.foldLeft(
+    ((found, ys), x) =>
+      found ? (true, append(x, ys)) : innerEq(v, x) ? (true, ys) : (false, append(x, ys)),
+    (false, []),
+    xs,
+  )->snd
 
 @ocaml.doc("
 [Array.removeEachBy] removes all occurrences of the given value from the array,
@@ -760,7 +763,7 @@ Running time: O(n)
 ]}
 ")
 let updateAt: 'a. (int, 'a => 'a, array<'a>) => array<'a> = (targetIndex, f, xs) =>
-  mapWithIndex((x, index) => index == targetIndex ? f(x) : x, xs)
+  xs->(mapWithIndex((x, index) => index == targetIndex ? f(x) : x, _))
 
 @ocaml.doc("
 [Array.swapAt] creates a new array with the elements at the two given indexes
@@ -775,7 +778,7 @@ Running time: O(n)
 ")
 let swapAt: 'a. (int, int, array<'a>) => array<'a> = (i, j, xs) =>
   switch (at(i, xs), at(j, xs)) {
-  | (Some(a), Some(b)) => mapWithIndex((x, k) => i == k ? b : j == k ? a : x, xs)
+  | (Some(a), Some(b)) => xs->(mapWithIndex((x, k) => i == k ? b : j == k ? a : x, _))
   | _ => xs
   }
 
@@ -791,7 +794,7 @@ Running time: O(n)
 ]}
 ")
 let removeAt: 'a. (int, array<'a>) => array<'a> = (targetIndex, xs) =>
-  filterWithIndex((_, i) => i != targetIndex, xs)
+  xs->(filterWithIndex((_, i) => i != targetIndex, _))
 
 @ocaml.doc("
 [Array.chunk] returns an array of arrays, where each of the inner arrays has
@@ -814,6 +817,9 @@ This runs in O(n{^2}) time and is not stack safe.
 let rec chunk: 'a. (int, array<'a>) => array<array<'a>> = (size, xs) =>
   size < 1
     ? [xs]
-    : length(xs) <= size
+    : xs->length <= size
     ? [xs]
-    : Relude_Array_Instances.concat([take(size, xs)], chunk(size, drop(size, xs)))
+    : xs
+      ->drop(size, _)
+      ->chunk(size, _)
+      ->(Relude_Array_Instances.concat([xs->(take(size, _))], _))

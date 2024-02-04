@@ -73,7 +73,7 @@ module WithMonad = (M: MONAD) => {
   let modify_: 's. ('s => 's) => t<unit, 's> = sToS => StateT(s => M.pure(((), sToS(s))))
 
   let map: 's 'a 'b. (. 'a => 'b, t<'a, 's>) => t<'b, 's> = (aToB, StateT(sToMAS)) => StateT(
-    s => M.map(((a, s)) => (aToB(a), s), sToMAS(s)),
+    s => sToMAS(s)->(M.map(((a, s)) => (aToB(a), s), _)),
   )
 
   let pure: 's 'a. 'a => t<'a, 's> = a => StateT(s => M.pure((a, s)))

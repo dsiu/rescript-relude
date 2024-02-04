@@ -21,12 +21,20 @@ module WithFunctor = (F: FUNCTOR) => {
   }
   include Relude_Extensions_Functor.FunctorExtensions(Functor)
 
+  let flip_orig: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
+  let flip_fix: 'a 'b 'c. (. ('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
+
   let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {
     | Pure(aToB) => freeA->(map(aToB, _))
     | Apply(fx, freeXToAToB) =>
-      let freeAToXToB = map(x => Relude_Function.flip(x, ...), freeXToAToB)
+      //      let freeAToXToB = map( => Relude_Function.flip(x, ...), freeXToAToB)
+
+      // freeXToAToB has type t<\"$Apply_'x" => 'a => 'b>
+
+      let freeAToXToB = map(f => flip_fix(f, ...), freeXToAToB)
       let freeXToB = apply(freeAToXToB, freeA)
+
       Apply(fx, freeXToB)
     }
 

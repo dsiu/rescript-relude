@@ -21,22 +21,22 @@ let fromArray: 'a. array<'a> => option<('a, 'a, 'a, 'a)> = x =>
 Constructs a tuple-4 from an array of at least 4 values
 ")
 let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a, 'a, 'a)> = xs =>
-  fromArray(Relude_Array.take(4, xs))
+  Relude_Array.take(4, xs)->fromArray
 
 @ocaml.doc("
 Constructs a tuple-4 from a list of exactly 4 values
 ")
 let fromList: 'a. list<'a> => option<('a, 'a, 'a, 'a)> = xs =>
-  fromArray({
+  {
     open Relude_List
-    toArray(take(5, xs))
-  })
+    take(5, xs)->toArray
+  }->fromArray
 
 @ocaml.doc("
 Constructs a tuple-4 from a list of at least 4 values
 ")
 let fromListAtLeast: 'a. list<'a> => option<('a, 'a, 'a, 'a)> = xs =>
-  fromList(Relude_List.take(4, xs))
+  Relude_List.take(4, xs)->fromList
 
 @ocaml.doc("
 Gets the first value of a tuple-4

@@ -289,10 +289,12 @@ the ['a] value unchanged.
 
 This is useful for doing things like logging the value inside the [IO].
 ")
-let tap: 'a 'e. ('a => unit, t<'a, 'e>) => t<'a, 'e> = (f, io) => map(a => {
-    f(a)
-    a
-  }, io)
+let tap: 'a 'e. ('a => unit, t<'a, 'e>) => t<'a, 'e> = (f, io) => {
+  io->(map(a => {
+      f(a)
+      a
+    }, _))
+}
 
 @ocaml.doc("
 Applicative [apply] function

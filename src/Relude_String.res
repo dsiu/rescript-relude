@@ -20,7 +20,7 @@ JavaScript [String.length] function, it works properly with Unicode characters.
   String.length({js|대한민국|js}) == 4;
 ]}
 ")
-let length: string => int = s => Js.String.length(s)
+let length: string => int = s => s->Js.String.length
 
 @ocaml.doc("
 [String.isEmpty] returns [true] if the provided string is the empty string [\"\"],
@@ -61,7 +61,7 @@ in <https://www.ecma-international.org/ecma-262/5.1/#sec-7.2>) removed from [s].
   trim({js|\n\u00a0 \t abc \f\r \t|js}) == \"abc\";
 ]}
 ")
-let trim: string => string = s => Js.String.trim(s)
+let trim: string => string = s => s->Js.String.trim
 
 // TODO
 //let trimLeft: string => string = ???
@@ -80,7 +80,7 @@ in <https://www.ecma-international.org/ecma-262/5.1/#sec-7.2>
   isWhitespace(\" \n \t X \r \") == false;
 ]}
 ")
-let isWhitespace: string => bool = s => s |> trim |> isEmpty
+let isWhitespace: string => bool = s => s->trim->isEmpty
 
 @ocaml.doc("
 Indicates if the string contains any non-whitespace characters
@@ -201,7 +201,7 @@ capitalizes to two [\"S\"]es in a row.
   toUpperCase({js|πς|js}) == {js|ΠΣ|js}; // sigma in final position
 ]}
 ")
-let toUpperCase: string => string = s => Js.String.toUpperCase(s)
+let toUpperCase: string => string = s => s->Js.String.toUpperCase
 
 @ocaml.doc("
 [toLowerCase(str)] converts [str] to lower case using the locale-insensitive
@@ -218,7 +218,7 @@ single lowercase glyph [ß], but [toLowerCase()] will not do this transformation
   toLowerCase({js|ΠΣ|js}) == {js|πς|js}; // sigma in final position
 ]}
 ")
-let toLowerCase: string => string = s => Js.String.toLowerCase(s)
+let toLowerCase: string => string = s => s->Js.String.toLowerCase
 
 @ocaml.doc("
 [fromCharCode(n)] creates a string containing the character corresponding to
@@ -234,7 +234,7 @@ Thus, [fromCharCode(0x1F63A)] gives the same result as [fromCharCode(0xF63A)].
   fromCharCode(-64568) == {js|ψ|js};
 ]}
 ")
-let fromCharCode: int => string = c => Js.String.fromCharCode(c)
+let fromCharCode: int => string = c => c->Js.String.fromCharCode
 
 @ocaml.doc("
 [charCodeAt(n, str)] returns (optionally) the numeric character code at the
@@ -772,7 +772,7 @@ when specifying [x].
   fromFloat(1.0e3) == \"1000\";
 ]}
 ")
-let fromFloat: float => string = f => Js.Float.toString(f)
+let fromFloat: float => string = f => f->Js.Float.toString
 
 @ocaml.doc("
 [toFloat(str)] returns [Some(x)] if [str] is a valid string representation of

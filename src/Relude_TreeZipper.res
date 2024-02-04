@@ -105,7 +105,7 @@ let getFocusValue: 'a. t<'a> => 'a = ({
 Applies a side-effect function with the current focus value, and returns the zipper unchanged
 ")
 let tapFocusValue: 'a. ('a => unit, t<'a>) => t<'a> = (f, zipper) => {
-  f(getFocusValue(zipper))
+  f(zipper->getFocusValue)
   zipper
 }
 
@@ -168,7 +168,7 @@ Gets the siblings to the left of the focus value, in order.
 (the first item of the resulting list is the item that is the leftmost sibling (furthest from focus))
 ")
 let getLeftSiblingsInOrder: 'a. t<'a> => list<Relude_Tree.t<'a>> = tree =>
-  Relude_List.reverse(getLeftSiblings(tree))
+  tree->getLeftSiblings->Relude_List.reverse
 
 @ocaml.doc("
 Sets the left siblings from a reversed list (where the first item of the list should be closest to the focus)
@@ -177,7 +177,7 @@ let setLeftSiblings: 'a. (list<Relude_Tree.t<'a>>, t<'a>) => option<t<'a>> = (
   newLeftSiblings,
   {ancestors, leftSiblings: _, focus, rightSiblings, children},
 ) =>
-  if Relude_List.isNotEmpty(ancestors) {
+  if ancestors->Relude_List.isNotEmpty {
     Some({
       ancestors,
       leftSiblings: newLeftSiblings,
@@ -196,7 +196,7 @@ let setLeftSiblingsFromInOrder: 'a. (list<Relude_Tree.t<'a>>, t<'a>) => option<t
   newLeftSiblingsInOrder,
   {ancestors, leftSiblings: _, focus, rightSiblings, children},
 ) =>
-  if Relude_List.isNotEmpty(ancestors) {
+  if ancestors->Relude_List.isNotEmpty {
     Some({
       ancestors,
       leftSiblings: Relude_List.reverse(newLeftSiblingsInOrder),
@@ -226,7 +226,7 @@ let setRightSiblings: 'a. (list<Relude_Tree.t<'a>>, t<'a>) => option<t<'a>> = (
   newRightSiblings,
   {ancestors, leftSiblings, focus, rightSiblings: _, children},
 ) =>
-  if Relude_List.isNotEmpty(ancestors) {
+  if ancestors->Relude_List.isNotEmpty {
     Some({
       ancestors,
       leftSiblings,
@@ -272,25 +272,32 @@ let moveLeft: 'a. t<'a> => option<t<'a>> = ({
   focus,
   rightSiblings,
   children,
-}) => Relude_Option.map(((leftHead, leftTail)) => {
-    ancestors,
-    leftSiblings: leftTail,
-    focus: Relude_Tree.getValue(leftHead),
-    rightSiblings: list{Relude_Tree.make(focus, children), ...rightSiblings},
-    children: Relude_Tree.getChildren(leftHead),
-  }, Relude_List.uncons(leftSiblings))
+}) =>
+  leftSiblings
+  ->Relude_List.uncons
+  ->(Relude_Option.map(((leftHead, leftTail)) => {
+      ancestors,
+      leftSiblings: leftTail,
+      focus: leftHead->Relude_Tree.getValue,
+      rightSiblings: list{Relude_Tree.make(focus, children), ...rightSiblings},
+      children: leftHead->Relude_Tree.getChildren,
+    }, _))
 
 @ocaml.doc("
 Moves to the left, unless we are already at the leftmost item
 ")
 let moveLeftWithClamp: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.getOrElse(zipper, moveLeft(zipper))
+  zipper
+  ->moveLeft
+  ->(Relude_Option.getOrElse(zipper, _))
 
 @ocaml.doc("
 Moves the focus as far as possible to the left
 ")
 let rec moveLeftToStart: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.foldLazy(() => zipper, moveLeftToStart, moveLeft(zipper))
+  zipper
+  ->moveLeft
+  ->(Relude_Option.foldLazy(() => zipper, moveLeftToStart, _))
 
 @ocaml.doc("
 Moves left a number of times
@@ -308,7 +315,9 @@ let rec moveLeftTimes: 'a. (int, t<'a>) => option<t<'a>> = (times, zipper) =>
 Move the focus to the left a number of times, stopping if the leftmost sibling is reached
 ")
 let moveLeftTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
-  Relude_Option.getOrElseLazy(() => moveLeftToStart(zipper), moveLeftTimes(times, zipper))
+  zipper
+  ->moveLeftTimes(times, _)
+  ->(Relude_Option.getOrElseLazy(() => moveLeftToStart(zipper), _))
 
 @ocaml.doc("
 Moves the focus one sibling to the right (if possible)
@@ -319,25 +328,30 @@ let moveRight: 'a. t<'a> => option<t<'a>> = ({
   focus,
   rightSiblings,
   children,
-}) => Relude_Option.map(((rightHead, rightTail)) => {
-    ancestors,
-    leftSiblings: list{Relude_Tree.make(focus, children), ...leftSiblings},
-    focus: Relude_Tree.getValue(rightHead),
-    rightSiblings: rightTail,
-    children: Relude_Tree.getChildren(rightHead),
-  }, Relude_List.uncons(rightSiblings))
+}) =>
+  rightSiblings
+  ->Relude_List.uncons
+  ->(Relude_Option.map(((rightHead, rightTail)) => {
+      ancestors,
+      leftSiblings: list{Relude_Tree.make(focus, children), ...leftSiblings},
+      focus: rightHead->Relude_Tree.getValue,
+      rightSiblings: rightTail,
+      children: rightHead->Relude_Tree.getChildren,
+    }, _))
 
 @ocaml.doc("
 Moves the zipper to the right one time, unless we are already at the rightmost item
 ")
 let moveRightWithClamp: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.getOrElse(zipper, moveRight(zipper))
+  zipper->moveRight->(Relude_Option.getOrElse(zipper, _))
 
 @ocaml.doc("
 Moves the focus as far as possible to the right
 ")
 let rec moveRightToEnd: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.foldLazy(() => zipper, moveRightToEnd, moveRight(zipper))
+  zipper
+  ->moveRight
+  ->(Relude_Option.foldLazy(() => zipper, moveRightToEnd, _))
 
 @ocaml.doc("
 Moves right a number of times
@@ -348,14 +362,16 @@ let rec moveRightTimes: 'a. (int, t<'a>) => option<t<'a>> = (times, zipper) =>
   } else if times == 0 {
     Some(zipper)
   } else {
-    Relude_Option.flatMap(moveRightTimes(times - 1, _), moveRight(zipper))
+    zipper->moveRight->(Relude_Option.flatMap(moveRightTimes(times - 1, _), _))
   }
 
 @ocaml.doc("
 Move the focus to the right a number of times, stopping if the rightmost sibling is reached
 ")
 let moveRightTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
-  Relude_Option.getOrElseLazy(() => moveRightToEnd(zipper), moveRightTimes(times, zipper))
+  zipper
+  ->moveRightTimes(times, _)
+  ->(Relude_Option.getOrElseLazy(() => zipper->moveRightToEnd, _))
 
 @ocaml.doc("
 Moves the focus up one level to the parent (if possible)
@@ -367,31 +383,36 @@ let moveUp: 'a. t<'a> => option<t<'a>> = ({
   rightSiblings,
   children,
 }) =>
-  Relude_Option.map(
-    (((ancestorsHeadLeft, ancestorsHeadFocus, ancestorsHeadRight), ancestorsTail)) => {
-      ancestors: ancestorsTail,
-      leftSiblings: ancestorsHeadLeft,
-      focus: ancestorsHeadFocus,
-      rightSiblings: ancestorsHeadRight,
-      children: Relude_List.flatten(list{
-        Relude_List.reverse(leftSiblings),
-        list{Relude_Tree.make(focus, children)},
-        rightSiblings,
-      }),
-    },
-    Relude_List.uncons(ancestors),
+  ancestors
+  ->Relude_List.uncons
+  ->(
+    Relude_Option.map(
+      (((ancestorsHeadLeft, ancestorsHeadFocus, ancestorsHeadRight), ancestorsTail)) => {
+        ancestors: ancestorsTail,
+        leftSiblings: ancestorsHeadLeft,
+        focus: ancestorsHeadFocus,
+        rightSiblings: ancestorsHeadRight,
+        children: Relude_List.flatten(list{
+          leftSiblings->Relude_List.reverse,
+          list{Relude_Tree.make(focus, children)},
+          rightSiblings,
+        }),
+      },
+      _,
+    )
   )
 
 @ocaml.doc("
 Moves the zipper up a level, unless it's already at the top
 ")
-let moveUpWithClamp: 'a. t<'a> => t<'a> = zipper => Relude_Option.getOrElse(zipper, moveUp(zipper))
+let moveUpWithClamp: 'a. t<'a> => t<'a> = zipper =>
+  zipper->moveUp->(Relude_Option.getOrElse(zipper, _))
 
 @ocaml.doc("
 Moves the zipper to focus the top of the tree
 ")
 let rec moveUpToTop: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.foldLazy(() => zipper, moveUpToTop, moveUp(zipper))
+  zipper->moveUp->(Relude_Option.foldLazy(() => zipper, moveUpToTop, _))
 
 @ocaml.doc("
 Moves the zipper up a number of times (if possible)
@@ -402,14 +423,16 @@ let rec moveUpTimes: 'a. (int, t<'a>) => option<t<'a>> = (times, zipper) =>
   } else if times == 0 {
     Some(zipper)
   } else {
-    Relude_Option.flatMap(moveUpTimes(times - 1, _), moveUp(zipper))
+    zipper->moveUp->(Relude_Option.flatMap(moveUpTimes(times - 1, _), _))
   }
 
 @ocaml.doc("
 Moves the zipper up a number of times, stopping if the top is reached
 ")
 let moveUpTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
-  Relude_Option.getOrElseLazy(() => moveUpToTop(zipper), moveUpTimes(times, zipper))
+  zipper
+  ->moveUpTimes(times, _)
+  ->(Relude_Option.getOrElseLazy(() => zipper->moveUpToTop, _))
 
 @ocaml.doc("
 Moves the focus down to the first child (if possible)
@@ -420,25 +443,28 @@ let moveDown: 'a. t<'a> => option<t<'a>> = ({
   focus,
   rightSiblings,
   children,
-}) => Relude_Option.map(((childrenHead, childrenTail)) => {
-    ancestors: list{(leftSiblings, focus, rightSiblings), ...ancestors},
-    leftSiblings: list{},
-    focus: Relude_Tree.getValue(childrenHead),
-    rightSiblings: childrenTail,
-    children: Relude_Tree.getChildren(childrenHead),
-  }, Relude_List.uncons(children))
+}) =>
+  children
+  ->Relude_List.uncons
+  ->(Relude_Option.map(((childrenHead, childrenTail)) => {
+      ancestors: list{(leftSiblings, focus, rightSiblings), ...ancestors},
+      leftSiblings: list{},
+      focus: childrenHead->Relude_Tree.getValue,
+      rightSiblings: childrenTail,
+      children: childrenHead->Relude_Tree.getChildren,
+    }, _))
 
 @ocaml.doc("
 Moves the zipper down one time, unless there are no children
 ")
 let moveDownWithClamp: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.getOrElse(zipper, moveDown(zipper))
+  zipper->moveDown->(Relude_Option.getOrElse(zipper, _))
 
 @ocaml.doc("
 Moves the zipper to focus the bottom of the tree (on the left-most child branches)
 ")
 let rec moveDownToBottom: 'a. t<'a> => t<'a> = zipper =>
-  Relude_Option.foldLazy(() => zipper, moveDownToBottom, moveDown(zipper))
+  zipper->moveDown->(Relude_Option.foldLazy(() => zipper, moveDownToBottom, _))
 
 @ocaml.doc("
 Moves the focus down a number of times (if possible)
@@ -449,7 +475,7 @@ let rec moveDownTimes: 'a. (int, t<'a>) => option<t<'a>> = (times, zipper) =>
   } else if times == 0 {
     Some(zipper)
   } else {
-    Relude_Option.flatMap(moveDownTimes(times - 1, _), moveDown(zipper))
+    zipper->moveDown->(Relude_Option.flatMap(moveDownTimes(times - 1, _), _))
   }
 
 @ocaml.doc("
@@ -457,7 +483,9 @@ Moves the zipper down a number of times, stopping when we get as low as we can,
 staying on the left-most child branches.
 ")
 let moveDownTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
-  Relude_Option.getOrElseLazy(() => moveDownToBottom(zipper), moveDownTimes(times, zipper))
+  zipper
+  ->moveDownTimes(times, _)
+  ->(Relude_Option.getOrElseLazy(() => zipper->moveDownToBottom, _))
 
 @ocaml.doc("
 Types of movements we can make in a TreeZipper
@@ -482,28 +510,30 @@ Applies a single movement command to a zipper
 ")
 let moveOnceBy: 'a. (movement, t<'a>) => option<t<'a>> = (move, zipper) =>
   switch move {
-  | #Up(n) => moveUpTimes(n, zipper)
-  | #UpWithClamp(n) => Some(moveUpTimesWithClamp(n, zipper))
-  | #UpToTop => Some(moveUpToTop(zipper))
-  | #Down(n) => moveDownTimes(n, zipper)
-  | #DownWithClamp(n) => Some(moveDownTimesWithClamp(n, zipper))
-  | #DownToBottom => Some(moveDownToBottom(zipper))
-  | #Left(n) => moveLeftTimes(n, zipper)
-  | #LeftWithClamp(n) => Some(moveLeftTimesWithClamp(n, zipper))
-  | #LeftToStart => Some(moveLeftToStart(zipper))
-  | #Right(n) => moveRightTimes(n, zipper)
-  | #RightWithClamp(n) => Some(moveRightTimesWithClamp(n, zipper))
-  | #RightToEnd => Some(moveRightToEnd(zipper))
+  | #Up(n) => zipper->(moveUpTimes(n, _))
+  | #UpWithClamp(n) => Some(zipper->(moveUpTimesWithClamp(n, _)))
+  | #UpToTop => Some(zipper->moveUpToTop)
+  | #Down(n) => zipper->(moveDownTimes(n, _))
+  | #DownWithClamp(n) => Some(zipper->(moveDownTimesWithClamp(n, _)))
+  | #DownToBottom => Some(zipper->moveDownToBottom)
+  | #Left(n) => zipper->(moveLeftTimes(n, _))
+  | #LeftWithClamp(n) => Some(zipper->(moveLeftTimesWithClamp(n, _)))
+  | #LeftToStart => Some(zipper->moveLeftToStart)
+  | #Right(n) => zipper->(moveRightTimes(n, _))
+  | #RightWithClamp(n) => Some(zipper->(moveRightTimesWithClamp(n, _)))
+  | #RightToEnd => Some(zipper->moveRightToEnd)
   }
 
 @ocaml.doc("
 Applies a list of movement commands to a zipper
 ")
 let moveBy: 'a. (list<movement>, t<'a>) => option<t<'a>> = (moves, zipper) =>
-  Relude_List.foldLeft(
-    (zipperOpt, move) => Relude_Option.flatMap(moveOnceBy(move, ...), zipperOpt),
-    Some(zipper),
-    moves,
+  moves->(
+    Relude_List.foldLeft(
+      (zipperOpt, move) => zipperOpt->(Relude_Option.flatMap(moveOnceBy(move, ...), _)),
+      Some(zipper),
+      _,
+    )
   )
 
 @ocaml.doc("
@@ -514,20 +544,22 @@ let foldBy: 'a 'b. (list<movement>, ('b, 'a) => 'b, 'b, t<'a>) => option<(t<'a>,
   f,
   init,
   zipper,
-) =>
-  Relude_List.foldLeft(
-    (zipperAccOpt, move) =>
-      Relude_Option.flatMap(
-        ((zipper, acc)) =>
-          Relude_Option.map(
-            nextZipper => (nextZipper, f(acc, getFocusValue(nextZipper))),
-            moveOnceBy(move, zipper),
-          ),
-        zipperAccOpt,
-      ),
-    Some((zipper, init)),
-    moves,
-  )
+) => {
+  moves->(Relude_List.foldLeft((zipperAccOpt, move) => {
+      zipperAccOpt->(Relude_Option.flatMap(((zipper, acc)) => {
+          zipper
+          ->moveOnceBy(move, _)
+          ->(
+            Relude_Option.map(
+              nextZipper => {
+                (nextZipper, f(acc, nextZipper->getFocusValue))
+              },
+              _,
+            )
+          )
+        }, _))
+    }, Some((zipper, init)), _))
+}
 
 @ocaml.doc("
 Converts a zipper of 'a to a zipper of 'b using a pure function
@@ -536,18 +568,20 @@ let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (
   aToB,
   {ancestors, leftSiblings, focus, rightSiblings, children},
 ) => {
-  ancestors: Relude_List.map(
-    ((left, focus, right)) => (
-      Relude_List.map(x => Relude_Tree.map(aToB, x, ...), left),
-      aToB(focus),
-      Relude_List.map(x => Relude_Tree.map(aToB, x, ...), right),
-    ),
-    ancestors,
+  ancestors: ancestors->(
+    Relude_List.map(
+      ((left, focus, right)) => (
+        left->(Relude_List.map(x => Relude_Tree.map(aToB, x, ...), _)),
+        aToB(focus),
+        right->(Relude_List.map(x => Relude_Tree.map(aToB, x, ...), _)),
+      ),
+      _,
+    )
   ),
-  leftSiblings: Relude_List.map(x => Relude_Tree.map(aToB, x, ...), leftSiblings),
+  leftSiblings: leftSiblings->(Relude_List.map(x => Relude_Tree.map(aToB, x, ...), _)),
   focus: aToB(focus),
-  rightSiblings: Relude_List.map(x => Relude_Tree.map(aToB, x, ...), rightSiblings),
-  children: Relude_List.map(x => Relude_Tree.map(aToB, x, ...), children),
+  rightSiblings: rightSiblings->(Relude_List.map(x => Relude_Tree.map(aToB, x, ...), _)),
+  children: children->(Relude_List.map(x => Relude_Tree.map(aToB, x, ...), _)),
 }
 
 module Functor: BsBastet.Interface.FUNCTOR with type t<'a> = t<'a> = {
@@ -567,18 +601,17 @@ Equivalent to a depth first search in the currently focused tree.
 ")
 let findInFocusAndChildren: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) => {
   let rec dfs = zipper =>
-    Relude_Option.orElseLazy(
-      ~fallback=() => Relude_Option.flatMap(dfs, moveRight(zipper)),
-      Relude_Option.orElseLazy(
-        ~fallback=() => Relude_Option.flatMap(dfs, moveDown(zipper)),
-        findInFocus(pred, zipper),
-      ),
-    )
+    findInFocus(pred, zipper)
+    ->Relude_Option.orElseLazy(~fallback=() => {
+      moveDown(zipper)->(Relude_Option.flatMap(dfs, _))
+    }, _)
+    ->(Relude_Option.orElseLazy(~fallback=() => {
+        moveRight(zipper)->(Relude_Option.flatMap(dfs, _))
+      }, _))
 
-  Relude_Option.orElseLazy(
-    ~fallback=() => Relude_Option.flatMap(dfs, moveDown(zipper)),
-    findInFocus(pred, zipper),
-  )
+  findInFocus(pred, zipper)->(Relude_Option.orElseLazy(~fallback=() => {
+      moveDown(zipper)->(Relude_Option.flatMap(dfs, _))
+    }, _))
 }
 
 @ocaml.doc("
@@ -590,12 +623,14 @@ let rec findLeft: 'a. (~checkFocus: bool=?, 'a => bool, t<'a>) => option<t<'a>> 
   zipper,
 ) =>
   if checkFocus {
-    Relude_Option.orElseLazy(
-      ~fallback=() => Relude_Option.flatMap(findLeft(pred, ...), moveLeft(zipper)),
-      findInFocusAndChildren(pred, zipper),
+    findInFocusAndChildren(pred, zipper)->(
+      Relude_Option.orElseLazy(
+        ~fallback=() => zipper->moveLeft->(Relude_Option.flatMap(findLeft(pred, ...), _)),
+        _,
+      )
     )
   } else {
-    Relude_Option.flatMap(findLeft(pred, ...), moveLeft(zipper))
+    zipper->moveLeft->(Relude_Option.flatMap(findLeft(pred, ...), _))
   }
 
 @ocaml.doc("
@@ -607,12 +642,11 @@ and findRight: 'a. (~checkFocus: bool=?, 'a => bool, t<'a>) => option<t<'a>> = (
   zipper,
 ) =>
   if checkFocus {
-    Relude_Option.orElseLazy(
-      ~fallback=() => Relude_Option.flatMap(findRight(pred, ...), moveRight(zipper)),
-      findInFocusAndChildren(pred, zipper),
-    )
+    findInFocusAndChildren(pred, zipper)->(Relude_Option.orElseLazy(~fallback=() => {
+        zipper->moveRight->(Relude_Option.flatMap(findRight(pred, ...), _))
+      }, _))
   } else {
-    Relude_Option.flatMap(findRight(pred, ...), moveRight(zipper))
+    zipper->moveRight->(Relude_Option.flatMap(findRight(pred, ...), _))
   }
 
 @ocaml.doc("
@@ -624,9 +658,8 @@ and findLeftOrRight: 'a. (~checkFocus: bool=?, 'a => bool, t<'a>) => option<t<'a
   pred,
   zipper,
 ) =>
-  Relude_Option.orElseLazy(
-    ~fallback=() => findRight(~checkFocus=false, pred, zipper),
-    findLeft(~checkFocus, pred, zipper),
+  findLeft(~checkFocus, pred, zipper)->(
+    Relude_Option.orElseLazy(~fallback=() => zipper->(findRight(~checkFocus=false, pred, _)), _)
   )
 
 @ocaml.doc("
@@ -634,36 +667,36 @@ Attempts to find a value by moving up a level, then searching left and right on 
 then progressing upward.
 ")
 and findUp: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) =>
-  Relude_Option.flatMap(parentZipper =>
-    // TODO: I think this is repeatedly searching some of the same values as we move up
-    Relude_Option.orElseLazy(
-      ~fallback=() => findUp(pred, parentZipper),
-      findLeftOrRight(pred, parentZipper),
-    )
-  , moveUp(zipper))
+  zipper
+  ->moveUp
+  ->(Relude_Option.flatMap(parentZipper =>
+      parentZipper
+      ->findLeftOrRight(pred, _)
+      ->(Relude_Option.orElseLazy(~fallback=() => parentZipper->(findUp(pred, _)), _))
+    , _))
+// TODO: I think this is repeatedly searching some of the same values as we move up
 
 @ocaml.doc("
 Attempts to find a value by moving down a level, then searching left and right on the child level,
 then progressing downward.
 ")
 and findDown: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) =>
-  Relude_Option.flatMap(
-    childZipper =>
-      Relude_Option.orElseLazy(
-        ~fallback=() => findDown(pred, childZipper),
-        findRight(pred, childZipper),
-      ),
-    moveDown(zipper),
-  )
+  zipper
+  ->moveDown
+  ->(Relude_Option.flatMap(childZipper =>
+      childZipper
+      ->findRight(pred, _)
+      ->(Relude_Option.orElseLazy(~fallback=() => childZipper->(findDown(pred, _)), _))
+    , _))
 
 @ocaml.doc("
 Attempts to find a value anywhere in the zipper, left/right/up/down
 ")
 and find: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) =>
-  Relude_Option.orElseLazy(
-    ~fallback=() => findDown(pred, zipper),
-    Relude_Option.orElseLazy(~fallback=() => findUp(pred, zipper), findLeftOrRight(pred, zipper)),
-  )
+  zipper
+  ->findLeftOrRight(pred, _)
+  ->Relude_Option.orElseLazy(~fallback=() => zipper->(findUp(pred, _)), _)
+  ->(Relude_Option.orElseLazy(~fallback=() => zipper->(findDown(pred, _)), _))
 
 @ocaml.doc("
 Inserts a new tree, and pushes the current focus to the left
@@ -676,9 +709,9 @@ let insertTreeWithPushLeft: 'a. (Relude_Tree.t<'a>, t<'a>) => option<t<'a>> = (
     Some({
       ancestors,
       leftSiblings: list{{value: focus, children}, ...leftSiblings},
-      focus: Relude_Tree.getValue(newTree),
+      focus: newTree->Relude_Tree.getValue,
       rightSiblings,
-      children: Relude_Tree.getChildren(newTree),
+      children: newTree->Relude_Tree.getChildren,
     })
   } else {
     None
@@ -697,13 +730,13 @@ let insertTreeWithPushRight: 'a. (Relude_Tree.t<'a>, t<'a>) => option<t<'a>> = (
   newTree,
   {ancestors, leftSiblings, focus, rightSiblings, children},
 ) =>
-  if Relude_List.isNotEmpty(ancestors) {
+  if ancestors->Relude_List.isNotEmpty {
     Some({
       ancestors,
       leftSiblings,
-      focus: Relude_Tree.getValue(newTree),
+      focus: newTree->Relude_Tree.getValue,
       rightSiblings: list{{value: focus, children}, ...rightSiblings},
-      children: Relude_Tree.getChildren(newTree),
+      children: newTree->Relude_Tree.getChildren,
     })
   } else {
     None
@@ -725,14 +758,16 @@ let deleteWithPullLeft: 'a. t<'a> => option<t<'a>> = ({
   rightSiblings,
   children: _,
 }) =>
-  if Relude_List.isNotEmpty(ancestors) {
-    Relude_Option.map(((leftHead, leftTail)) => {
-      ancestors,
-      leftSiblings: leftTail,
-      focus: Relude_Tree.getValue(leftHead),
-      rightSiblings,
-      children: Relude_Tree.getChildren(leftHead),
-    }, Relude_List.uncons(leftSiblings))
+  if ancestors->Relude_List.isNotEmpty {
+    leftSiblings
+    ->Relude_List.uncons
+    ->(Relude_Option.map(((leftHead, leftTail)) => {
+        ancestors,
+        leftSiblings: leftTail,
+        focus: leftHead->Relude_Tree.getValue,
+        rightSiblings,
+        children: leftHead->Relude_Tree.getChildren,
+      }, _))
   } else {
     None
   }
@@ -747,14 +782,16 @@ let deleteWithPullRight: 'a. t<'a> => option<t<'a>> = ({
   rightSiblings,
   children: _,
 }) =>
-  if Relude_List.isNotEmpty(ancestors) {
-    Relude_Option.map(((rightHead, rightTail)) => {
-      ancestors,
-      leftSiblings,
-      focus: Relude_Tree.getValue(rightHead),
-      rightSiblings: rightTail,
-      children: Relude_Tree.getChildren(rightHead),
-    }, Relude_List.uncons(rightSiblings))
+  if ancestors->Relude_List.isNotEmpty {
+    rightSiblings
+    ->Relude_List.uncons
+    ->(Relude_Option.map(((rightHead, rightTail)) => {
+        ancestors,
+        leftSiblings,
+        focus: rightHead->Relude_Tree.getValue,
+        rightSiblings: rightTail,
+        children: rightHead->Relude_Tree.getChildren,
+      }, _))
   } else {
     None
   }
@@ -765,45 +802,51 @@ it tries to pull from the right.  If there is no item on the right, it moves the
 discarding the current focus and children.
 ")
 let delete: 'a. t<'a> => option<t<'a>> = zipper =>
-  Relude_Option.orElseLazy(
-    ~fallback=() =>
-      Relude_Option.map(
-        (((parentLeftSiblings, parentFocus, parentRightSiblings), ancestorsTail)) => {
-          ancestors: ancestorsTail,
-          leftSiblings: parentLeftSiblings,
-          focus: parentFocus,
-          rightSiblings: parentRightSiblings,
-          children: list{},
-        },
-        Relude_List.uncons(getAncestors(zipper)),
-      ),
-    Relude_Option.orElseLazy(
-      ~fallback=() => deleteWithPullRight(zipper),
-      deleteWithPullLeft(zipper),
-    ),
-  )
+  zipper
+  ->deleteWithPullLeft
+  ->Relude_Option.orElseLazy(~fallback=() => zipper->deleteWithPullRight, _)
+  ->(Relude_Option.orElseLazy(~fallback=() =>
+      zipper
+      ->getAncestors
+      ->Relude_List.uncons
+      ->(
+        Relude_Option.map(
+          (((parentLeftSiblings, parentFocus, parentRightSiblings), ancestorsTail)) => {
+            ancestors: ancestorsTail,
+            leftSiblings: parentLeftSiblings,
+            focus: parentFocus,
+            rightSiblings: parentRightSiblings,
+            children: list{},
+          },
+          _,
+        )
+      )
+    , _))
 
 let showBy: 'a. ('a => string, t<'a>) => string = (
   showA,
   {ancestors, leftSiblings, focus, rightSiblings, children},
 ) => {
-  let ancestorsStr = Relude_List.showBy(
-    Relude_Tuple.showBy3(
-      Relude_List.showBy(Relude_Tree.showBy(showA, ...), ...),
-      showA,
-      Relude_List.showBy(Relude_Tree.showBy(showA, ...), ...),
-      ...
-    ),
-    ancestors,
-  )
+  let ancestorsStr =
+    ancestors->(
+      Relude_List.showBy(
+        Relude_Tuple.showBy3(
+          Relude_List.showBy(Relude_Tree.showBy(showA, ...), ...),
+          showA,
+          Relude_List.showBy(Relude_Tree.showBy(showA, ...), ...),
+          ...
+        ),
+        _,
+      )
+    )
 
-  let leftSiblingsStr = Relude_List.showBy(Relude_Tree.showBy(showA, ...), leftSiblings)
+  let leftSiblingsStr = leftSiblings->(Relude_List.showBy(Relude_Tree.showBy(showA, ...), _))
 
   let focusStr = showA(focus)
 
-  let rightSiblingsStr = Relude_List.showBy(Relude_Tree.showBy(showA, ...), rightSiblings)
+  let rightSiblingsStr = rightSiblings->(Relude_List.showBy(Relude_Tree.showBy(showA, ...), _))
 
-  let childrenStr = Relude_List.showBy(Relude_Tree.showBy(showA, ...), children)
+  let childrenStr = children->(Relude_List.showBy(Relude_Tree.showBy(showA, ...), _))
 
   "TreeZipper" ++
   ("\n" ++

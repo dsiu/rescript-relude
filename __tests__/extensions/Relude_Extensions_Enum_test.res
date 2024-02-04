@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 open! Relude.Globals
@@ -130,7 +133,7 @@ describe("Relude_Extensions_Enum", () => {
     },
     ((start, finish, expected)) => {
       let actual = Month.fromToAsList(~start, ~finish)
-      expect(actual) |> toEqual(expected)
+      expect(actual)->toEqual(expected)
     },
   )
 
@@ -144,7 +147,7 @@ describe("Relude_Extensions_Enum", () => {
     },
     ((start, expected)) => {
       let actual = Month.upFromAsList(start)
-      expect(actual) |> toEqual(expected)
+      expect(actual)->toEqual(expected)
     },
   )
 
@@ -158,7 +161,7 @@ describe("Relude_Extensions_Enum", () => {
     },
     ((start, expected)) => {
       let actual = Month.upFromIncludingAsList(start)
-      expect(actual) |> toEqual(expected)
+      expect(actual)->toEqual(expected)
     },
   )
 
@@ -172,7 +175,7 @@ describe("Relude_Extensions_Enum", () => {
     },
     ((start, expected)) => {
       let actual = Month.downFromAsList(start)
-      expect(actual) |> toEqual(expected)
+      expect(actual)->toEqual(expected)
     },
   )
 
@@ -186,7 +189,7 @@ describe("Relude_Extensions_Enum", () => {
     },
     ((start, expected)) => {
       let actual = Month.downFromIncludingAsList(start)
-      expect(actual) |> toEqual(expected)
+      expect(actual)->toEqual(expected)
     },
   )
 })
@@ -218,16 +221,16 @@ describe("Relude_Extensions_BoundedEnum", () => {
     },
     ((start, next, finish, expected)) => {
       let actual = Month.fromThenToAsList(~start, ~next, ~finish)
-      expect(actual) |> toEqual(expected)
+      expect(actual)->toEqual(expected)
     },
   )
   describe("Relude_Extensions_BoundedEnum", () => {
     let show = Show.show
-    let parseOrd = inverseMapOrd(~ordA=module(Relude_String.Ord), show)
-    let parseOrdBy = inverseMapOrdBy(Relude.String.compare, show)
-    let parseEq = inverseMapEq(~eqA=module(Relude_String.Eq), show)
-    let parseEqBy = inverseMapEqBy(Relude.String.eq, show)
-    let parseString = inverseMapString(show)
+    let parseOrd = inverseMapOrd(~ordA=module(Relude_String.Ord), show, ...)
+    let parseOrdBy = inverseMapOrdBy(Relude.String.compare, show, ...)
+    let parseEq = inverseMapEq(~eqA=module(Relude_String.Eq), show, ...)
+    let parseEqBy = inverseMapEqBy(Relude.String.eq, show, ...)
+    let parseString = inverseMapString(show, ...)
 
     testAll(
       "inverseMapOrd",
@@ -260,7 +263,7 @@ describe("Relude_Extensions_BoundedEnum", () => {
       },
       ((string, expected)) => {
         let actual = parseOrd(string)
-        expect(actual) |> toEqual(expected)
+        expect(actual)->toEqual(expected)
       },
     )
 
@@ -295,7 +298,7 @@ describe("Relude_Extensions_BoundedEnum", () => {
       },
       ((string, expected)) => {
         let actual = parseOrdBy(string)
-        expect(actual) |> toEqual(expected)
+        expect(actual)->toEqual(expected)
       },
     )
 
@@ -340,7 +343,7 @@ describe("Relude_Extensions_BoundedEnum", () => {
           usingInverseMapEq,
           usingInverseMapEqBy,
           usingInverseMapString,
-        )) |> toEqual((
+        ))->toEqual((
           usingInverseMapOrdBy,
           usingInverseMapEq,
           usingInverseMapEqBy,

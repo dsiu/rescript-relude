@@ -115,7 +115,7 @@ let alignWith: 'a 'b 'c. (Relude_Ior_Type.t<'a, 'b> => 'c, option<'a>, option<'b
   f,
   fa,
   fb,
-) => map(f, align(fa, fb))
+) => align(fa, fb)->(map(f, _))
 
 module Semialign: Relude_Interface.SEMIALIGN with type t<'a> = option<'a> = {
   include Functor

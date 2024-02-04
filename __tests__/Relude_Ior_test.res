@@ -286,17 +286,17 @@ describe("Ior", () => {
     test(
       "map",
       () =>
-        expect(IorT.map(a => a + 1, Ior.that(NonEmptyList.pure(That.Unknown))))->toEqual(
-          That(NonEmptyList.pure(That.Unknown)),
-        ),
+        IorT.map(a => a + 1, Ior.that(NonEmptyList.pure(That.Unknown)))
+        ->expect
+        ->toEqual(That(NonEmptyList.pure(That.Unknown))),
     )
 
     test(
       "apply",
       () =>
-        expect(
-          IorT.apply(Ior.this(a => a + 1), Ior.that(NonEmptyList.pure(That.Unknown))),
-        )->toEqual(That(NonEmptyList.pure(That.Unknown))),
+        IorT.apply(Ior.this(a => a + 1), Ior.that(NonEmptyList.pure(That.Unknown)))
+        ->expect
+        ->toEqual(That(NonEmptyList.pure(That.Unknown))),
     )
   })
 })

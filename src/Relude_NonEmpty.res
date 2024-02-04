@@ -185,8 +185,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Applies a NonEmpty sequence of function to a NonEmpty sequence of values
   ")
-  let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) =>
-    map(f => map(f, fa), ff) |> flatten
+  let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) => map(f => map(f, fa), ff)->flatten
 
   module Apply: APPLY with type t<'a> = t<'a> = {
     include Functor

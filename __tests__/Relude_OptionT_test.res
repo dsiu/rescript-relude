@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 
@@ -20,103 +23,138 @@ let (\"<$>", \"<$$>", \">>=") = {
 describe("OptionT", () => {
   testAsync("make", onDone =>
     OptionIOE.make(IOE.pure(Some(2)))
-    |> OptionIOE.map(a => expect(a) |> toEqual(2))
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | Ok(None) => onDone(fail("none"))
-      | Error(_x) => onDone(fail("error"))
-      }
+    ->OptionIOE.map(a => expect(a)->toEqual(2), _)
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | Ok(None) => onDone(fail("none"))
+          | Error(_x) => onDone(fail("error"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("map", onDone =>
     OptionIOE.pure(2)
-    |> OptionIOE.map(a => a * 2)
-    |> OptionIOE.map(a => expect(a) |> toEqual(4))
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.map(a => a * 2, _)
+    ->OptionIOE.map(a => expect(a)->toEqual(4), _)
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("apply", onDone =>
     OptionIOE.pure(2)
-    |> OptionIOE.apply(OptionIOE.pure(a => a * 2))
-    |> OptionIOE.map(a => expect(a) |> toEqual(4))
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.apply(OptionIOE.pure(a => a * 2), _)
+    ->OptionIOE.map(a => expect(a)->toEqual(4), _)
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("pure", onDone =>
     OptionIOE.pure(pass)
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("bind", onDone =>
     OptionIOE.pure(2)
-    |> OptionIOE.flatMap(a => OptionIOE.pure(a * 2))
-    |> OptionIOE.map(a => expect(a) |> toEqual(4))
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.flatMap(a => OptionIOE.pure(a * 2), _)
+    ->OptionIOE.map(a => expect(a)->toEqual(4), _)
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("operators", onDone =>
-    \"<$$>"(\">>="(\"<$$>"(OptionIOE.pure(2), a => a * 3), a => OptionIOE.pure(a + 7)), a =>
-      expect(a) |> toEqual(13)
+    \"<$$>"(
+      \">>="(\"<$$>"(OptionIOE.pure(2), a => a * 3), a => OptionIOE.pure(a + 7)),
+      a => expect(a)->toEqual(13),
     )
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("subflatMap", onDone =>
-    \"<$$>"(OptionIOE.pure(2) |> OptionIOE.subflatMap(a => Some(a * 3)), a =>
-      expect(a) |> toEqual(6)
+    \"<$$>"(
+      OptionIOE.pure(2)->(OptionIOE.subflatMap(a => Some(a * 3), _)),
+      a => expect(a)->toEqual(6),
     )
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 
   testAsync("semiflatMap", onDone =>
-    \"<$$>"(OptionIOE.pure(2) |> OptionIOE.semiflatMap(a => IO.pure(a * 3)), a =>
-      expect(a) |> toEqual(6)
+    \"<$$>"(
+      OptionIOE.pure(2)->(OptionIOE.semiflatMap(a => IO.pure(a * 3), _)),
+      a => expect(a)->toEqual(6),
     )
-    |> OptionIOE.runOptionT
-    |> IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(Some(assertion)) => onDone(assertion)
-      | _ => onDone(fail("fail"))
-      }
+    ->OptionIOE.runOptionT
+    ->(
+      IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(Some(assertion)) => onDone(assertion)
+          | _ => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 })

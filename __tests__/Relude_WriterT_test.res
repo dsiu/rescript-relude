@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 
@@ -18,13 +21,18 @@ let (\"<$>", \"$>", \"<$$>", \">>=") = {
 describe("WriterT", () =>
   test("pure, >>=, tell, $>, runWriterT", () => {
     // This gets a little ugly without having a do notation equivalent
-    let writer = \">>="(WriterList.pure(42), a =>
-      \">>="(\"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a * 2), a =>
-        \">>="(\"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a + 5), a =>
-          \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a)
-        )
-      )
+    let writer = \">>="(
+      WriterList.pure(42),
+      a =>
+        \">>="(
+          \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a * 2),
+          a =>
+            \">>="(
+              \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a + 5),
+              a => \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a),
+            ),
+        ),
     )
-    expect(writer |> Writer.runWriterT) |> toEqual((89, list{"a = 42", "a = 84", "a = 89"}))
+    expect(writer->Writer.runWriterT)->toEqual((89, list{"a = 42", "a = 84", "a = 89"}))
   })
 )

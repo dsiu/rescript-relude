@@ -200,13 +200,13 @@ let bitap: 'a. (unit => unit, 'a => unit, option<'a>) => option<'a> = (ifNone, i
   filter(isEven, None) == None;
 ]}
 ")
-let filter: 'a. ('a => bool) => option<'a> => option<'a> = fn =>
+let filter: 'a. (. 'a => bool, option<'a>) => option<'a> = fn =>
   Relude_Option_Instances.foldLeft((default, v) => fn(v) ? Some(v) : default, empty, ...)
 
 @ocaml.doc("
 [Option.keep] is an alias for {!val:filter}.
 ")
-let keep: 'a. ('a => bool) => option<'a> => option<'a> = o => filter(o)
+let keep: 'a. (. 'a => bool, option<'a>) => option<'a> = o => filter(o, ...)
 
 @ocaml.doc("
 [filterNot] is the inverse of [filter], meaning [Some] values are preserved if
@@ -218,9 +218,9 @@ the provided predicate function returns false.
   filterNot(isEven, Some(2)) == None;
 ]}
 ")
-let filterNot: 'a. ('a => bool) => option<'a> => option<'a> = f => filter(a => !f(a))
+let filterNot: 'a. (. 'a => bool, option<'a>) => option<'a> = f => filter(a => !f(a), ...)
 
 @ocaml.doc("
 Alias of filterNot
 ")
-let reject: 'a. ('a => bool) => option<'a> => option<'a> = filterNot
+let reject: 'a. (. 'a => bool, option<'a>) => option<'a> = filterNot

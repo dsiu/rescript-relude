@@ -17,7 +17,7 @@ let empty: module(Belt.Id.Comparable with type t = 'value and type identity = 'i
 let singleton: (
   module(Belt.Id.Comparable with type t = 'value and type identity = 'id),
   'value,
-) => Belt.Set.t<'value, 'id> = (id, value) => (Belt.Set.add(_, value))(Belt.Set.make(~id))
+) => Belt.Set.t<'value, 'id> = (id, value) => Belt.Set.make(~id)->Belt.Set.add(value)
 
 @ocaml.doc("
 [Set.fromArray] converts an array of values into a new set of those values,
@@ -40,7 +40,7 @@ let fromList: (
 @ocaml.doc("
 Determine whether a set is empty.
 ")
-let isEmpty: t<'value, 'id> => bool = s => Belt.Set.isEmpty(s)
+let isEmpty: t<'value, 'id> => bool = s => s->Belt.Set.isEmpty
 
 @ocaml.doc("
 Determine whether a set contains a given value.
@@ -242,31 +242,31 @@ let partition: ('value => bool, t<'value, 'id>) => (t<'value, 'id>, t<'value, 'i
 @ocaml.doc("
 Returns the total number of elements in a set.
 ")
-let length: t<'value, 'id> => int = s => Belt.Set.size(s)
+let length: t<'value, 'id> => int = s => s->Belt.Set.size
 
 @ocaml.doc("
 Creates a new array containing all elements of the set in ascending order based
 on the associated comparator function.
 ")
-let toArray: t<'value, 'id> => array<'value> = s => Belt.Set.toArray(s)
+let toArray: t<'value, 'id> => array<'value> = s => s->Belt.Set.toArray
 
 @ocaml.doc("
 Creates a new list containing all elements of the set in ascending order based
 on the associated comparator function.
 ")
-let toList: t<'value, 'id> => list<'value> = s => Belt.Set.toList(s)
+let toList: t<'value, 'id> => list<'value> = s => s->Belt.Set.toList
 
 @ocaml.doc("
 Optionally returns the lowest ordered element in a given set or [None] if the
 set is empty.
 ")
-let minimum: t<'value, 'id> => option<'value> = s => Belt.Set.minimum(s)
+let minimum: t<'value, 'id> => option<'value> = s => s->Belt.Set.minimum
 
 @ocaml.doc("
 Optionally returns the highest ordered element in a given set or [None] if the
 set is empty.
 ")
-let maximum: t<'value, 'id> => option<'value> = s => Belt.Set.maximum(s)
+let maximum: t<'value, 'id> => option<'value> = s => s->Belt.Set.maximum
 
 @ocaml.doc("
 Optionally returns an equivalent element from a set or [None] if no equivalent

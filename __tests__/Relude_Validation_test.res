@@ -9,6 +9,7 @@ module String = Relude_String
 module Result = Relude_Result
 module Option = Relude_Option
 module Validation = Relude_Validation
+module Fn = Relude_Function
 
 module Error = {
   type t =
@@ -95,10 +96,7 @@ module Person = {
     // apply
     // Apply the wrapped function again
     \"<*>"(
-      \"<*>"(
-        \"<$>"(a => b => makeWithNoValidation(a, b, ...), validateName(name)),
-        validateAge(age),
-      ),
+      \"<*>"(\"<$>"(makeWithNoValidation->Fn.uncurryFn3, validateName(name)), validateAge(age)),
       validateLanguage(language), // apply
       // You can keep going with <*> if there are more values to validate to construct our `Person`
     )
@@ -110,7 +108,7 @@ module Person = {
   ) =>
     // This is an example that doesn't use the map <$> and apply <*> operators.
     // This looks and is clunky, and that's the main reason the operator version is preferred!
-    ValidationE.map(a => b => makeWithNoValidation(a, b, ...), validateName(name))
+    ValidationE.map(makeWithNoValidation->Fn.uncurryFn3, validateName(name))
     ->ValidationE.apply(validateAge(age))
     ->ValidationE.apply(validateLanguage(language))
 }
@@ -126,56 +124,56 @@ describe("Validation", () => {
 
   test("tap success", () => {
     let x = ref(0)
-    ignore(Validation.tap(i => x := i, Validation.VOk(123)))
+    Validation.VOk(123)->Validation.tap(i => x := i, _)->ignore
     expect(x.contents)->toEqual(123)
   })
 
   test("tap error", () => {
     let x = ref(0)
-    ignore(Validation.tap(i => x := i, Validation.VError(123)))
+    Validation.VError(123)->Validation.tap(i => x := i, _)->ignore
     expect(x.contents)->toEqual(0)
   })
 
   test("mapError success", () => {
-    let actual = Validation.mapError(i => i + 1, Validation.VError(123))
+    let actual = Validation.VError(123)->(Validation.mapError(i => i + 1, _))
     expect(actual)->toEqual(Validation.VError(124))
   })
 
   test("mapError error", () => {
-    let actual = Validation.mapError(i => i + 1, Validation.VOk(123))
+    let actual = Validation.VOk(123)->(Validation.mapError(i => i + 1, _))
     expect(actual)->toEqual(Validation.VOk(123))
   })
 
   test("mapErrorsNel success", () => {
-    let actual = Validation.mapErrorsNel(i => i + 1, Validation.VError(NonEmptyList.pure(123)))
+    let actual = Validation.VError(NonEmptyList.pure(123))->(Validation.mapErrorsNel(i => i + 1, _))
     expect(actual)->toEqual(Validation.VError(NonEmptyList.pure(124)))
   })
 
   test("mapErrorsNel error", () => {
-    let actual = Validation.mapErrorsNel(i => i + 1, Validation.VOk(123))
+    let actual = Validation.VOk(123)->(Validation.mapErrorsNel(i => i + 1, _))
     expect(actual)->toEqual(Validation.VOk(123))
   })
 
   test("tapError success", () => {
     let x = ref(0)
-    ignore(Validation.tapError(i => x := i, Validation.VError(123)))
+    Validation.VError(123)->Validation.tapError(i => x := i, _)->ignore
     expect(x.contents)->toEqual(123)
   })
 
   test("tapError error", () => {
     let x = ref(0)
-    ignore(Validation.tapError(i => x := i, Validation.VOk(123)))
+    Validation.VOk(123)->Validation.tapError(i => x := i, _)->ignore
     expect(x.contents)->toEqual(0)
   })
 
   test("bimap success", () =>
-    expect(Validation.bimap(i => i + 1, i => i - 1, Validation.VOk(123)))->toEqual(
+    expect(Validation.VOk(123)->(Validation.bimap(i => i + 1, i => i - 1, _)))->toEqual(
       Validation.VOk(124),
     )
   )
 
   test("bimap error", () =>
-    expect(Validation.bimap(i => i + 1, i => i - 1, Validation.VError(123)))->toEqual(
+    expect(Validation.VError(123)->(Validation.bimap(i => i + 1, i => i - 1, _)))->toEqual(
       Validation.VError(122),
     )
   )
@@ -183,7 +181,9 @@ describe("Validation", () => {
   test("bitap success", () => {
     let x = ref(0)
 
-    ignore(Validation.bitap(i => x := i + 1, i => x := i - 1, Validation.VOk(123)))
+    Validation.VOk(123)
+    ->Validation.bitap(i => x := i + 1, i => x := i - 1, _)
+    ->ignore
 
     expect(x.contents)->toEqual(124)
   })
@@ -191,7 +191,9 @@ describe("Validation", () => {
   test("bitap error", () => {
     let x = ref(0)
 
-    ignore(Validation.bitap(i => x := i + 1, i => x := i - 1, Validation.VError(123)))
+    Validation.VError(123)
+    ->Validation.bitap(i => x := i + 1, i => x := i - 1, _)
+    ->ignore
 
     expect(x.contents)->toEqual(122)
   })
@@ -201,7 +203,7 @@ describe("Validation", () => {
     let f = i => Validation.VError(i + 1)
     let expected = Validation.VError(124)
 
-    ignore(expect(Validation.bind(input, f))->toEqual(expected))
+    expect(Validation.bind(input, f))->toEqual(expected)->ignore
     expect(Validation.flatMap(f, input))->toEqual(expected)
   })
 
@@ -210,7 +212,7 @@ describe("Validation", () => {
     let f = i => Validation.VOk(i + 1)
     let expected = Validation.VError(123)
 
-    ignore(expect(Validation.bind(input, f))->toEqual(expected))
+    expect(Validation.bind(input, f))->toEqual(expected)->ignore
     expect(Validation.flatMap(f, input))->toEqual(expected)
   })
 

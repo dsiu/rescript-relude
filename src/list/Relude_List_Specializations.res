@@ -73,11 +73,14 @@ module String = {
   have a special-case implementation here that uses Js.Dict for faster
   comparison. This is O(n) instead of O(n{^ 2}).
   ")
-  let distinct: list<string> => list<string> = xs =>
-    Relude_List_Instances.fromArray(Js.Dict.keys(Relude_List_Instances.foldLeft((acc, curr) => {
-          Js.Dict.set(acc, curr, 0)
-          acc
-        }, Js.Dict.empty(), xs)))
+  let distinct: list<string> => list<string> = xs => {
+    Relude_List_Instances.foldLeft((acc, curr) => {
+      Js.Dict.set(acc, curr, 0)
+      acc
+    }, Js.Dict.empty(), xs)
+    ->Js.Dict.keys
+    ->Relude_List_Instances.fromArray
+  }
 }
 
 @ocaml.doc("

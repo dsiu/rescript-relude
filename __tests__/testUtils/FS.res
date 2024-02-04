@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 Fs.Native wraps a few functions from the node.js fs module with little to no
 modification to the fs API.
@@ -44,7 +47,8 @@ module IO = {
         switch (Js.Null.toOption(err), content) {
         | (Some(err'), _) =>
           Js.Console.error(
-            "Read failed: " ++ Relude_Option.getOrElseLazy(_ => "No error", Js.Exn.message(err')),
+            "Read failed: " ++
+            Js.Exn.message(err')->(Relude_Option.getOrElseLazy(_ => "No error", _)),
           )
           onDone(Error(err'))
         | (_, content) => onDone(Ok(content))
@@ -58,7 +62,8 @@ module IO = {
         switch Js.Null.toOption(err) {
         | Some(err') =>
           Js.Console.error(
-            "Write failed: " ++ Relude_Option.getOrElseLazy(_ => "No error", Js.Exn.message(err')),
+            "Write failed: " ++
+            Js.Exn.message(err')->(Relude_Option.getOrElseLazy(_ => "No error", _)),
           )
           onDone(Error(err'))
         | None => onDone(Ok())

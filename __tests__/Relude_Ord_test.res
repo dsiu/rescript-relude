@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 open! Relude.Globals
@@ -24,7 +27,7 @@ describe("Ord", () => {
       userCompare(user3, user1),
       userCompare(user3, user2),
       userCompare(user3, user3),
-    )) |> toEqual((
+    ))->toEqual((
       #equal_to,
       #less_than,
       #less_than,
@@ -47,10 +50,10 @@ describe("Ord", () => {
     },
     ((input, expectedNormal, expectedReverse)) => {
       let compareNormal = Int.compare
-      let compareReverse = compareNormal |> Ord.reverse
+      let compareReverse = compareNormal->Ord.reverse
       let actualNormal = List.sortBy(compareNormal, input)
       let actualReverse = List.sortBy(compareReverse, input)
-      expect((actualNormal, actualReverse)) |> toEqual((expectedNormal, expectedReverse))
+      expect((actualNormal, actualReverse))->toEqual((expectedNormal, expectedReverse))
     },
   )
 
@@ -58,77 +61,77 @@ describe("Ord", () => {
     a,
     b,
     expected,
-  )) => expect(Ord.compareAsIntBy(String.compare, a, b)) |> toEqual(expected))
+  )) => expect(Ord.compareAsIntBy(String.compare, a, b))->toEqual(expected))
 
   testAll("compareAsIntBy", list{("a", "a", 0), ("a", "b", -1), ("b", "a", 1)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.compareAsInt(module(String.Ord), a, b)) |> toEqual(expected))
+  )) => expect(Ord.compareAsInt(module(String.Ord), a, b))->toEqual(expected))
 
   testAll("minBy", list{("a", "a", "a"), ("a", "b", "a"), ("b", "a", "a")}, ((a, b, expected)) =>
-    expect(Ord.minBy(String.compare, a, b)) |> toEqual(expected)
+    expect(Ord.minBy(String.compare, a, b))->toEqual(expected)
   )
 
   testAll("min", list{("a", "a", "a"), ("a", "b", "a"), ("b", "a", "a")}, ((a, b, expected)) =>
-    expect(Ord.min(module(String.Ord), a, b)) |> toEqual(expected)
+    expect(Ord.min(module(String.Ord), a, b))->toEqual(expected)
   )
 
   testAll("maxBy", list{("a", "a", "a"), ("a", "b", "b"), ("b", "a", "b")}, ((a, b, expected)) =>
-    expect(Ord.maxBy(String.compare, a, b)) |> toEqual(expected)
+    expect(Ord.maxBy(String.compare, a, b))->toEqual(expected)
   )
 
   testAll("max", list{("a", "a", "a"), ("a", "b", "b"), ("b", "a", "b")}, ((a, b, expected)) =>
-    expect(Ord.max(module(String.Ord), a, b)) |> toEqual(expected)
+    expect(Ord.max(module(String.Ord), a, b))->toEqual(expected)
   )
 
   testAll("lessThanBy", list{("a", "a", false), ("a", "b", true), ("b", "a", false)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.lessThanBy(String.compare, a, b)) |> toEqual(expected))
+  )) => expect(Ord.lessThanBy(String.compare, a, b))->toEqual(expected))
 
   testAll("lessThan", list{("a", "a", false), ("a", "b", true), ("b", "a", false)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.lessThan(module(String.Ord), a, b)) |> toEqual(expected))
+  )) => expect(Ord.lessThan(module(String.Ord), a, b))->toEqual(expected))
 
   testAll("lessThanOrEqBy", list{("a", "a", true), ("a", "b", true), ("b", "a", false)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.lessThanOrEqBy(String.compare, a, b)) |> toEqual(expected))
+  )) => expect(Ord.lessThanOrEqBy(String.compare, a, b))->toEqual(expected))
 
   testAll("lessThanOrEq", list{("a", "a", true), ("a", "b", true), ("b", "a", false)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.lessThanOrEq(module(String.Ord), a, b)) |> toEqual(expected))
+  )) => expect(Ord.lessThanOrEq(module(String.Ord), a, b))->toEqual(expected))
 
   testAll("greaterThanBy", list{("a", "a", false), ("a", "b", false), ("b", "a", true)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.greaterThanBy(String.compare, a, b)) |> toEqual(expected))
+  )) => expect(Ord.greaterThanBy(String.compare, a, b))->toEqual(expected))
 
   testAll("greaterThan", list{("a", "a", false), ("a", "b", false), ("b", "a", true)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.greaterThan(module(String.Ord), a, b)) |> toEqual(expected))
+  )) => expect(Ord.greaterThan(module(String.Ord), a, b))->toEqual(expected))
 
   testAll("greaterThanOrEqBy", list{("a", "a", true), ("a", "b", false), ("b", "a", true)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.greaterThanOrEqBy(String.compare, a, b)) |> toEqual(expected))
+  )) => expect(Ord.greaterThanOrEqBy(String.compare, a, b))->toEqual(expected))
 
   testAll("greaterThanOrEq", list{("a", "a", true), ("a", "b", false), ("b", "a", true)}, ((
     a,
     b,
     expected,
-  )) => expect(Ord.greaterThanOrEq(module(String.Ord), a, b)) |> toEqual(expected))
+  )) => expect(Ord.greaterThanOrEq(module(String.Ord), a, b))->toEqual(expected))
 
   testAll(
     "clampBy",
@@ -140,7 +143,7 @@ describe("Ord", () => {
       ("e", "b", "d", "d"),
     },
     ((input, min, max, expected)) =>
-      expect(Ord.clampBy(String.compare, ~min, ~max, input)) |> toEqual(expected),
+      expect(Ord.clampBy(String.compare, ~min, ~max, input))->toEqual(expected),
   )
 
   testAll(
@@ -153,7 +156,7 @@ describe("Ord", () => {
       ("e", "b", "d", "d"),
     },
     ((input, min, max, expected)) =>
-      expect(Ord.clamp(module(String.Ord), ~min, ~max, input)) |> toEqual(expected),
+      expect(Ord.clamp(module(String.Ord), ~min, ~max, input))->toEqual(expected),
   )
 
   testAll(
@@ -166,7 +169,7 @@ describe("Ord", () => {
       ("e", "b", "d", false),
     },
     ((input, min, max, expected)) =>
-      expect(Ord.betweenBy(String.compare, ~min, ~max, input)) |> toEqual(expected),
+      expect(Ord.betweenBy(String.compare, ~min, ~max, input))->toEqual(expected),
   )
 
   testAll(
@@ -179,14 +182,14 @@ describe("Ord", () => {
       ("e", "b", "d", false),
     },
     ((input, min, max, expected)) =>
-      expect(Ord.between(module(String.Ord), ~min, ~max, input)) |> toEqual(expected),
+      expect(Ord.between(module(String.Ord), ~min, ~max, input))->toEqual(expected),
   )
 
   testAll("abs", list{(-2, 2), (-1, 1), (0, 0), (1, 1), (2, 2)}, ((input, expected)) =>
-    expect(Ord.abs(module(Int.Ord), module(Int.Ring), input)) |> toEqual(expected)
+    expect(Ord.abs(module(Int.Ord), module(Int.Ring), input))->toEqual(expected)
   )
 
   testAll("signum", list{(-2, -1), (-1, -1), (0, 1), (1, 1), (2, 1)}, ((input, expected)) =>
-    expect(Ord.signum(module(Int.Ord), module(Int.Ring), input)) |> toEqual(expected)
+    expect(Ord.signum(module(Int.Ord), module(Int.Ring), input))->toEqual(expected)
   )
 })

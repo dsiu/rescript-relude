@@ -21,7 +21,7 @@ let fromArray: 'a. array<'a> => option<('a, 'a, 'a)> = x =>
 Constructs a tuple-3 from an array of at least 3 values
 ")
 let fromArrayAtLeast: 'a. array<'a> => option<('a, 'a, 'a)> = xs =>
-  Relude_Array.take(3, xs) |> fromArray
+  Relude_Array.take(3, xs)->fromArray
 
 @ocaml.doc("
 Constructs a tuple-3 from a list of exactly 3 values
@@ -29,14 +29,13 @@ Constructs a tuple-3 from a list of exactly 3 values
 let fromList: 'a. list<'a> => option<('a, 'a, 'a)> = xs =>
   {
     open Relude_List
-    take(4, xs) |> toArray
-  } |> fromArray
+    take(4, xs)->toArray
+  }->fromArray
 
 @ocaml.doc("
 Constructs a tuple-3 from a list of at least 3 values
 ")
-let fromListAtLeast: 'a. list<'a> => option<('a, 'a, 'a)> = xs =>
-  Relude_List.take(3, xs) |> fromList
+let fromListAtLeast: 'a. list<'a> => option<('a, 'a, 'a)> = xs => Relude_List.take(3, xs)->fromList
 
 @ocaml.doc("
 Gets the first value of a tuple-3

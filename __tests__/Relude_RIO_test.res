@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 
@@ -32,17 +35,23 @@ let (\"<$>", \"<$$>", \">>=") = {
 
 describe("Reader IO", () =>
   testAsync("test flow", onDone =>
-    \">>="(RIO.ask, env =>
-      \"<$$>"(\"<$$>"(RIO.pure(-1 * env.intValue), string_of_int), a => a ++ env.stringValue)
+    \">>="(
+      RIO.ask,
+      env =>
+        \"<$$>"(\"<$$>"(RIO.pure(-1 * env.intValue), string_of_int), a => a ++ env.stringValue),
     )
-    |> RIO.semiflatMap(c => Relude_IO.pure(c ++ "semi"))
-    |> RIO.runRIO(testEnv)
-    |> Relude_IO.map(a => expect(a) |> toEqual("-42abcsemi"))
-    |> Relude_IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(assertion) => onDone(assertion)
-      | Error(_) => onDone(fail("fail"))
-      }
+    ->RIO.semiflatMap(c => Relude_IO.pure(c ++ "semi"), _)
+    ->RIO.runRIO(testEnv, _)
+    ->Relude_IO.map(a => expect(a)->toEqual("-42abcsemi"), _)
+    ->(
+      Relude_IO.unsafeRunAsync(
+        x =>
+          switch x {
+          | Ok(assertion) => onDone(assertion)
+          | Error(_) => onDone(fail("fail"))
+          },
+        _,
+      )
     )
   )
 )

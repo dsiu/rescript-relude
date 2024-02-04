@@ -162,6 +162,7 @@ let uncurry5: 'a 'b 'c 'd 'e 'f. (('a, 'b, 'c, 'd, 'e) => 'f, ('a, 'b, 'c, 'd, '
 let map: 'a 'b 'r. (. 'a => 'b, 'r => 'a) => 'r => 'b = (aToB, rToA) => r =>
   aToB(rToA(r)) /* Same as compose */
 
+//let apply_x = (rToAToB, rToA) => r => rToAToB(r)(rToA(r))
 @ocaml.doc("
 In [apply(hof, f, a)], [hof] is a higher-order function that takes one argument
 and returns a new function that also takes one argument.
@@ -187,7 +188,6 @@ The result of [apply()] is equivalent to:
 ]}
 ")
 let apply_x = (rToAToB, rToA) => r => rToAToB(r)(rToA(r))
-
 let apply = (. rToAToB, rToA) => apply_x(rToAToB, rToA, ...)
 
 //let apply: 'a 'b 'r. (('r, 'a) => 'b, 'r => 'a, 'r) => 'b = (rToAToB, rToA, r) =>
@@ -248,9 +248,11 @@ as [bind], but with the first two arguments in reverse order.
   flatMap(showResult, cube, 5) == \"input 5 yields 125\";
 ]}
 ")
-let flatMap: 'a 'b 'r. (('a, 'r) => 'b, 'r => 'a) => 'r => 'b = {
-  (f, fa) => r => bind(fa, x => f(x, _))(r)
-}
+let flatMap: 'a 'b 'r. (
+  ('a, 'r) => 'b,
+  'r => 'a,
+) => 'r => 'b = //  (f, fa) => r => bind(fa, x => f(x, _))(r)
+(f, fa) => bind(fa, x => f(x, _))
 
 @ocaml.doc("
 [memoize0] takes a [unit => 'a] function and returns a new function
@@ -369,6 +371,22 @@ Takes a predicate function, and returns a new predicate function which negates
 the given predicate.
 ")
 let negate = (f: 'a => bool): ('a => bool) => a => !f(a)
+
+//
+// utils for converting curried functions to chained-uncurried function of single argument
+// this is needed to simulate curried callbacks in ReScript v11 default uncurried mode
+//
+let uncurryFn2: 'a 'b 'r. ((. 'a, 'b) => 'r) => 'a => 'b => 'r = f => {
+  a => b => f(a, b)
+}
+
+let uncurryFn3: 'a 'b 'c 'r. ((. 'a, 'b, 'c) => 'r) => 'a => 'b => 'c => 'r = f => {
+  a => b => c => f(a, b, c)
+}
+
+let uncurryFn4: 'a 'b 'c 'd 'r. (('a, 'b, 'c, 'd) => 'r) => 'a => 'b => 'c => 'd => 'r = f => {
+  a => b => c => d => f(a, b, c, d)
+}
 
 @ocaml.doc("
 The [Infix] submodule provides two infix operators for function composition.

@@ -62,7 +62,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   If the item is not found, the result is None.
   ")
   let indexOfBy: 'a. (('a, 'a) => bool, 'a, F.t<'a>) => option<int> = (f, x, xs) =>
-    snd(F.fold_left(((i, v), y) => (i + 1, optionAlt(v, f(x, y) ? Some(i) : None)), (0, None), xs))
+    F.fold_left(((i, v), y) => (i + 1, optionAlt(v, f(x, y) ? Some(i) : None)), (0, None), xs)->snd
 
   @ocaml.doc("
   Finds the index of the given item in the foldable using the given EQ module.
@@ -141,10 +141,10 @@ module FoldableExtensions = (F: FOLDABLE) => {
   also providing the item's index to the function.
   ")
   let forEachWithIndex: 'a. (('a, int) => unit, F.t<'a>) => unit = (f, xs) =>
-    ignore(F.fold_left((i, x) => {
-        f(x, i)
-        i + 1
-      }, 0, xs))
+    F.fold_left((i, x) => {
+      f(x, i)
+      i + 1
+    }, 0, xs)->ignore
 
   @ocaml.doc("
   [find] returns the first item in the foldable which satisfies the given
@@ -157,7 +157,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   Finds the first indexed item in the foldable which satisfies the given predicate.
   ")
   let findWithIndex: 'a. (('a, int) => bool, F.t<'a>) => option<'a> = (f, xs) =>
-    snd(F.fold_left(((i, v), x) => (i + 1, optionAlt(v, f(x, i) ? Some(x) : None)), (0, None), xs))
+    F.fold_left(((i, v), x) => (i + 1, optionAlt(v, f(x, i) ? Some(x) : None)), (0, None), xs)->snd
 
   @ocaml.doc("
   Converts the foldable into a list
@@ -208,13 +208,11 @@ module FoldableExtensions = (F: FOLDABLE) => {
     elements using the specified separator.
     ")
     let intercalate: (M.t, F.t<M.t>) => M.t = (sep, xs) =>
-      snd(
-        F.fold_left(
-          ((init, acc), x) => init ? (false, x) : (false, M.append(acc, M.append(sep, x))),
-          (true, M.empty),
-          xs,
-        ),
-      )
+      F.fold_left(
+        ((init, acc), x) => init ? (false, x) : (false, M.append(acc, M.append(sep, x))),
+        (true, M.empty),
+        xs,
+      )->snd
   }
 
   @ocaml.doc("

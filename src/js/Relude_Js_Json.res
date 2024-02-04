@@ -87,8 +87,9 @@ let fromFloat: float => json = n => Js.Json.number(n)
 Creates a Js.Json.t value from an option('a). If the option is [None], a null
 value is returned, otherwise, the value is encoded using the given function.
 ")
-let fromOption: ('a => json, option<'a>) => json = (encode, opt) =>
-  Relude_Option.fold(null, encode, opt)
+let fromOption: ('a => json, option<'a>) => json = (encode, opt) => {
+  opt->(Relude_Option.fold(null, encode, _))
+}
 
 @ocaml.doc("
 Creates a Js.Json.t array value from an array of Js.Json.t values
@@ -98,21 +99,24 @@ let fromArrayOfJson: array<json> => json = xs => Js.Json.array(xs)
 @ocaml.doc("
 Creates a Js.Json.t array value from an array of values that can be converted to Js.Json.t values with the given function
 ")
-let fromArrayOfJsonBy: 'a. ('a => json, array<'a>) => json = (f, items) =>
-  fromArrayOfJson(Array.map(f, items))
+let fromArrayOfJsonBy: 'a. ('a => json, array<'a>) => json = (f, items) => {
+  Array.map(f, items)->fromArrayOfJson
+}
 
 @ocaml.doc("
 Creates a Js.Json.t array value from an list of Js.Json.t values
 ")
-let fromListOfJson: list<json> => json =
-  \">>"(Relude_List.toArray, fromArrayOfJson, ...)
+let fromListOfJson: list<json> => json = {
+  Relude_List.toArray->(\">>"(fromArrayOfJson, ...))
+}
 
 @ocaml.doc("
 Creates a Js.Json.t array value from an list of values that can be converted to
 Js.Json.t values with the given function
 ")
-let fromListOfJsonBy: 'a. ('a => json, list<'a>) => json = (f, items) =>
-  fromListOfJson(Relude_List.map(f, items))
+let fromListOfJsonBy: 'a. ('a => json, list<'a>) => json = (f, items) => {
+  Relude_List.map(f, items)->fromListOfJson
+}
 
 @ocaml.doc("
 Creates a Js.Json.t object value from a Js.Dict containing Js.Json.t values.
@@ -127,8 +131,9 @@ let fromArrayOfDictOfJson: array<dict> => json = oa => Js.Json.objectArray(oa)
 @ocaml.doc("
 Creates a Js.Json.t array value from an list of Js.Dict.t(Js.Json.t) values.
 ")
-let fromListOfDictOfJson: list<dict> => json =
-  \">>"(Relude_List.toArray, oa => Js.Json.objectArray(oa), ...)
+let fromListOfDictOfJson: list<dict> => json = {
+  Relude_List.toArray->(\">>"(oa => Js.Json.objectArray(oa), ...))
+}
 
 @ocaml.doc("
 Creates a Js.Json.t object value from an array of key/value (string/Js.Json.t)
@@ -158,7 +163,9 @@ let fromListOfKeyValueTuples: list<(Js.Dict.key, json)> => json = tuples =>
 Attempts to decode the given Js.Json.t value as a null.  Returns [Some(())] if
 it is a [null], otherwise [None].
 ")
-let toNull: json => option<unit> = json => Relude_Option.void(Js.Json.decodeNull(json))
+let toNull: json => option<unit> = json => {
+  json->Js.Json.decodeNull->Relude_Option.void
+}
 
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as a [boolean]
@@ -173,7 +180,9 @@ let toString: json => option<string> = s => Js.Json.decodeString(s)
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as an [int]
 ")
-let toInt: json => option<int> = json => Relude_Option.map(int_of_float, Js.Json.decodeNumber(json))
+let toInt: json => option<int> = json => {
+  json->Js.Json.decodeNumber->(Relude_Option.map(int_of_float, _))
+}
 
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as a [float]
@@ -190,8 +199,9 @@ let toArrayOfJson: json => option<array<json>> = xs => Js.Json.decodeArray(xs)
 Attempts to decode the given [Js.Json.t] value as an array of [Js.Json.t]
 values, with a fallback.
 ")
-let toArrayOfJsonOrElse: (array<json>, json) => array<json> = (default, json) =>
-  Relude_Option.getOrElse(default, toArrayOfJson(json))
+let toArrayOfJsonOrElse: (array<json>, json) => array<json> = (default, json) => {
+  json->toArrayOfJson->(Relude_Option.getOrElse(default, _))
+}
 
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as an array of [Js.Json.t]
@@ -202,14 +212,17 @@ let toArrayOfJsonOrEmpty = toArrayOfJsonOrElse([], _)
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as a list of [Js.Json.t] values.
 ")
-let toListOfJson: json => option<list<json>> = json =>
-  Relude_Option.map(Relude_Array.toList, toArrayOfJson(json))
+let toListOfJson: json => option<list<json>> = json => {
+  json->toArrayOfJson->(Relude_Option.map(Relude_Array.toList, _))
+}
 
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as an list of [Js.Json.t] values,
 with a fallback.
 ")
-let toListOfJsonOrElse = (default, json) => Relude_Option.getOrElse(default, toListOfJson(json))
+let toListOfJsonOrElse = (default, json) => {
+  json->toListOfJson->(Relude_Option.getOrElse(default, _))
+}
 
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as a list of [Js.Json.t] values,
@@ -226,7 +239,9 @@ let toDictOfJson: json => option<dict> = obj => Js.Json.decodeObject(obj)
 Attempts to decode the given [Js.Json.t] value as a [Js.Dict.t(Js.Json.t)] with
 a fallback.
 ")
-let toDictOfJsonOrElse = (default, json) => Relude_Option.getOrElse(default, toDictOfJson(json))
+let toDictOfJsonOrElse = (default, json) => {
+  json->toDictOfJson->(Relude_Option.getOrElse(default, _))
+}
 
 @ocaml.doc("
 Attempts to decode the given [Js.Json.t] value as a [Js.Dict.t(Js.Json.t)] with
@@ -285,47 +300,62 @@ module TraversableE = ArrayValidationE.Traversable
 @ocaml.doc("
 Validates that the given Js.Json.t value is a null
 ")
-let validateNull: json => Relude_Validation.t<unit, Errors.t> = json =>
-  Relude_Validation.fromOptionLazy(
-    _ => Errors.pure("JSON value is not a null: " ++ show(json)),
-    toNull(json),
+let validateNull: json => Relude_Validation.t<unit, Errors.t> = json => {
+  toNull(json)->(
+    Relude_Validation.fromOptionLazy(
+      _ => Errors.pure("JSON value is not a null: " ++ show(json)),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is a bool
 ")
-let validateBool: json => Relude_Validation.t<bool, Errors.t> = json =>
-  Relude_Validation.fromOptionLazy(
-    _ => Errors.pure("JSON value is not a bool: " ++ show(json)),
-    toBool(json),
+let validateBool: json => Relude_Validation.t<bool, Errors.t> = json => {
+  toBool(json)->(
+    Relude_Validation.fromOptionLazy(
+      _ => Errors.pure("JSON value is not a bool: " ++ show(json)),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is a string
 ")
-let validateString: json => Relude_Validation.t<string, Errors.t> = json =>
-  Relude_Validation.fromOptionLazy(
-    _ => Errors.pure("JSON value is not a string: " ++ show(json)),
-    toString(json),
+let validateString: json => Relude_Validation.t<string, Errors.t> = json => {
+  toString(json)->(
+    Relude_Validation.fromOptionLazy(
+      _ => Errors.pure("JSON value is not a string: " ++ show(json)),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is an int
 ")
-let validateInt: json => Relude_Validation.t<int, Errors.t> = json =>
-  Relude_Validation.fromOptionLazy(
-    _ => Errors.pure("JSON value is not an int: " ++ show(json)),
-    toInt(json),
+let validateInt: json => Relude_Validation.t<int, Errors.t> = json => {
+  toInt(json)->(
+    Relude_Validation.fromOptionLazy(
+      _ => Errors.pure("JSON value is not an int: " ++ show(json)),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is a float
 ")
-let validateFloat: json => Relude_Validation.t<float, Errors.t> = json =>
-  Relude_Validation.fromOptionLazy(
-    _ => Errors.pure("JSON value is not a float: " ++ show(json)),
-    toFloat(json),
+let validateFloat: json => Relude_Validation.t<float, Errors.t> = json => {
+  toFloat(json)->(
+    Relude_Validation.fromOptionLazy(
+      _ => Errors.pure("JSON value is not a float: " ++ show(json)),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given value is either null or can be decoded using the given
@@ -338,7 +368,7 @@ let validateOptional = (
   ~errorAsNone=false,
   validate: json => Relude_Validation.t<'a, Errors.t>,
   json: json,
-): Relude_Validation.t<option<'a>, Errors.t> =>
+): Relude_Validation.t<option<'a>, Errors.t> => {
   switch validateNull(json) {
   | VOk() => VOk(None)
   | VError(_) =>
@@ -355,6 +385,7 @@ let validateOptional = (
       }
     }
   }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Array validation (at index and whole array)
@@ -364,8 +395,9 @@ let validateOptional = (
 Validates that the given Js.Json.t value is an array, and attempts to get the
 value at the given index as a raw Js.Json.t value.
 ")
-let getJsonAtIndex: (int, json) => option<json> = (index, json) =>
-  Relude_Option.flatMap(Relude_Array.at(index, _), toArrayOfJson(json))
+let getJsonAtIndex: (int, json) => option<json> = (index, json) => {
+  toArrayOfJson(json)->(Relude_Option.flatMap(Relude_Array.at(index, _), _))
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is an array, and attempts to get the
@@ -375,15 +407,18 @@ let validateJsonAtIndex: (
   int,
   json => Relude_Validation.t<'a, Errors.t>,
   json,
-) => Relude_Validation.t<'a, Errors.t> = (index, validateItem, json) =>
-  Relude_Option.foldLazy(
-    _ =>
-      Relude_Validation.error(
-        Errors.pure(string_of_int(index) ++ (" was not found in JSON: " ++ show(json))),
-      ),
-    json => validateItem(json),
-    getJsonAtIndex(index, json),
+) => Relude_Validation.t<'a, Errors.t> = (index, validateItem, json) => {
+  getJsonAtIndex(index, json)->(
+    Relude_Option.foldLazy(
+      _ =>
+        Relude_Validation.error(
+          Errors.pure(string_of_int(index) ++ (" was not found in JSON: " ++ show(json))),
+        ),
+      json => validateItem(json),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is an array with a null at the given
@@ -514,20 +549,25 @@ of the array using the given validation function.
 let validateArrayOfJson: 'a 'e. (
   (int, json) => Relude_Validation.t<'a, Errors.t>,
   json,
-) => Relude_Validation.t<array<'a>, Errors.t> = (validateItem, json) =>
-  Relude_Option.foldLazy(
-    () => Relude_Validation.error(Errors.pure("JSON value is not an array: " ++ show(json))),
-    jsonValues =>
-      TraversableE.traverse(
-        ((json, index)) =>
-          Relude_Validation.mapErrorsNea(
-            e => string_of_int(index) ++ (": " ++ e),
-            validateItem(index, json),
-          ),
-        Relude_Array.zipWithIndex(jsonValues),
-      ),
-    toArrayOfJson(json),
+) => Relude_Validation.t<array<'a>, Errors.t> = (validateItem, json) => {
+  json
+  ->toArrayOfJson
+  ->(
+    Relude_Option.foldLazy(
+      () => Relude_Validation.error(Errors.pure("JSON value is not an array: " ++ show(json))),
+      jsonValues =>
+        TraversableE.traverse(
+          ((json, index)) =>
+            Relude_Validation.mapErrorsNea(
+              e => string_of_int(index) ++ (": " ++ e),
+              validateItem(index, json),
+            ),
+          Relude_Array.zipWithIndex(jsonValues),
+        ),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is an array, then validates each item
@@ -537,23 +577,27 @@ list.
 let validateArrayOfJsonAsList: 'a 'e. (
   (int, json) => Relude_Validation.t<'a, Errors.t>,
   json,
-) => Relude_Validation.t<list<'a>, Errors.t> = (validateItem, json) =>
-  Relude_Validation.map(
-    Relude_Array.toList,
-    Relude_Option.foldLazy(
-      () => Relude_Validation.error(Errors.pure("JSON value is not an array: " ++ show(json))),
-      arrayOfJson =>
+) => Relude_Validation.t<list<'a>, Errors.t> = (validateItem, json) => {
+  json
+  ->toArrayOfJson
+  ->Relude_Option.foldLazy(
+    () => Relude_Validation.error(Errors.pure("JSON value is not an array: " ++ show(json))),
+    arrayOfJson =>
+      arrayOfJson
+      ->Relude_Array.zipWithIndex
+      ->(
         TraversableE.traverse(
           ((json, index)) =>
-            Relude_Validation.mapErrorsNea(
-              e => string_of_int(index) ++ (": " ++ e),
-              validateItem(index, json),
+            validateItem(index, json)->(
+              Relude_Validation.mapErrorsNea(e => string_of_int(index) ++ (": " ++ e), _)
             ),
-          Relude_Array.zipWithIndex(arrayOfJson),
-        ),
-      toArrayOfJson(json),
-    ),
+          _,
+        )
+      ),
+    _,
   )
+  ->(Relude_Validation.map(Relude_Array.toList, _))
+}
 
 @ocaml.doc("
 Validates that the given Js.Json.t value is an array, and then validates the
@@ -565,13 +609,15 @@ let validateArrayAtIndex: 'a. (
   (int, json) => Relude_Validation.t<'a, Errors.t>,
   json,
 ) => Relude_Validation.t<array<'a>, Errors.t> = (index, validateItem, json) =>
-  Relude_Option.foldLazy(
-    _ =>
-      Relude_Validation.error(
-        Errors.pure(string_of_int(index) ++ (" was not found in JSON: " ++ show(json))),
-      ),
-    json => validateArrayOfJson(validateItem, json),
-    getJsonAtIndex(index, json),
+  getJsonAtIndex(index, json)->(
+    Relude_Option.foldLazy(
+      _ =>
+        Relude_Validation.error(
+          Errors.pure(string_of_int(index) ++ (" was not found in JSON: " ++ show(json))),
+        ),
+      json => validateArrayOfJson(validateItem, json),
+      _,
+    )
   )
 
 @ocaml.doc("
@@ -605,10 +651,12 @@ let validateJsonForKey: (
   json => Relude_Validation.t<'a, Errors.t>,
   json,
 ) => Relude_Validation.t<'a, Errors.t> = (key, validateItem, json) =>
-  Relude_Option.foldLazy(
-    _ => Relude_Validation.error(Errors.pure(key ++ (" was not found in JSON: " ++ show(json)))),
-    json => validateItem(json),
-    getJsonForKey(key, json),
+  getJsonForKey(key, json)->(
+    Relude_Option.foldLazy(
+      _ => Relude_Validation.error(Errors.pure(key ++ (" was not found in JSON: " ++ show(json)))),
+      json => validateItem(json),
+      _,
+    )
   )
 
 @ocaml.doc("
@@ -726,12 +774,15 @@ let validateArrayForKey: 'a. (
   string,
   (int, json) => Relude_Validation.t<'a, Errors.t>,
   json,
-) => Relude_Validation.t<array<'a>, Errors.t> = (key, validateItem, json) =>
-  Relude_Option.foldLazy(
-    _ => Relude_Validation.error(Errors.pure(key ++ (" was not found in JSON: " ++ show(json)))),
-    json => validateArrayOfJson(validateItem, json),
-    getJsonForKey(key, json),
+) => Relude_Validation.t<array<'a>, Errors.t> = (key, validateItem, json) => {
+  getJsonForKey(key, json)->(
+    Relude_Option.foldLazy(
+      _ => Relude_Validation.error(Errors.pure(key ++ (" was not found in JSON: " ++ show(json)))),
+      json => validateArrayOfJson(validateItem, json),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates the given Js.Json.t value is an object with an array at the given key,
@@ -742,12 +793,15 @@ let validateListForKey: 'a. (
   string,
   (int, json) => Relude_Validation.t<'a, Errors.t>,
   json,
-) => Relude_Validation.t<list<'a>, Errors.t> = (key, validateItem, json) =>
-  Relude_Option.foldLazy(
-    _ => Relude_Validation.error(Errors.pure(key ++ (" was not found in JSON: " ++ show(json)))),
-    json => validateArrayOfJsonAsList(validateItem, json),
-    getJsonForKey(key, json),
+) => Relude_Validation.t<list<'a>, Errors.t> = (key, validateItem, json) => {
+  getJsonForKey(key, json)->(
+    Relude_Option.foldLazy(
+      _ => Relude_Validation.error(Errors.pure(key ++ (" was not found in JSON: " ++ show(json)))),
+      json => validateArrayOfJsonAsList(validateItem, json),
+      _,
+    )
   )
+}
 
 @ocaml.doc("
 Validates the given Js.Json.t value is an object with an object at the given
