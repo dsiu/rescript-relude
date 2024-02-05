@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 open! Relude.Globals
@@ -81,8 +84,8 @@ module ValidationE = Validation.WithErrors(NonEmptyList.SemigroupAny, String)
 
 let validateUser = (first: string, last: string, age: string): ValidationE.t<User.t> => {
   module NT: Relude.Interface.NATURAL_TRANSFORMATION
-               with type f<'a> = Field.t<'a>
-               and type g<'a> = ValidationE.t<'a> = {
+    with type f<'a> = Field.t<'a>
+    and type g<'a> = ValidationE.t<'a> = {
     type f<'a> = Field.t<'a>
     type g<'a> = ValidationE.t<'a>
     let f = (field: f<'a>) =>

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @@ocaml.text(`
 {b Relude} is an alternative standard library (a "prelude") written in Reason
 and compiled with the Melange compiler. It builds on the category theory

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 Extensions for any MONAD_ERROR
 ")

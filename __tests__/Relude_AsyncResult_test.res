@@ -460,14 +460,14 @@ describe("AsyncResult", () => {
   test("tapError init", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.init->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.init->AsyncResult.tapError(f, _)->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapError loading", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.loading->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.loading->AsyncResult.tapError(f, _)->ignore
     expect(count.contents)->toEqual(0)
   })
 

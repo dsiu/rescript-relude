@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 // TODO: someday we should abstract away the use of Js.Global timeout from this
 
 @ocaml.doc("
@@ -44,7 +47,7 @@ let debounce = (~delayMS: int, ~leading: bool=false, f: unit => unit): debounced
   let timerId = ref(None)
 
   let cancel = () => {
-    timerId.contents |> Relude_Option.forEach(timerId => Js.Global.clearTimeout(timerId))
+    timerId.contents->(Relude_Option.forEach(timerId => Js.Global.clearTimeout(timerId), _))
     timerId := None
   }
 
@@ -56,7 +59,7 @@ let debounce = (~delayMS: int, ~leading: bool=false, f: unit => unit): debounced
         }, delayMS))
   }
 
-  let isScheduled = () => timerId.contents |> Relude_Option.isSome
+  let isScheduled = () => timerId.contents->Relude_Option.isSome
 
   let flush = () => {
     cancel()
@@ -73,5 +76,5 @@ let debounce = (~delayMS: int, ~leading: bool=false, f: unit => unit): debounced
       schedule()
     }
 
-  {f: debounced, flush: flush, cancel: cancel, isScheduled: isScheduled}
+  {f: debounced, flush, cancel, isScheduled}
 }

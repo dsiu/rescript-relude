@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 include Relude_Option_Instances
 include Relude_Option_Base
 include Relude_Option_Specializations

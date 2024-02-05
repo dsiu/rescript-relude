@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @@ocaml.text(`
 This module is intended to be used as a global open (e.g. [open
 Relude.Globals;]) to bring the most core/common Relude modules, types, and

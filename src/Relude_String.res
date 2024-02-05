@@ -584,7 +584,7 @@ let splitAsArray = splitArray
 ]}
 ")
 let splitList = (~delimiter: string, input: string): list<string> =>
-  splitArray(~delimiter, input) |> Relude_List_Instances.fromArray
+  splitArray(~delimiter, input)->Relude_List_Instances.fromArray
 
 @ocaml.doc("
 [String.splitAsList] is an alias for {!val:splitList}.
@@ -632,8 +632,8 @@ let padStart: (~targetLength: int, ~padWith: string=?, string) => string = (
   ~padWith=" ",
   input,
 ) => {
-  let inputLength = input |> length
-  let padWithLength = padWith |> length
+  let inputLength = input->length
+  let padWithLength = padWith->length
   if inputLength >= targetLength {
     // Input already longer than target
     input
@@ -657,8 +657,8 @@ let padEnd: (~targetLength: int, ~padWith: string=?, string) => string = (
   ~padWith=" ",
   input,
 ) => {
-  let inputLength = input |> length
-  let padWithLength = padWith |> length
+  let inputLength = input->length
+  let padWithLength = padWith->length
   if inputLength >= targetLength {
     // Input already longer than target
     input

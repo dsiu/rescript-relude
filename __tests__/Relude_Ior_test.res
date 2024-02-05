@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 
@@ -286,7 +289,8 @@ describe("Ior", () => {
     test(
       "map",
       () =>
-        IorT.map(a => a + 1, Ior.that(NonEmptyList.pure(That.Unknown)))
+        Ior.that(NonEmptyList.pure(That.Unknown))
+        ->IorT.map(a => a + 1, _)
         ->expect
         ->toEqual(That(NonEmptyList.pure(That.Unknown))),
     )
@@ -294,7 +298,8 @@ describe("Ior", () => {
     test(
       "apply",
       () =>
-        IorT.apply(Ior.this(a => a + 1), Ior.that(NonEmptyList.pure(That.Unknown)))
+        Ior.that(NonEmptyList.pure(That.Unknown))
+        ->IorT.apply(Ior.this(a => a + 1), _)
         ->expect
         ->toEqual(That(NonEmptyList.pure(That.Unknown))),
     )

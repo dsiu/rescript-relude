@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 module List: Relude_Interface.SEQUENCE with type t<'a> = list<'a> = {
   type t<'a> = list<'a>
   let emptyLazy = () => list{}

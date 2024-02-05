@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 Creates a JS Error with the given string message.
 ")

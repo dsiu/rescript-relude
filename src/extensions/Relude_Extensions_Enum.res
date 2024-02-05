@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 let listAppend = (value, list) => List.concat(list{list, list{value}})
 //let arrayAppend = (value, array) => Array.concat([array, [|value|]]);
 

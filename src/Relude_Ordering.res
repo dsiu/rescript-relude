@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @@ocaml.text(`
 Contains functions and typeclass instances for the [ordering] type - the enum
 with inhabitants [\`less_than], [\`equal_to], and [\`greater_than].

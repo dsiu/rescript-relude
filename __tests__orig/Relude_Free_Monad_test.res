@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 open Relude.Globals
@@ -95,28 +98,34 @@ module StorageAPI = {
 
 describe("Relude_Free_Monad", () =>
   describe("StorageAPI", () =>
-    test("StorageState interpreter", () => {
-      // This is our monadic program stored as our free monad
-      let program = {
-        open StorageAPI
-        \">>="(\">>="(put("key1", 42), _ => get("key1")), value1 =>
+    test(
+      "StorageState interpreter",
+      () => {
+        // This is our monadic program stored as our free monad
+        let program = {
+          open StorageAPI
           \">>="(
-            \">>="(\">>="(\">>="(delete("key1"), _ => put("key2", 99)), _ => put("key1", 5)), _ =>
-              get("key1")
-            ),
-            value2 => \"<$$>"(get("key2"), value3 => (value1, value2, value3)),
+            \">>="(put("key1", 42), _ => get("key1")),
+            value1 =>
+              \">>="(
+                \">>="(
+                  \">>="(\">>="(delete("key1"), _ => put("key2", 99)), _ => put("key1", 5)),
+                  _ => get("key1"),
+                ),
+                value2 => \"<$$>"(get("key2"), value3 => (value1, value2, value3)),
+              ),
           )
-        )
-      }
+        }
 
-      // Interpret the program using our state-monad-based interpreter.
-      // Then run the resulting state monad.
-      let (results, _) =
-        StorageAPI.foldFree(StorageAPI.interpreter, program) |> StorageAPI.State.runStateT(
-          Belt.Map.String.empty,
-        )
+        // Interpret the program using our state-monad-based interpreter.
+        // Then run the resulting state monad.
+        let (results, _) =
+          StorageAPI.foldFree(StorageAPI.interpreter, program) |> StorageAPI.State.runStateT(
+            Belt.Map.String.empty,
+          )
 
-      expect(results) |> toEqual((Some(42), Some(5), Some(99)))
-    })
+        expect(results) |> toEqual((Some(42), Some(5), Some(99)))
+      },
+    )
   )
 )

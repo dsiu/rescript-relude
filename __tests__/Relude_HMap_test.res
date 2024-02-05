@@ -171,6 +171,8 @@ describe("HMap", () => {
       ->HMapS.add(stringKey, "hi", _)
       ->(HMapS.add(floatKey, 42.3, _))
 
+    // Use keyMeta to extract the key info - in this case our label, and the 'a => string function
+    // that got embedded in the key
     let value = map->(
       HMapS.all(
         (HMapS.KeyValue(k, _)) => {

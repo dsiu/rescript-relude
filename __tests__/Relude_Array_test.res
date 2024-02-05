@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 
@@ -510,7 +513,7 @@ describe("Array", () => {
 
   test("<|> is associative", () => {
     let \"<|>" = Array.Infix.\"<|>"
-    expect(\"<|>"(\"<|>"([0, 1], [2, 3]), [4, 5]))->toEqual(\"<|>"([0, 1], \"<|>"([2, 3], [4, 5])))
+    expect([0, 1]->\"<|>"([2, 3])->\"<|>"([4, 5]))->toEqual([0, 1]->\"<|>"([2, 3]->\"<|>"([4, 5])))
   })
 
   test("void", () => expect(Array.void([1, 2, 3]))->toEqual([(), (), ()]))

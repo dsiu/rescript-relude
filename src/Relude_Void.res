@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 [Void.t] is a type for which it is impossible to construct a value. This may
 sound like a strange concept, but it can be very valuable for indicating at

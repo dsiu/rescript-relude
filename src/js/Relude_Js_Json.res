@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc(`
 [Relude.Js.Json] contains helper functions for dealing with [Js.Json.t] values.
 `)

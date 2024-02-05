@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 module Tuple2 = Relude_Tuple2
 module Tuple3 = Relude_Tuple3
 module Tuple4 = Relude_Tuple4

@@ -209,7 +209,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Applies a monadic function to a NonEmpty sequence of values
   ")
-  let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (nonEmpty, f) => map(f, nonEmpty) |> flatten
+  let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (nonEmpty, f) => map(f, nonEmpty)->flatten
 
   module Monad: MONAD with type t<'a> = t<'a> = {
     include Applicative

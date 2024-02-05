@@ -141,7 +141,7 @@ let toNonEmptyList: 'a. t<'a> => Relude_NonEmpty.List.t<'a> = ({value, children}
 Dumps the tree to a flattened non-empty array, with the top value first, proceeding downward and left-to-right
 ")
 let toNonEmptyArray: 'a. t<'a> => Relude_NonEmpty.Array.t<'a> = tree =>
-  tree |> toNonEmptyList |> Relude_NonEmpty.Array.fromNonEmptyList
+  tree->toNonEmptyList->Relude_NonEmpty.Array.fromNonEmptyList
 
 @ocaml.doc("
 Zips two tree together position-by-position using the given function
@@ -204,7 +204,7 @@ let rec bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (
   {value: valueA, children: childTreesA},
   aToTreeB,
 ) => {
-  let {value: valueB, children: childTreesB} = valueA |> aToTreeB
+  let {value: valueB, children: childTreesB} = valueA->aToTreeB
   let otherChildTreesB = childTreesA->(Relude_List.map(childTreeA => bind(childTreeA, aToTreeB), _))
   {
     value: valueB,
@@ -352,7 +352,7 @@ let showPrettyBy: 'a. ('a => string, t<'a>) => string = (showA, tree) => {
       ->getChildren
       ->Relude_List.map(x => showPrettyByWithIndent(level + 1, showA, x), _)
       ->(Relude_List.String.joinWith("", _))
-    indent ++ (showA(tree |> getValue) ++ ("\n" ++ childrenStr))
+    indent ++ (showA(tree->getValue) ++ ("\n" ++ childrenStr))
   }
   showPrettyByWithIndent(0, showA, tree)
 }

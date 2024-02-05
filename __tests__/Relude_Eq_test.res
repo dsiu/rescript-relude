@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open Jest
 open Expect
 open! Relude.Globals

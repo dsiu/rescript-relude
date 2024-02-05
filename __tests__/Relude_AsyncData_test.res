@@ -342,42 +342,42 @@ describe("AsyncData", () => {
   test("alt Loading Init", () =>
     expect({
       open AsyncData.Infix
-      \"<|>"(AsyncData.loading, AsyncData.init)
+      AsyncData.loading->\"<|>"(AsyncData.init)
     })->toEqual(AsyncData.loading)
   )
 
   test("alt Init Loading", () =>
     expect({
       open AsyncData.Infix
-      \"<|>"(AsyncData.init, AsyncData.loading)
+      AsyncData.init->\"<|>"(AsyncData.loading)
     })->toEqual(AsyncData.loading)
   )
 
   test("alt Loading Reloading", () =>
     expect({
       open AsyncData.Infix
-      \"<|>"(AsyncData.loading, AsyncData.reloading(42))
+      AsyncData.loading->\"<|>"(AsyncData.reloading(42))
     })->toEqual(AsyncData.reloading(42))
   )
 
   test("alt Reloading Loading", () =>
     expect({
       open AsyncData.Infix
-      \"<|>"(AsyncData.reloading(42), AsyncData.loading)
+      AsyncData.reloading(42)->\"<|>"(AsyncData.loading)
     })->toEqual(AsyncData.reloading(42))
   )
 
   test("alt Reloading Complete", () =>
     expect({
       open AsyncData.Infix
-      \"<|>"(AsyncData.reloading(42), AsyncData.complete(43))
+      AsyncData.reloading(42)->\"<|>"(AsyncData.complete(43))
     })->toEqual(AsyncData.complete(43))
   )
 
   test("alt Complete Reloading", () =>
     expect({
       open AsyncData.Infix
-      \"<|>"(AsyncData.complete(43), AsyncData.reloading(42))
+      AsyncData.complete(43)->\"<|>"(AsyncData.reloading(42))
     })->toEqual(AsyncData.complete(43))
   )
 })

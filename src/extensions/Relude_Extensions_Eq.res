@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -12,7 +15,7 @@ module EqExtensions = (Eq: EQ) => {
   @ocaml.doc("
   Indicates if the two items are not equal
   ")
-  let notEq = Eq.eq |> Relude_Eq.invert
+  let notEq = Eq.eq->Relude_Eq.invert
 
   @ocaml.doc("
   Alias for notEq

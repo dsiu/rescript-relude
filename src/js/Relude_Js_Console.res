@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 module IO = {
   @ocaml.doc("
   Suspends a Js.log side effect in an IO

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -32,7 +35,7 @@ module OrdExtensions = (O: ORD) => {
   let compareWithConversion: ('b => O.t) => Relude_Ord.compare<'b> = bToA =>
     Relude_Ord.by(bToA, O.compare)
 
-  let compareReversed = O.compare |> Relude_Ord.reverse
+  let compareReversed = O.compare->Relude_Ord.reverse
 
   @ocaml.doc("
   Creates a new Ord module which is the reverse of the given Ord

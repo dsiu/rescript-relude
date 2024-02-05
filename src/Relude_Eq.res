@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 type eq<'a> = ('a, 'a) => bool
 
 @ocaml.doc("

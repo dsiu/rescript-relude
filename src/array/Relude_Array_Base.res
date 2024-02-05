@@ -1,5 +1,5 @@
-@@uncurry
-@@uncurry.swap
+@@uncurried
+@@uncurried.swap
 
 open BsBastet.Interface
 

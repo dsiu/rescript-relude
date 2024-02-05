@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @@ocaml.text(`
 [Relude.Decimal] contains a type [t] which represents arbitrary precision
 numeric values, backed by an [int] mantissa and an [int] exponent. This can be
@@ -93,7 +96,7 @@ The return value of this function is undefined for exponent values < 0.
 let // let round: (rounding, t) => t = (_rounding, decimal) => decimal; // TODO
 
 tenToThePowerOfPositive: int => int = exponent =>
-  Relude_Int.rangeAsArray(1, exponent + 1) |> Relude_Array.foldLeft((acc, _) => 10 * acc, 1)
+  Relude_Int.rangeAsArray(1, exponent + 1)->(Relude_Array.foldLeft((acc, _) => 10 * acc, 1, _))
 
 @ocaml.doc("
 [Decimal.normalize] normalizes the exponent to the minimal exponent for two

@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @@ocaml.text(`
 [Relude.Array] contains typeclass instances and utility functions for the
 [array('a)] type.

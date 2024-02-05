@@ -92,28 +92,24 @@ describe("ContT Identity", () => {
   open Cont.Infix
 
   testAsync("pure", onDone =>
-    \"<$$>"(\"<$$>"(Cont.pure(42), value => expect(value)->toEqual(42)), onDone)->(
-      Cont.runContT(() => (), _)
-    )
+    Cont.pure(42)
+    ->\"<$$>"(value => expect(value)->toEqual(42))
+    ->\"<$$>"(onDone)
+    ->(Cont.runContT(() => (), _))
   )
 
   testAsync("map (<$$>) success", onDone => {
     let filePath = FilePath.FilePath("test.txt")
-
-    Cont.runContT(
-      () => (),
-      \"<$$>"(
-        \"<$$>"(
-          readFileSuccessCont(filePath),
-          x =>
-            switch x {
-            | Ok(value) => expect(value)->toEqual("Read file: test.txt")
-            | Error(_) => fail("Failed")
-            },
-        ),
-        onDone,
-      ),
+    readFileSuccessCont(filePath)
+    ->\"<$$>"(
+      x =>
+        switch x {
+        | Ok(value) => expect(value)->toEqual("Read file: test.txt")
+        | Error(_) => fail("Failed")
+        },
     )
+    ->\"<$$>"(onDone)
+    ->(Cont.runContT(() => (), _))
   })
 
   testAsync("bind (>>=) success", onDone => {
@@ -122,41 +118,35 @@ describe("ContT Identity", () => {
     let filePath3 = FilePath.FilePath("test3.txt")
     let expected = "Read file: test1.txt, Read file: test2.txt, Read file: test3.txt"
 
-    Cont.runContT(
-      () => (),
-      \"<$$>"(
-        \">>="(
-          readFileSuccessCont(filePath1),
-          x =>
-            switch x {
-            | Ok(content1) =>
-              \">>="(
-                readFileSuccessCont(filePath2),
-                x =>
-                  switch x {
-                  | Ok(content2) =>
-                    \"<$$>"(
-                      readFileSuccessCont(filePath3),
-                      x =>
-                        switch x {
-                        | Ok(content3) =>
-                          let result = Relude.List.String.joinWith(
-                            ", ",
-                            list{content1, content2, content3},
-                          )
-                          expect(result)->toEqual(expected)
-                        | Error(_) => fail("Failed 3")
-                        },
-                    )
-                  | Error(_) => Cont.pure(fail("Failed 2"))
-                  },
-              )
-            | Error(_) => Cont.pure(fail("Failed 1"))
-            },
-        ),
-        onDone,
-      ),
+    readFileSuccessCont(filePath1)
+    ->\">>="(
+      x =>
+        switch x {
+        | Ok(content1) =>
+          readFileSuccessCont(filePath2)->\">>="(
+            x =>
+              switch x {
+              | Ok(content2) =>
+                readFileSuccessCont(filePath3)->\"<$$>"(
+                  x =>
+                    switch x {
+                    | Ok(content3) =>
+                      let result = Relude.List.String.joinWith(
+                        ", ",
+                        list{content1, content2, content3},
+                      )
+                      expect(result)->toEqual(expected)
+                    | Error(_) => fail("Failed 3")
+                    },
+                )
+              | Error(_) => Cont.pure(fail("Failed 2"))
+              },
+          )
+        | Error(_) => Cont.pure(fail("Failed 1"))
+        },
     )
+    ->\"<$$>"(onDone)
+    ->(Cont.runContT(() => (), _))
   })
 })
 
@@ -177,14 +167,9 @@ let stringToIntCB: (
   string,
   Result.t<int, Error.t> => IO.t<unit, Error.t>,
 ) => IO.t<unit, Error.t> = (str, onDone) =>
-  IO.flatMap(
-    i => onDone(Ok(i)),
-    Relude.Option.fold(
-      IO.throw(Error.Error("Failed")),
-      i => IO.pure(i),
-      Relude.Int.fromString(str),
-    ),
-  )
+  Relude.Int.fromString(str)
+  ->Relude.Option.fold(IO.throw(Error.Error("Failed")), i => IO.pure(i), _)
+  ->(IO.flatMap(i => onDone(Ok(i)), _))
 
 @ocaml.doc("
 A ContT version of the above ContT(IO) CB API
@@ -212,46 +197,55 @@ describe("ContT IO", () => {
   open ContIO.Infix
 
   testAsync("map", onDone =>
-    IO.unsafeRunAsync(
+    stringToIntCont("42")
+    ->\"<$$>"(res => res->(Result.map(a => a * 2, _)))
+    ->ContIO.runContT(
       x =>
         switch x {
-        | Ok() => ()
-        | Error(_) => ()
+        | Ok(i) => assertIntIO(84, i, onDone)
+        | Error(_) => failIO(onDone)
         },
-      ContIO.runContT(
+      _,
+    )
+    ->(
+      IO.unsafeRunAsync(
         x =>
           switch x {
-          | Ok(i) => assertIntIO(84, i, onDone)
-          | Error(_) => failIO(onDone)
+          | Ok() => ()
+          | Error(_) => ()
           },
-        \"<$$>"(stringToIntCont("42"), res => Result.map(a => a * 2, res)),
-      ),
+        _,
+      )
     )
   )
 
   testAsync("Cont.map2", onDone =>
-    IO.unsafeRunAsync(
+    ContIO.map2(
+      (res1, res2) =>
+        switch (res1, res2) {
+        | (Ok(a), Ok(b)) => Ok(a + b)
+        | _ => Error(Error.Error("error"))
+        },
+      stringToIntCont("42"),
+      stringToIntCont("43"),
+    )
+    ->ContIO.runContT(
       x =>
         switch x {
-        | Ok() => ()
-        | Error(_) => ()
+        | Ok(a) => assertIntIO(85, a, onDone)
+        | Error(_) => failIO(onDone)
         },
-      ContIO.runContT(
+      _,
+    )
+    ->(
+      IO.unsafeRunAsync(
         x =>
           switch x {
-          | Ok(a) => assertIntIO(85, a, onDone)
-          | Error(_) => failIO(onDone)
+          | Ok() => ()
+          | Error(_) => ()
           },
-        ContIO.map2(
-          (res1, res2) =>
-            switch (res1, res2) {
-            | (Ok(a), Ok(b)) => Ok(a + b)
-            | _ => Error(Error.Error("error"))
-            },
-          stringToIntCont("42"),
-          stringToIntCont("43"),
-        ),
-      ),
+        _,
+      )
     )
   )
 })

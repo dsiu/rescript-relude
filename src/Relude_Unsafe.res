@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 [Unsafe.coerce] unsafely casts a value from type ['a] to type ['b]
 ")

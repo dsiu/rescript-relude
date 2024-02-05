@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 // TODO: someday we should abstract away the use of Js.Global timeout from this
 
 @ocaml.doc("
@@ -24,7 +27,7 @@ let throttle = (~delayMS: int, ~leading: bool=false, f: unit => unit): throttled
   let timerId = ref(None)
 
   let cancel = () => {
-    timerId.contents |> Relude_Option.forEach(timerId => Js.Global.clearTimeout(timerId))
+    timerId.contents->(Relude_Option.forEach(timerId => Js.Global.clearTimeout(timerId), _))
     timerId := None
   }
 
@@ -53,5 +56,5 @@ let throttle = (~delayMS: int, ~leading: bool=false, f: unit => unit): throttled
       attempt()
     }
 
-  {f: throttled, cancel: cancel, isThrottled: isThrottled}
+  {f: throttled, cancel, isThrottled}
 }

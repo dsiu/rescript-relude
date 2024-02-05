@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 @ocaml.doc("
 [Extensions.Monad] contains a module functor [MonadExtensions] which gives you
 access to a wide variety of functions and infix operators that you can get \"for

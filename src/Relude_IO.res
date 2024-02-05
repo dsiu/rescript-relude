@@ -1055,9 +1055,9 @@ let rec flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = ioA =>
   switch ioA {
   | Pure(a) => throw(a)
   | Throw(e) => pure(e)
-  | Suspend(getA) => suspendIO(() => getA() |> throw)
-  | SuspendIO(getIOA) => SuspendIO(() => getIOA() |> flip)
-  | Async(onDoneA) => Async(onDone => onDoneA(resultA => onDone(resultA |> Relude_Result.flip)))
+  | Suspend(getA) => suspendIO(() => getA()->throw)
+  | SuspendIO(getIOA) => SuspendIO(() => getIOA()->flip)
+  | Async(onDoneA) => Async(onDone => onDoneA(resultA => onDone(resultA->Relude_Result.flip)))
   | Map(r0ToA, ioR0) => flipMap(r0ToA, ioR0)
   | Apply(ioR0ToA, ioR0) => flipApply(ioR0ToA, ioR0)
   | FlatMap(r0ToIOA, ioR0) => flipFlatMap(r0ToIOA, ioR0)
@@ -1068,7 +1068,7 @@ and flipMap: 'a 'r0 'e. ('r0 => 'a, t<'r0, 'e>) => t<'e, 'a> = (r0ToA, ioR0) =>
   | Pure(r0) => Throw(r0ToA(r0))
   | Throw(e) => Pure(e)
   | Suspend(getR0) => SuspendIO(() => Throw(r0ToA(getR0())))
-  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->(map(r0ToA, _)) |> flip)
+  | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->map(r0ToA, _)->flip)
   | Async(onDoneR0) =>
     Async(
       onDone =>
@@ -1093,7 +1093,7 @@ and flipApply: 'a 'r0 'e. (t<'r0 => 'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (ioR0ToA
           | Error(e) => onDone(Ok(e))
           | Ok(r0) =>
             ioR0ToA
-            ->map(r0ToA => r0 |> r0ToA, _)
+            ->map(r0ToA => r0->r0ToA, _)
             ->(unsafeRunAsync(x =>
                 switch x {
                 | Error(e) => onDone(Ok(e))
@@ -1110,9 +1110,9 @@ and flipApply: 'a 'r0 'e. (t<'r0 => 'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (ioR0ToA
 
 and flipFlatMap: 'a 'r0 'e. ('r0 => t<'a, 'e>, t<'r0, 'e>) => t<'e, 'a> = (r0ToIOA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => r0 |> r0ToIOA |> flip
+  | Pure(r0) => r0->r0ToIOA->flip
   | Throw(e) => Pure(e)
-  | Suspend(getR0) => SuspendIO(() => getR0() |> r0ToIOA |> flip)
+  | Suspend(getR0) => SuspendIO(() => getR0()->r0ToIOA->flip)
   | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->flatMap(r0ToIOA, _)->flip)
   | Async(onDoneR0) =>
     Async(
@@ -1140,7 +1140,7 @@ let rec summonError: 'a 'e. t<'a, 'e> => t<result<'a, 'e>, Relude_Void.t> = ioA 
   | Pure(a) => Pure(Ok(a))
   | Throw(e) => Pure(Error(e))
   | Suspend(getA) => Suspend(() => Ok(getA()))
-  | SuspendIO(getIOA) => SuspendIO(() => getIOA() |> summonError)
+  | SuspendIO(getIOA) => SuspendIO(() => getIOA()->summonError)
   | Async(onDoneA) => Async(onDone => onDoneA(result => onDone(Ok(result))))
   | Map(r0ToA, ioR0) => summonErrorMap(r0ToA, ioR0)
   | Apply(ioR0ToA, ioR0) => summonErrorApply(ioR0ToA, ioR0)
@@ -1196,7 +1196,7 @@ and summonErrorFlatMap: 'a 'r0 'e. (
   t<'r0, 'e>,
 ) => t<result<'a, 'e>, Relude_Void.t> = (r0ToIOA, ioR0) =>
   switch ioR0 {
-  | Pure(r0) => r0ToIOA(r0) |> summonError
+  | Pure(r0) => r0ToIOA(r0)->summonError
   | Throw(e) => Pure(Error(e))
   | Suspend(getR0) => SuspendIO(() => r0ToIOA(getR0())->summonError)
   | SuspendIO(getIOR0) => SuspendIO(() => getIOR0()->flatMap(r0ToIOA, _)->summonError)
@@ -1308,14 +1308,14 @@ Creates an async [IO] that waits for the given millisecond timeout before
 completing with a unit value.
 ")
 let delay: 'e. int => t<unit, 'e> = millis =>
-  async(onDone => Js.Global.setTimeout(_ => onDone(Ok()), millis) |> ignore)
+  async(onDone => Js.Global.setTimeout(_ => onDone(Ok()), millis)->ignore)
 
 @ocaml.doc("
 Creates an async non-failing [IO] that waits for the given millisecond timeout
 before completing with a unit value.
 ")
 let delayWithVoid: int => t<unit, Relude_Void.t> = millis =>
-  async(onDone => Js.Global.setTimeout(_ => onDone(Ok()), millis) |> ignore)
+  async(onDone => Js.Global.setTimeout(_ => onDone(Ok()), millis)->ignore)
 
 @ocaml.doc("
 Injects a delay in milliseconds after the given IO.  The value or error from the
