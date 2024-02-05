@@ -388,6 +388,12 @@ let uncurryFn4: 'a 'b 'c 'd 'r. (('a, 'b, 'c, 'd) => 'r) => 'a => 'b => 'c => 'd
   a => b => c => d => f(a, b, c, d)
 }
 
+let uncurryFn5: 'a 'b 'c 'd 'e 'r. (
+  ('a, 'b, 'c, 'd, 'e) => 'r
+) => 'a => 'b => 'c => 'd => 'e => 'r = f => {
+  a => b => c => d => e => f(a, b, c, d, e)
+}
+
 @ocaml.doc("
 The [Infix] submodule provides two infix operators for function composition.
 
