@@ -32,7 +32,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@glennsl/rescript-jest": "github:dsiu/rescript-jest#rescript-v11-curried-mode",
+    "@glennsl/rescript-jest": "^0.10.0",
     "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip",
     "docsify-cli": "~4.4.0",
     "rescript": "^11.0.1"
