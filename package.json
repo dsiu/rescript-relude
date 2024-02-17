@@ -35,7 +35,7 @@
     "@glennsl/rescript-jest": "^0.10.0",
     "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip",
     "docsify-cli": "~4.4.0",
-    "rescript": "^11.0.1"
+    "rescript": "^11.1.0-rc.2"
   },
   "peerDependencies": {
     "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip"
