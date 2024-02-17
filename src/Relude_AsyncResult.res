@@ -282,7 +282,7 @@ let toIdle = Relude_AsyncData.toIdle
 @ocaml.doc("
 Maps a pure function over the value in a Reloading(Ok(_)) or Complete(Ok(_)) value
 ")
-let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, fa) =>
+let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, fa) =>
   switch fa {
   | Init => Init
   | Loading => Loading
@@ -407,7 +407,7 @@ let tapError: 'a 'e. ('e => unit, t<'a, 'e>) => t<'a, 'e> = (ifError, fa) =>
 @ocaml.doc("
 Applies a wrapped function to a value in a Reloading(Ok(_)) or Complete(Ok(_)) value
 ")
-let apply: 'a 'b 'e. (. t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (ff, fa) =>
+let apply: 'a 'b 'e. (t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (ff, fa) =>
   switch (ff, fa) {
   | (Init, Init) => Init
   | (Init, Loading) => Loading
@@ -458,7 +458,7 @@ let pure: 'a 'e. 'a => t<'a, 'e> = completeOk
 @ocaml.doc("
 Applies a monadic function to the value in a Reloading(Ok(_)) or Complete(Ok(_)) value
 ")
-let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
+let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
   switch fa {
   | Init => Init
   | Loading => Loading
@@ -588,7 +588,7 @@ preferred over [Init]. The exception to this rule is the case where one of the
 provided AsyncResult values has an inner [Result] in an error state, in which
 case the other value is always preferred.
 ")
-let alt: 'a 'e. (. t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (fa, fb) =>
+let alt: 'a 'e. (t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (fa, fb) =>
   switch (fa, fb) {
   // when both are errors, prefer "complete" over "reloading"
   | (Reloading(Error(_)), Complete(Error(_)) as b) => b

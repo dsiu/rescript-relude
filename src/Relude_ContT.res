@@ -41,14 +41,14 @@ module WithMonad = (M: MONAD) => {
   @ocaml.doc("
   Maps a pure function over the intermediate type ['a] of the [ContT]
   ")
-  let map: 'r 'a 'b. (. 'a => 'b, t<'r, 'a>) => t<'r, 'b> = (aToB, ContT(aToMRToMR)) => ContT(
+  let map: 'r 'a 'b. ('a => 'b, t<'r, 'a>) => t<'r, 'b> = (aToB, ContT(aToMRToMR)) => ContT(
     bToMR => aToMRToMR(a => bToMR(aToB(a))),
   )
 
   @ocaml.doc("
   Applies a wrapped function over the intermediate type ['a] of the [ContT]
   ")
-  let apply: 'r 'a 'b. (. t<'r, 'a => 'b>, t<'r, 'a>) => t<'r, 'b> = (
+  let apply: 'r 'a 'b. (t<'r, 'a => 'b>, t<'r, 'a>) => t<'r, 'b> = (
     ContT(aToBToMRToMR),
     ContT(aToMRToMR),
   ) => ContT(bToMR => aToBToMRToMR(aToB => aToMRToMR(a => bToMR(aToB(a)))))
@@ -61,7 +61,7 @@ module WithMonad = (M: MONAD) => {
   @ocaml.doc("
   Monad bind
   ")
-  let bind: 'r 'a 'b. (. t<'r, 'a>, 'a => t<'r, 'b>) => t<'r, 'b> = (
+  let bind: 'r 'a 'b. (t<'r, 'a>, 'a => t<'r, 'b>) => t<'r, 'b> = (
     ContT(aToMRToMR),
     aToContTB,
   ) => ContT(

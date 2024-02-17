@@ -286,7 +286,7 @@ let flip: 'a 'e. t<'a, 'e> => t<'e, 'a> = x =>
   | Error(e) => Ok(e)
   }
 
-let compose: 'a 'b 'c 'e. (. t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
+let compose: 'a 'b 'c 'e. (t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
   resultBToC,
   resultAToB,
 ) =>
@@ -336,7 +336,7 @@ This is something we could have done with a simple [if] statement, but we will
 see [map()] become useful when we have several things to validate. (See
 [apply()] and [map2()], [map3()], etc.)
 ")
-let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, fa) =>
+let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, fa) =>
   switch fa {
   | Ok(a) => Ok(f(a))
   | Error(_) as e => e
@@ -439,7 +439,7 @@ Using [apply()] properly is somewhat complex. See the example in the
 Validation tests for more details. (It uses [VOk] and [VError], but the logic is
 identical.)
 ")
-let apply: 'a 'b 'e. (. t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (rf, ra) =>
+let apply: 'a 'b 'e. (t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (rf, ra) =>
   switch (rf, ra) {
   | (Ok(f), Ok(a)) => Ok(f(a))
   | (Ok(_), Error(e)) => Error(e)
@@ -584,7 +584,7 @@ order.
 ]}
 
 ")
-let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
+let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
   switch fa {
   | Ok(a) => f(a)
   | Error(_) as fa => fa
@@ -629,7 +629,7 @@ the last one is returned.
   alt(Error(\"bad\"), Error(\"worse\")) == Error(\"worse\");
 ]}
 ")
-let alt: 'a 'e. (. t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (fa1, fa2) =>
+let alt: 'a 'e. (t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (fa1, fa2) =>
   switch fa1 {
   | Ok(_) => fa1
   | Error(_) => fa2

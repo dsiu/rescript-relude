@@ -387,7 +387,7 @@ module type MAP = {
   let filterNot: ((key, 'value) => bool, t<'value>) => t<'value>
   let reject: ((key, 'value) => bool, t<'value>) => t<'value>
   let partition: ((key, 'value) => bool, t<'value>) => (t<'value>, t<'value>)
-  let map: (. 'v1 => 'v2, t<'v1>) => t<'v2>
+  let map: ('v1 => 'v2, t<'v1>) => t<'v2>
   let mapWithKey: ((key, 'v1) => 'v2, t<'v1>) => t<'v2>
   let groupListBy: ('a => key, list<'a>) => t<list<'a>>
   let groupArrayBy: ('a => key, array<'a>) => t<array<'a>>
@@ -453,7 +453,7 @@ module WithOrd = (M: ORD): (MAP with type key = M.t and type Comparable.t = M.t)
   let filterNot: ((key, 'value) => bool, t<'value>) => t<'value> = filterNot
   let reject: ((key, 'value) => bool, t<'value>) => t<'value> = reject
   let partition: ((key, 'value) => bool, t<'value>) => (t<'value>, t<'value>) = partition
-  let map: (. 'v1 => 'v2, t<'v1>) => t<'v2> = map
+  let map: ('v1 => 'v2, t<'v1>) => t<'v2> = map
   let mapWithKey: ((key, 'v1) => 'v2, t<'v1>) => t<'v2> = mapWithKey
 
   module Functor: FUNCTOR with type t<'a> = t<'a> = {

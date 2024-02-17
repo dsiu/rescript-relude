@@ -17,7 +17,7 @@ include Relude_Extensions_SemigroupAny.SemigroupAnyExtensions(SemigroupAny)
 @ocaml.doc("
 Applies a pure function to each value in the array
 ")
-let map: 'a 'b. (. 'a => 'b, array<'a>) => array<'b> = BsBastet.Array.Functor.map
+let map: 'a 'b. ('a => 'b, array<'a>) => array<'b> = BsBastet.Array.Functor.map
 
 module Functor: FUNCTOR with type t<'a> = array<'a> = {
   type t<'a> = array<'a>
@@ -28,7 +28,7 @@ include Relude_Extensions_Functor.FunctorExtensions(Functor)
 @ocaml.doc("
 Applies an array of functions to an array of values to produce a new array of values.
 ")
-let apply: 'a 'b. (. array<'a => 'b>, array<'a>) => array<'b> = BsBastet.Array.Apply.apply
+let apply: 'a 'b. (array<'a => 'b>, array<'a>) => array<'b> = BsBastet.Array.Apply.apply
 
 module Apply: APPLY with type t<'a> = array<'a> = {
   include Functor
@@ -50,7 +50,7 @@ include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 @ocaml.doc("
 Maps a monadic function over each element of the array, and flattens (concatenates) the result.
 ")
-let bind: 'a 'b. (. array<'a>, 'a => array<'b>) => array<'b> = BsBastet.Array.Monad.flat_map
+let bind: 'a 'b. (array<'a>, 'a => array<'b>) => array<'b> = BsBastet.Array.Monad.flat_map
 
 module Monad: MONAD with type t<'a> = array<'a> = {
   include Applicative
@@ -61,7 +61,7 @@ include Relude_Extensions_Monad.MonadExtensions(Monad)
 @ocaml.doc("
 Alt for arrays concatenates the two arrays
 ")
-let alt: 'a. (. array<'a>, array<'a>) => array<'a> = BsBastet.Array.Alt.alt
+let alt: 'a. (array<'a>, array<'a>) => array<'a> = BsBastet.Array.Alt.alt
 
 module Alt: ALT with type t<'a> = array<'a> = {
   include Functor
@@ -72,7 +72,7 @@ include Relude_Extensions_Alt.AltExtensions(Alt)
 @ocaml.doc("
 Imap is the invariant map function for arrays.
 ")
-let imap: 'a 'b. (. 'a => 'b, 'b => 'a, array<'a>) => array<'b> = BsBastet.Array.Invariant.imap
+let imap: 'a 'b. ('a => 'b, 'b => 'a, array<'a>) => array<'b> = BsBastet.Array.Invariant.imap
 
 module Invariant: INVARIANT with type t<'a> = array<'a> = {
   type t<'a> = array<'a>

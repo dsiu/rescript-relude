@@ -564,7 +564,7 @@ let foldBy: 'a 'b. (list<movement>, ('b, 'a) => 'b, 'b, t<'a>) => option<(t<'a>,
 @ocaml.doc("
 Converts a zipper of 'a to a zipper of 'b using a pure function
 ")
-let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (
+let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (
   aToB,
   {ancestors, leftSiblings, focus, rightSiblings, children},
 ) => {

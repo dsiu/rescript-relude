@@ -116,7 +116,7 @@ let catThat: 'a 'b. list<t<'a, 'b>> => list<'b> = iors => Relude_List.foldRight(
 @ocaml.doc("
 Maps a pure function over the [this] channel of the Ior
 ")
-let mapThis: 'a 'b 'c. (. 'a => 'c, t<'a, 'b>) => t<'c, 'b> = (f, fa) =>
+let mapThis: 'a 'b 'c. ('a => 'c, t<'a, 'b>) => t<'c, 'b> = (f, fa) =>
   switch fa {
   | That(_) as e => e
   | This(a) => This(f(a))
@@ -252,7 +252,7 @@ let pure: 'a 'b. 'a => t<'a, 'b> = a => This(a)
 @ocaml.doc("
 Applies a monadic function to the success channel of the Ior
 ")
-let bind: (. t<'a, 'b>, 'a => t<'c, 'b>) => t<'c, 'b> = (fa, f) =>
+let bind: (t<'a, 'b>, 'a => t<'c, 'b>) => t<'c, 'b> = (fa, f) =>
   switch fa {
   | This(a) => f(a)
   | That(_) as that => that
@@ -383,7 +383,7 @@ module WithThats = (Thats: SEMIGROUP_ANY, That: TYPE) => {
 
   module Apply: APPLY with type t<'a> = t<'a, Thats.t<That.t>> = {
     include Functor
-    let apply = (. ff, fa) => applyWithAppendThats(Thats.append, ff, fa)
+    let apply = (ff, fa) => applyWithAppendThats(Thats.append, ff, fa)
   }
   let apply = Apply.apply
   include Relude_Extensions_Apply.ApplyExtensions(Apply)

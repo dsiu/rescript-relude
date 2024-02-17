@@ -159,7 +159,7 @@ let uncurry5: 'a 'b 'c 'd 'e 'f. (('a, 'b, 'c, 'd, 'e) => 'f, ('a, 'b, 'c, 'd, '
   map(double, square, 3) == 18;
 ]}
 ")
-let map: 'a 'b 'r. (. 'a => 'b, 'r => 'a) => 'r => 'b = (aToB, rToA) => r =>
+let map: 'a 'b 'r. ('a => 'b, 'r => 'a) => 'r => 'b = (aToB, rToA) => r =>
   aToB(rToA(r)) /* Same as compose */
 
 //let apply_x = (rToAToB, rToA) => r => rToAToB(r)(rToA(r))
@@ -188,7 +188,7 @@ The result of [apply()] is equivalent to:
 ]}
 ")
 let apply_x = (rToAToB, rToA) => r => rToAToB(r)(rToA(r))
-let apply = (. rToAToB, rToA) => apply_x(rToAToB, rToA, ...)
+let apply = (rToAToB, rToA) => apply_x(rToAToB, rToA, ...)
 
 //let apply: 'a 'b 'r. (('r, 'a) => 'b, 'r => 'a, 'r) => 'b = (rToAToB, rToA, r) =>
 //  rToAToB(r, rToA(r))
@@ -227,7 +227,7 @@ and returns a new function that also takes one argument.
 let bind_x = (rToA, arToB, r) => arToB(rToA(r))(r)
 //let bind: 'a 'b 'r. ('r => 'a, ('a, 'r) => 'b) => 'r => 'b = (rToA, arToB) =>
 //  bind_x(rToA, arToB, ...)
-let bind = (. rToA, arToB) => bind_x(rToA, arToB, ...)
+let bind = (rToA, arToB) => bind_x(rToA, arToB, ...)
 //let bind: 'a 'b 'r. ('r => 'a, ('a, 'r) => 'b, 'r) => 'b = (rToA, arToB, r) => arToB(rToA(r), r)
 
 @ocaml.doc("

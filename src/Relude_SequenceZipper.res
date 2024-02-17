@@ -130,7 +130,7 @@ module WithSequence = (S: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Maps a pure function over the values of a Zipper
   ")
-  let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (f, Zipper(left, focus, right)) => Zipper(
+  let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (f, Zipper(left, focus, right)) => Zipper(
     S.Functor.map(f, left),
     f(focus),
     S.Functor.map(f, right),
@@ -148,7 +148,7 @@ module WithSequence = (S: Relude_Interface.SEQUENCE) => {
   Implementation taken from: https://github.com/qfpl/list-zipper/blob/master/src/Data/ListZipper.hs#L151
   At the time of this writing, I don't personally understand why it's implemented this way.
   ")
-  let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (Zipper(l1, f1, r1), Zipper(l2, f2, r2)) => {
+  let apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (Zipper(l1, f1, r1), Zipper(l2, f2, r2)) => {
     // todo: is this correct?
     Zipper(S.zipWith((f, a) => f(a), l1, l2), f1(f2), S.zipWith((f, a) => f(a), r1, r2))
   }

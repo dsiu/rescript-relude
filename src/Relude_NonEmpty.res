@@ -166,7 +166,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Maps a pure function over the NonEmpty
   ")
-  let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (f, NonEmpty(x, xs)) => NonEmpty(
+  let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (f, NonEmpty(x, xs)) => NonEmpty(
     f(x),
     TailSequence.Monad.map(f, xs),
   )
@@ -185,7 +185,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Applies a NonEmpty sequence of function to a NonEmpty sequence of values
   ")
-  let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) => map(f => map(f, fa), ff)->flatten
+  let apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (ff, fa) => map(f => map(f, fa), ff)->flatten
 
   module Apply: APPLY with type t<'a> = t<'a> = {
     include Functor
@@ -209,7 +209,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Applies a monadic function to a NonEmpty sequence of values
   ")
-  let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (nonEmpty, f) => map(f, nonEmpty)->flatten
+  let bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (nonEmpty, f) => map(f, nonEmpty)->flatten
 
   module Monad: MONAD with type t<'a> = t<'a> = {
     include Applicative

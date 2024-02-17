@@ -22,7 +22,7 @@ module WithMonad = (M: MONAD) => {
 
   let liftF: 'a. M.t<'a> => t<'a> = mA => OptionT(M.map(a => Some(a), mA))
 
-  let map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, OptionT(mOptionA)) => OptionT(
+  let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, OptionT(mOptionA)) => OptionT(
     M.map(optionA => Relude_Option.map(aToB, optionA), mOptionA),
   )
 
@@ -36,7 +36,7 @@ module WithMonad = (M: MONAD) => {
   }
   include Relude_Extensions_Functor.FunctorExtensions(Functor)
 
-  let apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (
+  let apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (
     OptionT(mOptionAToB),
     OptionT(mOptionA),
   ) => OptionT(
@@ -60,7 +60,7 @@ module WithMonad = (M: MONAD) => {
   }
   include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 
-  let bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (OptionT(mOptionA), aToOptionTB) => OptionT(
+  let bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (OptionT(mOptionA), aToOptionTB) => OptionT(
     M.flat_map(mOptionA, optionA =>
       switch optionA {
       | Some(a) =>

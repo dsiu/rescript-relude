@@ -4,7 +4,7 @@
 open BsBastet.Interface
 open Relude_Function.Infix
 
-let compose: 'a 'b 'c. (. option<'b => 'c>, option<'a => 'b>) => option<'a => 'c> = (
+let compose: 'a 'b 'c. (option<'b => 'c>, option<'a => 'b>) => option<'a => 'c> = (
   optionBToC,
   optionAToB,
 ) =>
@@ -30,7 +30,7 @@ include Relude_Extensions_Semigroupoid.SemigroupoidExtensions(Semigroupoid)
   map(x => x * x, None) == None;
 ]}
 ")
-let map: 'a 'b. (. 'a => 'b, option<'a>) => option<'b> = (f, x) =>
+let map: 'a 'b. ('a => 'b, option<'a>) => option<'b> = (f, x) =>
   switch x {
   | Some(x) => Some(f(x))
   | None => None
@@ -54,7 +54,7 @@ include Relude_Extensions_Functor.FunctorExtensions(Functor)
   apply(None, None) == None;
 ]}
 ")
-let apply: 'a 'b. (. option<'a => 'b>, option<'a>) => option<'b> = BsBastet.Option.Apply.apply
+let apply: 'a 'b. (option<'a => 'b>, option<'a>) => option<'b> = BsBastet.Option.Apply.apply
 
 module Apply: APPLY with type t<'a> = option<'a> = {
   include Functor
@@ -91,7 +91,7 @@ case, [f] is a function that takes a non-[option] argument and returns an
 
 [bind] is the same as [flatMap], but with the arguments in the reverse order.
 ")
-let bind: 'a 'b. (. option<'a>, 'a => option<'b>) => option<'b> = (x, f) =>
+let bind: 'a 'b. (option<'a>, 'a => option<'b>) => option<'b> = (x, f) =>
   switch x {
   | Some(v) => f(v)
   | None => None

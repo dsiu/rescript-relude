@@ -64,7 +64,7 @@ It returns [VError(e)] if [x] is of the form [VError(e)].
   map((x) => {sqrt(float_of_int(x))}, VError(\"bad\")) == VError(\"bad\");
 ]}
 ")
-let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, x) =>
+let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, x) =>
   switch x {
   | VOk(a) => VOk(f(a))
   | VError(_) as e => e
@@ -264,7 +264,7 @@ errors to be discarded.
   flatMapV(VError(\"not an int\"), mustBeEven) == VError(\"not an int\");
 ]}
 ")
-let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
+let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (fa, f) =>
   switch fa {
   | VOk(a) => f(a)
   | VError(e) => VError(e)
@@ -421,7 +421,7 @@ module WithErrors = (Errors: SEMIGROUP_ANY, Error: TYPE) => {
 
   module Apply: APPLY with type t<'a> = t<'a> = {
     include Functor
-    let apply = (. ff, fa) => applyWithAppendErrors(Errors.append, ff, fa)
+    let apply = (ff, fa) => applyWithAppendErrors(Errors.append, ff, fa)
   }
   let apply = Apply.apply
   include Relude_Extensions_Apply.ApplyExtensions(Apply)

@@ -61,7 +61,7 @@ module WithMonad = (M: MONAD) => {
     },
   )
 
-  let map: 'a 'b 'r 's 'w. (. 'a => 'b, t<'a, 'r, 's, 'w>) => t<'b, 'r, 's, 'w> = (
+  let map: 'a 'b 'r 's 'w. ('a => 'b, t<'a, 'r, 's, 'w>) => t<'b, 'r, 's, 'w> = (
     aToB,
     RWST(f),
   ) => RWST(
@@ -118,7 +118,7 @@ module WithMonad = (M: MONAD) => {
 
     module Apply: APPLY with type t<'a> = t<'a, R.t, S.t, Log.t> = {
       include Functor
-      let apply = (. ff, fa) => applyWithAppendLog(Log.Monoid.append, ff, fa)
+      let apply = (ff, fa) => applyWithAppendLog(Log.Monoid.append, ff, fa)
     }
     let apply = Apply.apply
     include Relude_Extensions_Apply.ApplyExtensions(Apply)
@@ -132,7 +132,7 @@ module WithMonad = (M: MONAD) => {
 
     module Monad: MONAD with type t<'a> = t<'a, R.t, S.t, Log.t> = {
       include Applicative
-      let flat_map = (. f, ma) => bindWithAppendLog(Log.Monoid.append, f, ma)
+      let flat_map = (f, ma) => bindWithAppendLog(Log.Monoid.append, f, ma)
     }
     let bind = Monad.flat_map
     include Relude_Extensions_Monad.MonadExtensions(Monad)

@@ -163,7 +163,7 @@ let zip: 'a 'b. (t<'a>, t<'b>) => t<('a, 'b)> = (ta, tb) => zipWith((a, b) => (a
 @ocaml.doc("
 Maps a function over all values of the tree
 ")
-let rec map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, {value, children}) => {
+let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, {value, children}) => {
   value: aToB(value),
   children: children->(Relude_List.map(map(aToB, _), _)),
 }
@@ -177,7 +177,7 @@ include Relude_Extensions_Functor.FunctorExtensions(Functor)
 @ocaml.doc("
 Applies a tree of functions to a tree of values position-by-position, trimming off non-matching branches.
 ")
-let rec apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (
+let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (
   {value: aToB, children: aToBChildTrees},
   {value: a, children: aChildTrees} as aTree,
 ) => {
@@ -200,7 +200,7 @@ module Applicative: APPLICATIVE with type t<'a> = t<'a> = {
 }
 include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 
-let rec bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (
+let rec bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (
   {value: valueA, children: childTreesA},
   aToTreeB,
 ) => {

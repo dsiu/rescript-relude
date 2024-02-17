@@ -277,7 +277,7 @@ let fromResult: 'a 'e. result<'a, 'e> => t<'a, 'e> = res =>
 [IO.map] applies a function ['a => 'b] on an [IO.t('a, 'e)] to produce an
 [IO.t('b, 'e)].
 ")
-let map: 'a 'b 'e. (. 'a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, io) => Map(f, io)
+let map: 'a 'b 'e. ('a => 'b, t<'a, 'e>) => t<'b, 'e> = (f, io) => Map(f, io)
 
 let \"<$>" = map
 
@@ -299,10 +299,7 @@ let tap: 'a 'e. ('a => unit, t<'a, 'e>) => t<'a, 'e> = (f, io) => {
 @ocaml.doc("
 Applicative [apply] function
 ")
-let apply: 'a 'b 'e. (. t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (ioAToB, ioA) => Apply(
-  ioAToB,
-  ioA,
-)
+let apply: 'a 'b 'e. (t<'a => 'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (ioAToB, ioA) => Apply(ioAToB, ioA)
 
 let \"<*>" = apply
 
@@ -319,7 +316,7 @@ let flatMap: 'a 'b 'e. ('a => t<'b, 'e>, t<'a, 'e>) => t<'b, 'e> = (rToIOA, ioR)
 [IO.bind] is [flatMap] with the argument order reversed. It's also an alias for
 the [>>=] \"bind\" operator.
 ")
-let bind: 'a 'b 'e. (. t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (ioA, aToIOB) => FlatMap(
+let bind: 'a 'b 'e. (t<'a, 'e>, 'a => t<'b, 'e>) => t<'b, 'e> = (ioA, aToIOB) => FlatMap(
   aToIOB,
   ioA,
 )
@@ -469,7 +466,7 @@ Creates a new IO value that contains the composition of functions from two
 input IO values. Composition is done from right-to-left with this function - see
 andThen for left-to-right.
 ")
-let rec compose: 'a 'b 'c 'e. (. t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
+let rec compose: 'a 'b 'c 'e. (t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 'e> = (
   ioBToC,
   ioAToB,
 ) =>
@@ -970,7 +967,7 @@ module functor, like this:
   );
 ]}
 ")
-let alt: 'a 'e. (. t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (io1, io2) => io1->(catchError(_ => io2, _))
+let alt: 'a 'e. (t<'a, 'e>, t<'a, 'e>) => t<'a, 'e> = (io1, io2) => io1->(catchError(_ => io2, _))
 
 @ocaml.doc("
 Creates a new IO that will run the two input IO effects in parallel, and resolve

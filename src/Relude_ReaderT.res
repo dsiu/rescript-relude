@@ -36,18 +36,18 @@ module WithMonad = (M: MONAD) => {
     r => rToMA(rToR(r)),
   )
 
-  let map: 'r 'a 'b. (. 'a => 'b, t<'r, 'a>) => t<'r, 'b> = (aToB, ReaderT(rToMA)) => ReaderT(
+  let map: 'r 'a 'b. ('a => 'b, t<'r, 'a>) => t<'r, 'b> = (aToB, ReaderT(rToMA)) => ReaderT(
     r => M.map(aToB, rToMA(r)),
   )
 
-  let apply: 'r 'a 'b. (. t<'r, 'a => 'b>, t<'r, 'a>) => t<'r, 'b> = (
+  let apply: 'r 'a 'b. (t<'r, 'a => 'b>, t<'r, 'a>) => t<'r, 'b> = (
     ReaderT(rToMAToB),
     ReaderT(rToMA),
   ) => ReaderT(r => M.apply(rToMAToB(r), rToMA(r)))
 
   let pure: 'r 'a. 'a => t<'r, 'a> = a => ReaderT(_ => M.pure(a))
 
-  let bind: 'r 'a 'b. (. t<'r, 'a>, 'a => t<'r, 'b>) => t<'r, 'b> = (
+  let bind: 'r 'a 'b. (t<'r, 'a>, 'a => t<'r, 'b>) => t<'r, 'b> = (
     ReaderT(rToMA),
     aToReaderB,
   ) => ReaderT(

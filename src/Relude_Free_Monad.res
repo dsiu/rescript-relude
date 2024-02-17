@@ -8,7 +8,7 @@ module WithFunctor = (F: FUNCTOR) => {
     | Pure('a)
     | FlatMap(F.t<t<'a>>)
 
-  let rec map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
+  let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
     switch freeA {
     | Pure(a) => Pure(aToB(a))
     | FlatMap(fFreeA) => FlatMap(fFreeA->(F.map(freeA => freeA->(map(aToB, _)), _)))
@@ -20,7 +20,7 @@ module WithFunctor = (F: FUNCTOR) => {
   }
   include Relude_Extensions_Functor.FunctorExtensions(Functor)
 
-  let rec apply: 'a 'b. (. t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
+  let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {
     | Pure(aToB) => freeA->(map(aToB, _))
     | FlatMap(fFreeAToB) => FlatMap(fFreeAToB->(F.map(freeAToB => apply(freeAToB, freeA), _)))
@@ -40,7 +40,7 @@ module WithFunctor = (F: FUNCTOR) => {
   }
   include Relude_Extensions_Applicative.ApplicativeExtensions(Applicative)
 
-  let rec bind: 'a 'b. (. t<'a>, 'a => t<'b>) => t<'b> = (freeA, aToFreeB) =>
+  let rec bind: 'a 'b. (t<'a>, 'a => t<'b>) => t<'b> = (freeA, aToFreeB) =>
     switch freeA {
     | Pure(a) => aToFreeB(a)
     | FlatMap(fFreeA) => FlatMap(fFreeA->(F.map(freeA => bind(freeA, aToFreeB), _)))

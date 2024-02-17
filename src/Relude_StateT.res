@@ -72,13 +72,13 @@ module WithMonad = (M: MONAD) => {
   ")
   let modify_: 's. ('s => 's) => t<unit, 's> = sToS => StateT(s => M.pure(((), sToS(s))))
 
-  let map: 's 'a 'b. (. 'a => 'b, t<'a, 's>) => t<'b, 's> = (aToB, StateT(sToMAS)) => StateT(
+  let map: 's 'a 'b. ('a => 'b, t<'a, 's>) => t<'b, 's> = (aToB, StateT(sToMAS)) => StateT(
     s => sToMAS(s)->(M.map(((a, s)) => (aToB(a), s), _)),
   )
 
   let pure: 's 'a. 'a => t<'a, 's> = a => StateT(s => M.pure((a, s)))
 
-  let apply: 's 'a 'b. (. t<'a => 'b, 's>, t<'a, 's>) => t<'b, 's> = (
+  let apply: 's 'a 'b. (t<'a => 'b, 's>, t<'a, 's>) => t<'b, 's> = (
     StateT(sToMAToBS),
     StateT(sToMAS),
   ) => StateT(
@@ -98,7 +98,7 @@ module WithMonad = (M: MONAD) => {
     },
   )
 
-  let bind: 's 'a 'b. (. t<'a, 's>, 'a => t<'b, 's>) => t<'b, 's> = (
+  let bind: 's 'a 'b. (t<'a, 's>, 'a => t<'b, 's>) => t<'b, 's> = (
     StateT(sToMAS),
     aToStateTBS,
   ) => StateT(
