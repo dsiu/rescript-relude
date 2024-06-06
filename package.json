@@ -35,7 +35,7 @@
     "@glennsl/rescript-jest": "github:dsiu/rescript-jest#rescript-v11-curried-mode",
     "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-curried-mode",
     "docsify-cli": "~4.4.0",
-    "rescript": "^11.0.0-rc.6"
+    "rescript": "^11.1.1"
   },
   "peerDependencies": {
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v11-curried-mode"
