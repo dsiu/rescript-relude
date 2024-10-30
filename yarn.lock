@@ -514,10 +514,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@rescript/core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@rescript/core/-/core-1.0.0.tgz#8626f3b1c09eeb1b4788f42f754e58d3e68041c1"
-  integrity sha512-F5HURYYx8Kp6h1KBiri2nFwGKR16o9/XTCNl2TEWfCwqR+MTzf/lpuPuB6ajnaYytsU0kTUBIFI0DOoLgkDxSg==
+"@rescript/core@^1.3.0":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@rescript/core/-/core-1.6.1.tgz#159670c94d64a2b8236f46be2bf09a007b1ece08"
+  integrity sha512-vyb5k90ck+65Fgui+5vCja/mUfzKaK3kOPT4Z6aAJdHLH1eljEi1zKhXroCiCtpNLSWp8k4ulh1bdB5WS0hvqA==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -863,9 +863,9 @@ browserslist@^4.22.2:
 
 "bs-bastet@github:dsiu/rescript-bastet#rescript-v11-uncurried-wip":
   version "0.0.1"
-  resolved "https://codeload.github.com/dsiu/rescript-bastet/tar.gz/8e19f28f88fea06d4423282609a56715e6c1a8a3"
+  resolved "https://codeload.github.com/dsiu/rescript-bastet/tar.gz/c8116c22a90ba2eaa4c04eee9ea8e3b141a34e04"
   dependencies:
-    "@rescript/core" "^1.0.0"
+    "@rescript/core" "^1.3.0"
     bs-stdlib-shims "^0.1.0"
 
 bs-stdlib-shims@^0.1.0:
@@ -2869,10 +2869,10 @@ requires-port@^1.0.0:
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==
 
-rescript@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.yarnpkg.com/rescript/-/rescript-11.1.0.tgz#68dec0b3cbc456c1f9c8e4f10bda6fae49bf7f92"
-  integrity sha512-9la2Dv+ACylQ77I8s4spPu1JnLZXbH5WgxcLHLLUBWgFFSiv0wXqgzWztrBIZqwFgVX5BYcwldUqUVcEzdCyHg==
+rescript@^11.1.4:
+  version "11.1.4"
+  resolved "https://registry.yarnpkg.com/rescript/-/rescript-11.1.4.tgz#9a42ebc4fc5363707e39cef5b3188160b63bee42"
+  integrity sha512-0bGU0bocihjSC6MsE3TMjHjY0EUpchyrREquLS8VsZ3ohSMD+VHUEwimEfB3kpBI1vYkw3UFZ3WD8R28guz/Vw==
 
 resolve-cwd@^3.0.0:
   version "3.0.0"
