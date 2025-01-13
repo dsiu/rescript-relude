@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -29,7 +26,7 @@ Running time: O(1)
 ]}
 ")
 let consOption: 'a. (option<'a>, list<'a>) => list<'a> = (x, xs) =>
-  x->(Relude_Option_Base.fold(xs, x => list{x, ...xs}, _))
+  x->Relude_Option_Base.fold(xs, x => list{x, ...xs}, _)
 
 @ocaml.doc("
 [List.prepend] is an alias for {!val:cons}.
@@ -82,7 +79,7 @@ Running time: O(n)
 ]}
 ")
 let appendOption: 'a. (option<'a>, list<'a>) => list<'a> = (x, xs) =>
-  x->(Relude_Option_Base.fold(xs, append(_, xs), _))
+  x->Relude_Option_Base.fold(xs, append(_, xs), _)
 
 @ocaml.doc("
 [List.repeat] accepts a count and a value, and it creates a new list that
@@ -161,8 +158,7 @@ let tail: 'a. list<'a> => option<list<'a>> = x =>
 @ocaml.doc("
 Gets all but the first items in the list, or [[]] if the list is empty.
 ")
-let tailOrEmpty: 'a. list<'a> => list<'a> = xs =>
-  tail(xs)->(Relude_Option_Base.getOrElse(list{}, _))
+let tailOrEmpty: 'a. list<'a> => list<'a> = xs => tail(xs)->Relude_Option_Base.getOrElse(list{}, _)
 
 @ocaml.doc("
 Gets all but the last item in the list, or None if the list is empty
@@ -218,7 +214,7 @@ let takeExactly: 'a. (int, list<'a>) => option<list<'a>> = (i, xs) => {
     | list{y, ...ys} => go(list{y, ...acc}, count - 1, ys)
     }
   if i >= 0 {
-    go(list{}, i, xs)->(Relude_Option_Instances.map(reverse, _))
+    go(list{}, i, xs)->Relude_Option_Instances.map(reverse, _)
   } else {
     None
   }
@@ -291,7 +287,7 @@ let keepWithIndex: 'a. (('a, int) => bool, list<'a>) => list<'a> = filterWithInd
 Creates a new list containing only the items from the given list that do not
 satisfy the given predicate.
 ")
-let filterNot: 'a. ('a => bool, list<'a>) => list<'a> = (f, l) => l->(filter(a => !f(a), _))
+let filterNot: 'a. ('a => bool, list<'a>) => list<'a> = (f, l) => l->filter(a => !f(a), _)
 
 @ocaml.doc("
 Alias of filterNot
@@ -303,7 +299,7 @@ Creates a new list containing only the items from the given list that do not
 satisfy the given indexed predicate.
 ")
 let filterNotWithIndex: 'a. (('a, int) => bool, list<'a>) => list<'a> = (f, l) =>
-  l->(filterWithIndex((a, i) => !f(a, i), _))
+  l->filterWithIndex((a, i) => !f(a, i), _)
 
 @ocaml.doc("
 Alias of filterNotWithIndex
@@ -483,13 +479,13 @@ Creates a new list that replaces the item at the given index with the given
 value. If the index is out of range, no replacement is made.
 ")
 let replaceAt: 'a. (int, 'a, list<'a>) => list<'a> = (targetIndex, newX, xs) => {
-  xs->(mapWithIndex((x, currentIndex) =>
-      if currentIndex == targetIndex {
-        newX
-      } else {
-        x
-      }
-    , _))
+  xs->mapWithIndex((x, currentIndex) =>
+    if currentIndex == targetIndex {
+      newX
+    } else {
+      x
+    }
+  , _)
 }
 
 @ocaml.doc("
@@ -531,7 +527,7 @@ Creates a new list that modifies the value at the given index with the given
 function. If the index is out of range, no change is made.
 ")
 let updateAt: 'a. (int, 'a => 'a, list<'a>) => list<'a> = (targetIndex, f, xs) => {
-  xs->(mapWithIndex((x, index) => index == targetIndex ? f(x) : x, _))
+  xs->mapWithIndex((x, index) => index == targetIndex ? f(x) : x, _)
 }
 
 @ocaml.doc("
@@ -540,7 +536,7 @@ If either index is out of range, no change is made.
 ")
 let swapAt: 'a. (int, int, list<'a>) => list<'a> = (i, j, xs) => {
   switch (at(i, xs), at(j, xs)) {
-  | (Some(a), Some(b)) => xs->(mapWithIndex((x, k) => i == k ? b : j == k ? a : x, _))
+  | (Some(a), Some(b)) => xs->mapWithIndex((x, k) => i == k ? b : j == k ? a : x, _)
   | _ => xs
   }
 }
@@ -550,7 +546,7 @@ Creates a new list without the element at the given index. If the index is out
 of range, no change is made.
 ")
 let removeAt: 'a. (int, list<'a>) => list<'a> = (targetIndex, xs) => {
-  xs->(filterWithIndex((_, i) => i != targetIndex, _))
+  xs->filterWithIndex((_, i) => i != targetIndex, _)
 }
 
 @ocaml.doc("
@@ -560,5 +556,5 @@ can't be split evenly, the final chunk will be the remaining elements.
 let rec chunk: 'a. (int, list<'a>) => list<list<'a>> = (size, xs) => {
   xs->Relude_List_Instances.length <= size
     ? list{xs}
-    : list{xs->(take(size, _)), ...xs->drop(size, _)->(chunk(size, _))}
+    : list{xs->take(size, _), ...xs->(drop(size, _))->chunk(size, _)}
 }

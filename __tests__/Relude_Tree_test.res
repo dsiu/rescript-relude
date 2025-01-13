@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 open! Relude.Globals
@@ -51,14 +48,14 @@ describe("Tree", () => {
   test("getValue", () => expect(testTree1->Tree.getValue)->toEqual(1))
 
   test("setValue", () =>
-    expect(testTree1->(Tree.setValue(100, _)))->toEqual({
+    expect(testTree1->Tree.setValue(100, _))->toEqual({
       value: 100,
       children: list{Tree.pure(2), Tree.pure(3)},
     })
   )
 
   test("modifyValue", () =>
-    expect(testTree1->(Tree.modifyValue(a => a + 5, _)))->toEqual({
+    expect(testTree1->Tree.modifyValue(a => a + 5, _))->toEqual({
       value: 6,
       children: list{Tree.pure(2), Tree.pure(3)},
     })
@@ -69,14 +66,14 @@ describe("Tree", () => {
   )
 
   test("getChildAt", () =>
-    expect((testTree1->(Tree.getChildAt(1, _)), testTree1->(Tree.getChildAt(2, _))))->toEqual((
+    expect((testTree1->Tree.getChildAt(1, _), testTree1->Tree.getChildAt(2, _)))->toEqual((
       Some(Tree.pure(3)),
       None,
     ))
   )
 
   test("setChildren", () =>
-    expect(testTree1->(setChildren(list{Tree.pure(42), Tree.pure(43)}, _)))->toEqual({
+    expect(testTree1->setChildren(list{Tree.pure(42), Tree.pure(43)}, _))->toEqual({
       value: 1,
       children: list{Tree.pure(42), Tree.pure(43)},
     })
@@ -84,11 +81,9 @@ describe("Tree", () => {
 
   test("modifyChildren", () =>
     expect(
-      testTree1->(
-        modifyChildren(
-          children => children->(List.map(child => child->(Tree.modifyValue(a => a * 100, _)), _)),
-          _,
-        )
+      testTree1->modifyChildren(
+        children => children->List.map(child => child->Tree.modifyValue(a => a * 100, _), _),
+        _,
       ),
     )->toEqual({value: 1, children: list{Tree.pure(200), Tree.pure(300)}})
   )
@@ -108,14 +103,14 @@ describe("Tree", () => {
   )
 
   test("prependChildren", () =>
-    expect(testTree1->(Tree.prependChildren(list{Tree.pure(-1), Tree.pure(0)}, _)))->toEqual({
+    expect(testTree1->Tree.prependChildren(list{Tree.pure(-1), Tree.pure(0)}, _))->toEqual({
       value: 1,
       children: list{Tree.pure(-1), Tree.pure(0), Tree.pure(2), Tree.pure(3)},
     })
   )
 
   test("appendChildren", () =>
-    expect(testTree1->(Tree.appendChildren(list{Tree.pure(-1), Tree.pure(0)}, _)))->toEqual({
+    expect(testTree1->Tree.appendChildren(list{Tree.pure(-1), Tree.pure(0)}, _))->toEqual({
       value: 1,
       children: list{Tree.pure(2), Tree.pure(3), Tree.pure(-1), Tree.pure(0)},
     })
@@ -150,14 +145,14 @@ describe("Tree", () => {
   })
 
   test("map", () =>
-    expect(testTree1->(Tree.map(string_of_int, _)))->toEqual(
+    expect(testTree1->Tree.map(Int.toString, _))->toEqual(
       Tree.make("1", list{Tree.pure("2"), Tree.pure("3")}),
     )
   )
 
   test("apply", () => {
     let testTreeF = Tree.make(a => a * 10, list{Tree.pure(a => a * 100), Tree.pure(a => a * 1000)})
-    let actual = testTree1->(Tree.apply(testTreeF, _))
+    let actual = testTree1->Tree.apply(testTreeF, _)
     // Not sure if this is the expected result for apply on a tree, but sure
     let expected = Tree.make(
       10,
@@ -174,10 +169,10 @@ describe("Tree", () => {
   test("flatMap", () => {
     let f = a =>
       Tree.make(
-        string_of_int(a * 10),
-        list{Tree.pure(string_of_int(a * 100)), Tree.pure(string_of_int(a * 1000))},
+        Int.toString(a * 10),
+        list{Tree.pure(Int.toString(a * 100)), Tree.pure(Int.toString(a * 1000))},
       )
-    let actual = testTree1->(Tree.flatMap(f, _))
+    let actual = testTree1->Tree.flatMap(f, _)
     let expected = Tree.make(
       "10",
       list{
@@ -191,7 +186,7 @@ describe("Tree", () => {
   })
 
   test("extend", () => {
-    let f = tree => tree->(Tree.foldLeft(\"+", 0, _))
+    let f = tree => tree->Tree.foldLeft(\"+", 0, _)
     let actual = Tree.extend(f, testTree2)
     let expected = Tree.make(
       199,
@@ -206,19 +201,19 @@ describe("Tree", () => {
 
   test("foldLeft", () =>
     expect(
-      testTree2->(Tree.foldLeft((acc, value) => acc->(List.append(value, _)), list{}, _)),
+      testTree2->Tree.foldLeft((acc, value) => acc->List.append(value, _), list{}, _),
     )->toEqual(list{21, 22, 2, 31, 32, 3, 41, 42, 4, 1})
   )
 
   test("foldRight", () =>
     expect(
-      testTree2->(Tree.foldRight((value, acc) => acc->(List.append(value, _)), list{}, _)),
+      testTree2->Tree.foldRight((value, acc) => acc->List.append(value, _), list{}, _),
     )->toEqual(list{42, 41, 4, 32, 31, 3, 22, 21, 2, 1})
   )
 
   test("Fold_Map", () => {
     module FoldMap = Tree.Foldable.Fold_Map(String.Monoid)
-    let actual = FoldMap.fold_map(a => string_of_int(a) ++ "-", testTree2)
+    let actual = FoldMap.fold_map(a => Int.toString(a) ++ "-", testTree2)
     let expected = "21-22-2-31-32-3-41-42-4-1-"
     expect(actual)->toEqual(expected)
   })
@@ -280,7 +275,7 @@ describe("Tree", () => {
   })
 
   test("filter", () => {
-    let actual = testTree2->(Tree.filter(a => a < 30, _))
+    let actual = testTree2->Tree.filter(a => a < 30, _)
     let expected = Tree.make(
       1,
       list{Tree.make(2, list{Tree.pure(21), Tree.pure(22)}), Tree.pure(3), Tree.pure(4)},
@@ -289,7 +284,7 @@ describe("Tree", () => {
   })
 
   test("showBy", () =>
-    expect(testTree1->(showBy(string_of_int, _)))->toEqual("Tree 1 [Tree 2 [], Tree 3 []]")
+    expect(testTree1->showBy(Int.toString, _))->toEqual("Tree 1 [Tree 2 [], Tree 3 []]")
   )
 
   test("Show", () => {
@@ -308,7 +303,7 @@ describe("Tree", () => {
         Tree.make(3, list{Tree.pure(31), Tree.make(32, list{Tree.pure(321), Tree.pure(322)})}),
       },
     )
-    let actual = tree->(showPrettyBy(string_of_int, _))
+    let actual = tree->showPrettyBy(Int.toString, _)
     let expected = "1
 |- 2
    |- 21

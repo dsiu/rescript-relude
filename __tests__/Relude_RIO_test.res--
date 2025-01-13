@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -40,9 +37,9 @@ describe("Reader IO", () =>
       env =>
         \"<$$>"(\"<$$>"(RIO.pure(-1 * env.intValue), string_of_int), a => a ++ env.stringValue),
     )
-    ->RIO.semiflatMap(c => Relude_IO.pure(c ++ "semi"), _)
-    ->RIO.runRIO(testEnv, _)
-    ->Relude_IO.map(a => expect(a)->toEqual("-42abcsemi"), _)
+    ->(RIO.semiflatMap(c => Relude_IO.pure(c ++ "semi"), _))
+    ->(RIO.runRIO(testEnv, _))
+    ->(Relude_IO.map(a => expect(a)->toEqual("-42abcsemi"), _))
     ->(
       Relude_IO.unsafeRunAsync(
         x =>

@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/reazen/relude.git"
   },
+  "packageManager": "yarn@4.6.0",
   "scripts": {
     "clean": "rescript clean",
     "build": "rescript build",
@@ -31,16 +32,6 @@
   ],
   "author": "",
   "license": "MIT",
-  "devDependencies": {
-    "@glennsl/rescript-jest": "^0.10.0",
-    "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip",
-    "docsify-cli": "~4.4.0",
-    "rescript": "^11.1.4"
-  },
-  "peerDependencies": {
-    "bs-bastet": "github:dsiu/rescript-bastet#rescript-v11-uncurried-wip"
-  },
-  "dependencies": {},
   "jest": {
     "verbose": false,
     "testPathIgnorePatterns": [
@@ -48,5 +39,13 @@
       "/testUtils/"
     ]
   },
-  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+  "devDependencies": {
+    "@glennsl/rescript-jest": "github:dsiu/rescript-jest#rescript-v12",
+    "bs-bastet": "github:dsiu/rescript-bastet#rescript-v12",
+    "docsify-cli": "~4.4.0",
+    "rescript": "^12.0.0-alpha.7"
+  },
+  "dependencies": {
+    "@rescript/core": "^1.6.1"
+  }
 }

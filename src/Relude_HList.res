@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @ocaml.doc("
 Type of an empty HList
 ")

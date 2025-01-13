@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 // TODO: someday we should abstract away the use of Js.Global timeout from this
 
 @ocaml.doc("

@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 type t<'key, 'value, 'id> = Belt.Map.t<'key, 'value, 'id>
@@ -398,7 +395,7 @@ module WithOrd = (M: ORD): (MAP with type key = M.t and type Comparable.t = M.t)
 
   module Comparable = Belt.Id.MakeComparable({
     type t = key
-    let cmp = (. a, b) => Relude_Ordering.toInt(M.compare(a, b))
+    let cmp = (a, b) => Relude_Ordering.toInt(M.compare(a, b))
   })
 
   type t<'value> = t<key, 'value, Comparable.identity>

@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @ocaml.doc("
 Extensions for any APPLY
 ")

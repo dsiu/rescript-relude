@@ -1,7 +1,4 @@
-@@uncurried
-@@uncurried.swap
-
-let listAppend = (value, list) => List.concat(list{list, list{value}})
+let listAppend = (value, list) => List.concat(list{value}, list)
 //let arrayAppend = (value, array) => Array.concat([array, [|value|]]);
 
 module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
@@ -71,7 +68,7 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
       // Create the lookup function which closes over the lookupList
       let lookup = a =>
         lookupList
-        ->Relude_List_Instances.find(((a', _)) => eqA(a', a), _)
+        ->(Relude_List_Instances.find(((a', _)) => eqA(a', a), _))
         ->(Relude_Option_Instances.map(snd, _))
 
       lookup(a)
@@ -127,7 +124,7 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
       let module(M) = module(
         Map.Make({
           type t = a
-          let compare = (. a, b) =>
+          let compare = (a, b) =>
             switch compareA(a, b) {
             | #equal_to => 0
             | #less_than => -1

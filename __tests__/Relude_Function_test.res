@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -73,9 +70,9 @@ describe("Function", () => {
 
   test("apply", () => {
     let showResult = (n, x: float) =>
-      "input " ++ (string_of_int(n) ++ (" yields " ++ Js.Float.toString(x)))
+      "input " ++ (Int.toString(n) ++ (" yields " ++ Js.Float.toString(x)))
 
-    let cube = x => float_of_int(x * x * x)
+    let cube = x => Float.fromInt(x * x * x)
 
     expect(Function.apply(x => showResult(x, ...), cube)(5))->toBe("input 5 yields 125")
   })
@@ -84,18 +81,18 @@ describe("Function", () => {
 
   test("bind", () => {
     let showResult = (x, n: int) =>
-      "input " ++ (string_of_int(n) ++ (" yields " ++ Js.Float.toString(x)))
+      "input " ++ (Int.toString(n) ++ (" yields " ++ Js.Float.toString(x)))
 
-    let cube = x => float_of_int(x * x * x)
+    let cube = x => Float.fromInt(x * x * x)
 
     expect(Function.bind(cube, x => showResult(x, ...))(5))->toBe("input 5 yields 125")
   })
 
   test("flatMap", () => {
     let showResult = (x, n: int) =>
-      "input " ++ (string_of_int(n) ++ (" yields " ++ Js.Float.toString(x)))
+      "input " ++ (Int.toString(n) ++ (" yields " ++ Js.Float.toString(x)))
 
-    let cube = x => float_of_int(x * x * x)
+    let cube = x => Float.fromInt(x * x * x)
 
     expect(Function.flatMap(showResult, cube)(5))->toBe("input 5 yields 125")
   })
@@ -104,7 +101,7 @@ describe("Function", () => {
     let calls = ref(0)
     let f = () => {
       calls := calls.contents + 1
-      string_of_int(calls.contents)
+      Int.toString(calls.contents)
     }
     let memoized = Function.memoize0(f)
     let result1 = memoized()
@@ -117,9 +114,9 @@ describe("Function", () => {
     let calls = ref(list{})
     let f = (i: int) => {
       calls := list{i, ...calls.contents}
-      string_of_int(i)
+      Int.toString(i)
     }
-    let memoized = Function.memoize1(~makeKey=string_of_int, f)
+    let memoized = Function.memoize1(~makeKey=Int.toString(_), f)
     let result1 = memoized(11)
     let result2 = memoized(11)
     let result3 = memoized(22)
@@ -195,7 +192,7 @@ describe("Function", () => {
   })
 
   test("wrap", () => {
-    let f = a => string_of_int(a * 10)
+    let f = a => Int.toString(a * 10)
     let before = a => a + 4
     let after = str => str ++ "!"
     let f = Function.wrap(~before, ~after, f, _)
@@ -214,7 +211,7 @@ describe("Function", () => {
   test("WithArgument", () => {
     open FunctionWithStringArgument.Infix
     let plus5 = a => a + 5
-    let times3 = a => a->int_of_string * 3
+    let times3 = a => a->(Int.fromString(_))->Relude.Option.getOrThrow * 3
     let actual = \"<$>"(plus5, times3)("10")
     expect(actual)->toBe(35)
   })

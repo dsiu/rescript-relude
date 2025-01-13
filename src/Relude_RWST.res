@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 module RWSResult = {

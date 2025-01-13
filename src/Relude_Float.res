@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -38,7 +35,7 @@ used for mathematical operations that do not result in a real number, such as
 Note that two [Float.nan] values are not equal to each other (and in fact,
 [Float.nan] is not equal to itself). To check for [nan], use [Float.isNaN].
 ")
-let nan: float = nan
+let nan: float = Float.Constants.nan
 
 @ocaml.doc("
 Positive infinity
@@ -79,13 +76,13 @@ let divide: (float, float) => float = \"/."
   Float.(pow(-2.0, (0.333333)) |> isNaN) == true;
 ]}
 ")
-let pow = (a, b) => a ** b
+let pow = (a, b) => Math.pow(a, ~exp=b)
 
 @ocaml.doc("
 [Float.sqrt] determines the square root of the given float. The square root of
 negative numbers is [nan].
 ")
-let sqrt = sqrt
+let sqrt = Math.sqrt
 
 @ocaml.doc("
 [Float.top] is the constant representing the maximum float value.
@@ -177,13 +174,13 @@ operation can lead to int overflows.
   Float.toInt(12345678901.0) == -539222987;
 ]}
 ")
-let toInt = int_of_float
+let toInt = Float.toInt
 
 @ocaml.doc("
 [Float.fromInt] converts an int (e.g. [1]) to its floating-point representation
 ([1.0]).
 ")
-let fromInt = float_of_int
+let fromInt = Float.fromInt
 
 @ocaml.doc("
 [Float.fractionalPart] returns only the decimal portion as a positive floating
@@ -205,7 +202,7 @@ let fractionalPart = v => {
 @ocaml.doc("
 [Float.floor] rounds a floating point number to the nearest lower whole number.
 ")
-let floor = floor
+let floor = Math.floor
 
 @ocaml.doc("
 [Float.floorAsInt] rounds a floating point number to the nearest lower integer.
@@ -215,7 +212,7 @@ let floorAsInt = v => toInt(floor(v))
 @ocaml.doc("
 [Float.ceil] rounds a floating point number to the nearest higher whole number.
 ")
-let ceil = ceil
+let ceil = Math.ceil
 
 @ocaml.doc("
 [Float.ceilAsInt] rounds a floating point number to the nearest higher integer.
@@ -242,7 +239,7 @@ requested number of decimals.
 ]}
 ")
 let toPrecision = (~decimals, num) => {
-  let pow = 10.0 ** fromInt(decimals)
+  let pow = Math.pow(10.0, ~exp=fromInt(decimals))
   let multiplied = num >= 0.0 ? floor(pow *. num) : ceil(pow *. num)
   multiplied /. pow
 }
@@ -282,10 +279,7 @@ if the input string is a valid floating point number or [None] otherwise.
   Float.fromString(\"3.4.5\") == None;
 ]}
 ")
-let fromString: string => option<float> = v =>
-  try Some(float_of_string(v)) catch {
-  | _ => None
-  }
+let fromString: string => option<float> = Float.fromString
 
 module Additive = {
   include BsBastet.Float.Additive

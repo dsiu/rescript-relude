@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 open Relude.Globals
@@ -119,12 +116,12 @@ describe("Relude_Free_Monad", () =>
 
         // Interpret the program using our state-monad-based interpreter.
         // Then run the resulting state monad.
-        let (results, _) =
-          StorageAPI.foldFree(StorageAPI.interpreter, program) |> StorageAPI.State.runStateT(
-            Belt.Map.String.empty,
-          )
+        let (results, _) = StorageAPI.State.runStateT(
+          Belt.Map.String.empty,
+          StorageAPI.foldFree(StorageAPI.interpreter, program),
+        )
 
-        expect(results) |> toEqual((Some(42), Some(5), Some(99)))
+        toEqual((Some(42), Some(5), Some(99)), expect(results))
       },
     )
   )

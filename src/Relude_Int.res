@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @ocaml.text(`
@@ -9,7 +6,7 @@ open BsBastet.Interface
 @ocaml.doc("
 [toFloat] returns the floating-point representation of the int
 ")
-let toFloat = float_of_int
+let toFloat = Float.fromInt
 
 @ocaml.doc("
 [fromFloat] turns a float into an int by dropping the fractional part.
@@ -17,7 +14,7 @@ let toFloat = float_of_int
 Floats that can't be represented as an int (e.g. [infinity], [nan]) will
 return 0.
 ")
-let fromFloat = int_of_float
+let fromFloat = Float.toInt
 
 @ocaml.doc("
 The integer value 0
@@ -62,7 +59,7 @@ let divideWithModulo: (int, int) => (int, int) = (a, b) => (divide(a, b), modulo
 @ocaml.doc("
 Converts two int values to floats, then performs a float division
 ")
-let divideAsFloat: (int, int) => float = (a, b) => float_of_int(a) /. float_of_int(b)
+let divideAsFloat: (int, int) => float = (a, b) => Float.fromInt(a) /. Float.fromInt(b)
 
 @ocaml.doc("
 The top bound (max value) of 32 bit int
@@ -214,7 +211,7 @@ function.
   Int.show(0x1a) == \"26\";
 ]}
 ")
-let show: int => string = string_of_int
+let show: int => string = Int.toString(_)
 
 @ocaml.doc("
 [Int.toString] is an alias for {!val:show}.
@@ -241,10 +238,7 @@ until it fails to parse. If any part of the provided string is not a valid
   Int.fromString(\"3dozen\") == None;
 ]}
 ")
-let fromString: string => option<int> = v =>
-  try Some(int_of_string(v)) catch {
-  | _ => None
-  }
+let fromString: string => option<int> = Int.fromString(_)
 
 module Additive = {
   include BsBastet.Int.Additive

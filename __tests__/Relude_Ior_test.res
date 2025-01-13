@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -253,8 +250,8 @@ describe("Ior", () => {
   )) => {
     let actual = Ior.fold(
       a => a * 10,
-      b => int_of_string(b) * 10,
-      (a, b) => a * 10 + int_of_string(b) * 10,
+      b => Int.fromString(b)->Relude.Option.getOrThrow * 10,
+      (a, b) => a * 10 + Int.fromString(b)->Relude.Option.getOrThrow * 10,
       input,
     )
     expect(actual)->toEqual(expected)
@@ -281,6 +278,7 @@ describe("Ior", () => {
     input,
     expected,
   )) => {
+    let int_of_string = s => s->Int.fromString->Relude.Option.getOrThrow
     let actual = Ior.mergeWith(int_of_string, int_of_string, (a, b) => a + b, input)
     expect(actual)->toEqual(expected)
   })
@@ -290,7 +288,7 @@ describe("Ior", () => {
       "map",
       () =>
         Ior.that(NonEmptyList.pure(That.Unknown))
-        ->IorT.map(a => a + 1, _)
+        ->(IorT.map(a => a + 1, _))
         ->expect
         ->toEqual(That(NonEmptyList.pure(That.Unknown))),
     )
@@ -299,7 +297,7 @@ describe("Ior", () => {
       "apply",
       () =>
         Ior.that(NonEmptyList.pure(That.Unknown))
-        ->IorT.apply(Ior.this(a => a + 1), _)
+        ->(IorT.apply(Ior.this(a => a + 1), _))
         ->expect
         ->toEqual(That(NonEmptyList.pure(That.Unknown))),
     )

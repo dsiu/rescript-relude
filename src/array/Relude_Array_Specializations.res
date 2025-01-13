@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -163,6 +160,7 @@ module Result = {
 @ocaml.doc("
 Array extensions for array(IO.t('a, 'e))
 ")
+/**
 module IO = {
   @ocaml.doc("
   Maps a function ['a => IO.t('b, 'e)] over an [array('a)] and produces a
@@ -190,7 +188,7 @@ module IO = {
     TraverseIO.sequence(xs)
   }
 }
-
+*/
 @ocaml.doc("
 Array extensions for [array(Validation.t('a, 'e))]
 ")

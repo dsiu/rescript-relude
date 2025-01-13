@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -464,7 +461,7 @@ describe("Array", () => {
   test("map", () => expect(Array.map(a => a + 2, [1, 2, 3]))->toEqual([3, 4, 5]))
 
   test("mapWithIndex", () =>
-    expect(Array.mapWithIndex((v, i) => v ++ string_of_int(i), ["a", "b", "c"]))->toEqual([
+    expect(Array.mapWithIndex((v, i) => v ++ Int.toString(i), ["a", "b", "c"]))->toEqual([
       "a0",
       "b1",
       "c2",
@@ -507,7 +504,7 @@ describe("Array", () => {
     expect(Array.String.joinWith(", ", ["a", "b", "c"]))->toEqual("a, b, c")
   )
 
-  test("showBy", () => expect(Array.showBy(string_of_int, [1, 2, 3]))->toEqual("[1, 2, 3]"))
+  test("showBy", () => expect(Array.showBy(Int.toString, [1, 2, 3]))->toEqual("[1, 2, 3]"))
 
   test("alt", () => expect(Array.Alt.alt(["a", "b"], ["c"]))->toEqual(["a", "b", "c"]))
 
@@ -544,7 +541,7 @@ describe("Array", () => {
   )
 
   test("chunk", () =>
-    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]->(Array.chunk(3, _)))->toEqual([
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]->Array.chunk(3, _))->toEqual([
       [1, 2, 3],
       [4, 5, 6],
       [7, 8, 9],

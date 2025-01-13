@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -23,7 +20,7 @@ let (\"<$>", \"<$$>", \">>=") = {
 describe("OptionT", () => {
   testAsync("make", onDone =>
     OptionIOE.make(IOE.pure(Some(2)))
-    ->OptionIOE.map(a => expect(a)->toEqual(2), _)
+    ->(OptionIOE.map(a => expect(a)->toEqual(2), _))
     ->OptionIOE.runOptionT
     ->(
       IO.unsafeRunAsync(
@@ -40,8 +37,8 @@ describe("OptionT", () => {
 
   testAsync("map", onDone =>
     OptionIOE.pure(2)
-    ->OptionIOE.map(a => a * 2, _)
-    ->OptionIOE.map(a => expect(a)->toEqual(4), _)
+    ->(OptionIOE.map(a => a * 2, _))
+    ->(OptionIOE.map(a => expect(a)->toEqual(4), _))
     ->OptionIOE.runOptionT
     ->(
       IO.unsafeRunAsync(
@@ -57,8 +54,8 @@ describe("OptionT", () => {
 
   testAsync("apply", onDone =>
     OptionIOE.pure(2)
-    ->OptionIOE.apply(OptionIOE.pure(a => a * 2), _)
-    ->OptionIOE.map(a => expect(a)->toEqual(4), _)
+    ->(OptionIOE.apply(OptionIOE.pure(a => a * 2), _))
+    ->(OptionIOE.map(a => expect(a)->toEqual(4), _))
     ->OptionIOE.runOptionT
     ->(
       IO.unsafeRunAsync(
@@ -89,8 +86,8 @@ describe("OptionT", () => {
 
   testAsync("bind", onDone =>
     OptionIOE.pure(2)
-    ->OptionIOE.flatMap(a => OptionIOE.pure(a * 2), _)
-    ->OptionIOE.map(a => expect(a)->toEqual(4), _)
+    ->(OptionIOE.flatMap(a => OptionIOE.pure(a * 2), _))
+    ->(OptionIOE.map(a => expect(a)->toEqual(4), _))
     ->OptionIOE.runOptionT
     ->(
       IO.unsafeRunAsync(

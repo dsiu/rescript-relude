@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -95,7 +92,7 @@ describe("Js.Promise", () => {
   testPromise("fromIO error", () =>
     Relude_IO.throw(42)
     ->Relude_Js_Promise.fromIO
-    ->Js.Promise.then_(_ => fail("fail")->Js.Promise.resolve, _)
+    ->(Js.Promise.then_(_ => fail("fail")->Js.Promise.resolve, _))
     ->(
       Js.Promise.catch(
         error => error->Relude_Unsafe.coerce->expect->toEqual(42)->Js.Promise.resolve,
@@ -113,7 +110,7 @@ describe("Js.Promise", () => {
   testPromise("fromIOExn error", () =>
     Relude_IO.suspendThrow(() => Relude_Js_Exn.make("exn")->Relude_Js_Exn.unsafeToExn)
     ->Relude_Js_Promise.fromIOExn
-    ->Js.Promise.then_(_ => fail("fail")->Js.Promise.resolve, _)
+    ->(Js.Promise.then_(_ => fail("fail")->Js.Promise.resolve, _))
     ->(
       Js.Promise.catch(
         error =>
@@ -136,7 +133,7 @@ describe("Js.Promise", () => {
   testPromise("fromIOJsExn error", () =>
     Relude_IO.suspendThrow(() => Relude_Js_Exn.make("js_exn"))
     ->Relude_Js_Promise.fromIOJsExn
-    ->Js.Promise.then_(_ => fail("fail")->Js.Promise.resolve, _)
+    ->(Js.Promise.then_(_ => fail("fail")->Js.Promise.resolve, _))
     ->(
       Js.Promise.catch(
         error =>

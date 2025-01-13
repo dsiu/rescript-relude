@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -200,7 +197,7 @@ module BoundedEnum: Relude_Interface.BOUNDED_ENUM with type t = bool = {
     | _ => None
     }
 }
-include Relude_Extensions_BoundedEnum.BoundedEnumExtensions(BoundedEnum)
+//include Relude_Extensions_BoundedEnum.BoundedEnumExtensions(BoundedEnum)
 
 module Infix = {
   include Relude_Extensions_Eq.EqInfix(Eq)

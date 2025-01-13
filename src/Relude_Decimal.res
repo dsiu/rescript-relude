@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @@ocaml.text(`
 [Relude.Decimal] contains a type [t] which represents arbitrary precision
 numeric values, backed by an [int] mantissa and an [int] exponent. This can be
@@ -67,17 +64,17 @@ let // let fromString: string => option(t) = _ => None; // TODO
 
 show: t => string = (Decimal(mantissa, exponent)) =>
   if exponent == 0 {
-    string_of_int(mantissa)
+    Int.toString(mantissa)
   } else if exponent > 0 {
     if mantissa == 0 {
       "0"
     } else {
       let zeroes = Relude_String.repeat(exponent, "0")
-      string_of_int(mantissa) ++ zeroes
+      Int.toString(mantissa) ++ zeroes
     }
   } else {
     /* mantissa < 0 */
-    let (whole, fractional) = Relude_String.splitAt(exponent, string_of_int(mantissa))
+    let (whole, fractional) = Relude_String.splitAt(exponent, Int.toString(mantissa))
     whole ++ ("." ++ fractional)
   }
 
@@ -96,7 +93,7 @@ The return value of this function is undefined for exponent values < 0.
 let // let round: (rounding, t) => t = (_rounding, decimal) => decimal; // TODO
 
 tenToThePowerOfPositive: int => int = exponent =>
-  Relude_Int.rangeAsArray(1, exponent + 1)->(Relude_Array.foldLeft((acc, _) => 10 * acc, 1, _))
+  Relude_Int.rangeAsArray(1, exponent + 1)->Relude_Array.foldLeft((acc, _) => 10 * acc, 1, _)
 
 @ocaml.doc("
 [Decimal.normalize] normalizes the exponent to the minimal exponent for two

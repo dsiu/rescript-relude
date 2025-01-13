@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -163,6 +160,7 @@ module Result = {
 @ocaml.doc("
 List extensions for [IO.t('a, 'e)]
 ")
+/**
 module IO = {
   let traverse = (type e, f: 'a => Relude_IO.t<'b, e>, list: list<'a>): Relude_IO.t<
     list<'b>,
@@ -183,7 +181,7 @@ module IO = {
     TraverseIO.sequence(xs)
   }
 }
-
+*/
 @ocaml.doc("
 List extensions for [Validation.t('a, 'e)]
 ")

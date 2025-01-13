@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -25,11 +22,11 @@ describe("WriterT", () =>
       WriterList.pure(42),
       a =>
         \">>="(
-          \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a * 2),
+          \"$>"(Writer.tell(list{"a = " ++ Int.toString(a)}), a * 2),
           a =>
             \">>="(
-              \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a + 5),
-              a => \"$>"(Writer.tell(list{"a = " ++ string_of_int(a)}), a),
+              \"$>"(Writer.tell(list{"a = " ++ Int.toString(a)}), a + 5),
+              a => \"$>"(Writer.tell(list{"a = " ++ Int.toString(a)}), a),
             ),
         ),
     )

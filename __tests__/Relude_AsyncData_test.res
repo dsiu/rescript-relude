@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -162,56 +159,56 @@ describe("AsyncData", () => {
   test("tap Init", () => {
     let count = ref(0)
     let f = () => count := count.contents + 1
-    AsyncData.init->AsyncData.tap(f, () => (), _ => (), _ => (), _)->ignore
+    AsyncData.init->(AsyncData.tap(f, () => (), _ => (), _ => (), _))->ignore
     expect(count.contents)->toEqual(1)
   })
 
   test("tap Loading", () => {
     let count = ref(0)
     let f = () => count := count.contents + 1
-    AsyncData.loading->AsyncData.tap(() => (), f, _ => (), _ => (), _)->ignore
+    AsyncData.loading->(AsyncData.tap(() => (), f, _ => (), _ => (), _))->ignore
     expect(count.contents)->toEqual(1)
   })
 
   test("tap Reloading", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncData.reloading(42)->AsyncData.tap(() => (), () => (), f, _ => (), _)->ignore
+    AsyncData.reloading(42)->(AsyncData.tap(() => (), () => (), f, _ => (), _))->ignore
     expect(count.contents)->toEqual(43)
   })
 
   test("tap Complete", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncData.complete(42)->AsyncData.tap(() => (), () => (), _ => (), f, _)->ignore
+    AsyncData.complete(42)->(AsyncData.tap(() => (), () => (), _ => (), f, _))->ignore
     expect(count.contents)->toEqual(43)
   })
 
   test("tapInit", () => {
     let count = ref(0)
     let f = () => count := count.contents + 1
-    AsyncData.init->AsyncData.tapInit(f, _)->ignore
+    AsyncData.init->(AsyncData.tapInit(f, _))->ignore
     expect(count.contents)->toEqual(1)
   })
 
   test("tapLoading", () => {
     let count = ref(0)
     let f = () => count := count.contents + 1
-    AsyncData.loading->AsyncData.tapLoading(f, _)->ignore
+    AsyncData.loading->(AsyncData.tapLoading(f, _))->ignore
     expect(count.contents)->toEqual(1)
   })
 
   test("tapReloading", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncData.reloading(42)->AsyncData.tapReloading(f, _)->ignore
+    AsyncData.reloading(42)->(AsyncData.tapReloading(f, _))->ignore
     expect(count.contents)->toEqual(43)
   })
 
   test("tapComplete", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncData.complete(42)->AsyncData.tapComplete(f, _)->ignore
+    AsyncData.complete(42)->(AsyncData.tapComplete(f, _))->ignore
     expect(count.contents)->toEqual(43)
   })
 

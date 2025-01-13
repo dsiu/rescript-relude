@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 type t<'value, 'id> = Belt.Set.t<'value, 'id>
 
 @ocaml.doc("
@@ -190,7 +187,7 @@ TODO: optimize foldRight for sets. This remains unimplemented in [Belt]'s API,
 but it exists in PureScript/Haskell, since [Set] implements [Foldable].
 ")
 let foldRight: (('b, 'a) => 'a, 'a, t<'b, 'id>) => 'a = (fn, acc, set) =>
-  Array.fold_right(fn, Belt.Set.toArray(set), acc)
+  Array.reduceRight(Belt.Set.toArray(set), acc, (a, b) => fn(b, a))
 
 @ocaml.doc("
 Determine whether a given predicate holds true for all values in a given set.
@@ -340,7 +337,7 @@ module WithOrd = (M: BsBastet.Interface.ORD): (
 
   module Comparable = Belt.Id.MakeComparable({
     type t = value
-    let cmp = (. a, b) => Relude_Ordering.toInt(M.compare(a, b))
+    let cmp = (a, b) => Relude_Ordering.toInt(M.compare(a, b))
   })
 
   type t = t<value, Comparable.identity>

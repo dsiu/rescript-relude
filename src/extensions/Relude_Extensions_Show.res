@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 module ShowExtensions = (S: BsBastet.Interface.SHOW) => {
   let logShow: S.t => unit = a => Js.log(S.show(a))
 

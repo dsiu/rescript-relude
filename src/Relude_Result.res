@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -692,7 +689,7 @@ let mapHandleError: 'a 'e 'b. ('a => 'b, 'e => 'b, t<'a, 'e>) => t<'b, Relude_Vo
   aToB,
   eToB,
   ioAE,
-) => ioAE->map(aToB, _)->(handleError(eToB, _))
+) => ioAE->(map(aToB, _))->(handleError(eToB, _))
 
 @ocaml.doc("
 [Result.recover] ensures that the returned result is [Ok] by returning the

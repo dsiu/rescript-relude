@@ -1,8 +1,7 @@
 {
   "name": "relude",
   "bsc-flags": [
-    "-bs-no-version-header",
-    "-bs-super-errors"
+    "-bs-no-version-header"
   ],
   "version": "0.1.0",
   "sources": [
@@ -25,13 +24,13 @@
     "bs-bastet"
   ],
   "bs-dev-dependencies": [
-    "@glennsl/rescript-jest",
+    "@glennsl/rescript-jest"
   ],
   "warnings": {
     "number": "+A-4-29-40-42-60",
-    "error": "+A"
+    "error": "+A-3"
   },
-  "namespace": false,
+  "namespace": true,
   "refmt": 3,
   "ppx-flags": [
 

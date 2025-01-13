@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -376,126 +373,126 @@ describe("AsyncResult", () => {
   test("tapByValue init", () => {
     let count = ref(0)
     let f = () => count := count.contents + 1
-    AsyncResult.init->AsyncResult.tapByValue(f, _ => (), _)->ignore
+    AsyncResult.init->(AsyncResult.tapByValue(f, _ => (), _))->ignore
     expect(count.contents)->toEqual(1)
   })
 
   test("tapByValue loading", () => {
     let count = ref(0)
     let f = () => count := count.contents + 1
-    AsyncResult.loading->AsyncResult.tapByValue(f, _ => (), _)->ignore
+    AsyncResult.loading->(AsyncResult.tapByValue(f, _ => (), _))->ignore
     expect(count.contents)->toEqual(1)
   })
 
   test("tapByValue reloadingOk", () => {
     let count = ref(0)
     let f = a => count := count.contents + a->Result.getOk->(Option.getOrElse(-1, _)) + 1
-    AsyncResult.reloadingOk(10)->AsyncResult.tapByValue(() => (), f, _)->ignore
+    AsyncResult.reloadingOk(10)->(AsyncResult.tapByValue(() => (), f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapByValue reloadingError", () => {
     let count = ref(0)
     let f = a => count := count.contents + a->Result.getError->(Option.getOrElse(-1, _)) + 1
-    AsyncResult.reloadingError(10)->AsyncResult.tapByValue(() => (), f, _)->ignore
+    AsyncResult.reloadingError(10)->(AsyncResult.tapByValue(() => (), f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapByValue completeOk", () => {
     let count = ref(0)
     let f = a => count := count.contents + a->Result.getOk->(Option.getOrElse(-1, _)) + 1
-    AsyncResult.completeOk(10)->AsyncResult.tapByValue(() => (), f, _)->ignore
+    AsyncResult.completeOk(10)->(AsyncResult.tapByValue(() => (), f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapByValue completeError", () => {
     let count = ref(0)
     let f = a => count := count.contents + a->Result.getError->(Option.getOrElse(-1, _)) + 1
-    AsyncResult.completeError(10)->AsyncResult.tapByValue(() => (), f, _)->ignore
+    AsyncResult.completeError(10)->(AsyncResult.tapByValue(() => (), f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapOk init", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.init->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.init->(AsyncResult.tapOk(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapOk loading", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.loading->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.loading->(AsyncResult.tapOk(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapOk reloadingOk", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.reloadingOk(10)->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.reloadingOk(10)->(AsyncResult.tapOk(f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapOk reloadingError", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.reloadingError(10)->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.reloadingError(10)->(AsyncResult.tapOk(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapOk completeOk", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.completeOk(10)->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.completeOk(10)->(AsyncResult.tapOk(f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapOk completeError", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.completeError(10)->AsyncResult.tapOk(f, _)->ignore
+    AsyncResult.completeError(10)->(AsyncResult.tapOk(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapError init", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.init->AsyncResult.tapError(f, _)->ignore
+    AsyncResult.init->(AsyncResult.tapError(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapError loading", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.loading->AsyncResult.tapError(f, _)->ignore
+    AsyncResult.loading->(AsyncResult.tapError(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapError reloadingOk", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.reloadingOk(10)->AsyncResult.tapError(f, _)->ignore
+    AsyncResult.reloadingOk(10)->(AsyncResult.tapError(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapError reloadingError", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.reloadingError(10)->AsyncResult.tapError(f, _)->ignore
+    AsyncResult.reloadingError(10)->(AsyncResult.tapError(f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
   test("tapError completeOk", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.completeOk(10)->AsyncResult.tapError(f, _)->ignore
+    AsyncResult.completeOk(10)->(AsyncResult.tapError(f, _))->ignore
     expect(count.contents)->toEqual(0)
   })
 
   test("tapError completeError", () => {
     let count = ref(0)
     let f = a => count := count.contents + a + 1
-    AsyncResult.completeError(10)->AsyncResult.tapError(f, _)->ignore
+    AsyncResult.completeError(10)->(AsyncResult.tapError(f, _))->ignore
     expect(count.contents)->toEqual(11)
   })
 
@@ -751,42 +748,42 @@ describe("AsyncResult", () => {
 
   test("flatMap Init", () =>
     AsyncResult.init
-    ->AsyncResult.flatMap(a => AsyncResult.reloadingOk(a), _)
+    ->(AsyncResult.flatMap(a => AsyncResult.reloadingOk(a), _))
     ->expect
     ->toEqual(AsyncResult.init)
   )
 
   test("flatMap Loading", () =>
     AsyncResult.loading
-    ->AsyncResult.flatMap(a => AsyncResult.reloadingOk(a), _)
+    ->(AsyncResult.flatMap(a => AsyncResult.reloadingOk(a), _))
     ->expect
     ->toEqual(AsyncResult.loading)
   )
 
   test("flatMap Reloading Ok", () =>
     AsyncResult.reloadingOk(1)
-    ->AsyncResult.flatMap(a => AsyncResult.reloadingError(a + 1), _)
+    ->(AsyncResult.flatMap(a => AsyncResult.reloadingError(a + 1), _))
     ->expect
     ->toEqual(AsyncResult.reloadingError(2))
   )
 
   test("flatMap Reloading Error", () =>
     AsyncResult.reloadingError(1)
-    ->AsyncResult.flatMap(a => AsyncResult.reloadingOk(a + 1), _)
+    ->(AsyncResult.flatMap(a => AsyncResult.reloadingOk(a + 1), _))
     ->expect
     ->toEqual(AsyncResult.reloadingError(1))
   )
 
   test("flatMap Complete Ok", () =>
     AsyncResult.completeOk(1)
-    ->AsyncResult.flatMap(a => AsyncResult.completeError(a + 1), _)
+    ->(AsyncResult.flatMap(a => AsyncResult.completeError(a + 1), _))
     ->expect
     ->toEqual(AsyncResult.completeError(2))
   )
 
   test("flatMap Complete Error", () =>
     AsyncResult.completeError(1)
-    ->AsyncResult.flatMap(a => AsyncResult.completeOk(a + 1), _)
+    ->(AsyncResult.flatMap(a => AsyncResult.completeOk(a + 1), _))
     ->expect
     ->toEqual(AsyncResult.completeError(1))
   )
@@ -829,240 +826,240 @@ describe("AsyncResult", () => {
 
   test("fold Init", () =>
     AsyncResult.init
-    ->AsyncResult.fold(
+    ->(AsyncResult.fold(
       1,
       2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(1)
   )
 
   test("fold Loading", () =>
     AsyncResult.loading
-    ->AsyncResult.fold(
+    ->(AsyncResult.fold(
       1,
       2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(2)
   )
 
   test("fold Reloading Ok", () =>
     AsyncResult.reloadingOk(10)
-    ->AsyncResult.fold(
+    ->(AsyncResult.fold(
       1,
       2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(13)
   )
 
   test("fold Reloading Error", () =>
     AsyncResult.reloadingError(10)
-    ->AsyncResult.fold(
+    ->(AsyncResult.fold(
       1,
       2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(3)
   )
 
   test("fold Complete Ok", () =>
     AsyncResult.completeOk(10)
-    ->AsyncResult.fold(
+    ->(AsyncResult.fold(
       1,
       2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(14)
   )
 
   test("fold Complete Error", () =>
     AsyncResult.completeError(10)
-    ->AsyncResult.fold(
+    ->(AsyncResult.fold(
       1,
       2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(4)
   )
 
   test("foldLazy Init", () =>
     AsyncResult.init
-    ->AsyncResult.foldLazy(
+    ->(AsyncResult.foldLazy(
       () => 1,
       () => 2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(1)
   )
 
   test("foldLazy Loading", () =>
     AsyncResult.loading
-    ->AsyncResult.foldLazy(
+    ->(AsyncResult.foldLazy(
       () => 1,
       () => 2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(2)
   )
 
   test("foldLazy Reloading Ok", () =>
     AsyncResult.reloadingOk(10)
-    ->AsyncResult.foldLazy(
+    ->(AsyncResult.foldLazy(
       () => 1,
       () => 2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(13)
   )
 
   test("foldLazy Reloading Error", () =>
     AsyncResult.reloadingError(10)
-    ->AsyncResult.foldLazy(
+    ->(AsyncResult.foldLazy(
       () => 1,
       () => 2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(3)
   )
 
   test("foldLazy Complete Ok", () =>
     AsyncResult.completeOk(10)
-    ->AsyncResult.foldLazy(
+    ->(AsyncResult.foldLazy(
       () => 1,
       () => 2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(14)
   )
 
   test("foldLazy Complete Error", () =>
     AsyncResult.completeError(10)
-    ->AsyncResult.foldLazy(
+    ->(AsyncResult.foldLazy(
       () => 1,
       () => 2,
       r => r->(Result.getOrElse(0, _)) + 3,
       r => r->(Result.getOrElse(0, _)) + 4,
       _,
-    )
+    ))
     ->expect
     ->toEqual(4)
   )
 
   test("foldByValue Init", () =>
     AsyncResult.init
-    ->AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(1)
   )
 
   test("foldByValue Loading", () =>
     AsyncResult.loading
-    ->AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(1)
   )
 
   test("foldByValue Reloading Ok", () =>
     AsyncResult.reloadingOk(10)
-    ->AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(12)
   )
 
   test("foldByValue Reloading Error", () =>
     AsyncResult.reloadingError(10)
-    ->AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(13)
   )
 
   test("foldByValue Complete Ok", () =>
     AsyncResult.completeOk(10)
-    ->AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(12)
   )
 
   test("foldByValue Complete Error", () =>
     AsyncResult.completeError(10)
-    ->AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValue(1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(13)
   )
 
   test("foldByValueLazy Init", () =>
     AsyncResult.init
-    ->AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(1)
   )
 
   test("foldByValueLazy Loading", () =>
     AsyncResult.loading
-    ->AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(1)
   )
 
   test("foldByValueLazy Reloading Ok", () =>
     AsyncResult.reloadingOk(10)
-    ->AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(12)
   )
 
   test("foldByValueLazy Reloading Error", () =>
     AsyncResult.reloadingError(10)
-    ->AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(13)
   )
 
   test("foldByValueLazy Complete Ok", () =>
     AsyncResult.completeOk(10)
-    ->AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(12)
   )
 
   test("foldByValueLazy Complete Error", () =>
     AsyncResult.completeError(10)
-    ->AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _)
+    ->(AsyncResult.foldByValueLazy(() => 1, ok => ok + 2, error => error + 3, _))
     ->expect
     ->toEqual(13)
   )

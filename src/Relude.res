@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @@ocaml.text(`
 {b Relude} is an alternative standard library (a "prelude") written in Reason
 and compiled with the Melange compiler. It builds on the category theory
@@ -39,7 +36,7 @@ module Void = Relude_Void
 module Array = Relude_Array
 module ArrayZipper = Relude_ArrayZipper
 module HList = Relude_HList
-module HMap = Relude_HMap
+//module HMap = Relude_HMap
 module List = Relude_List
 
 module ListZipper = Relude_ListZipper
@@ -62,7 +59,7 @@ module AsyncResult = Relude_AsyncResult
 module Cont = Relude_ContT.Cont
 module ContT = Relude_ContT
 //module Free = Relude_Free
-module IO = Relude_IO
+//module IO = Relude_IO
 module Ior = Relude_Ior
 module Option = Relude_Option
 module OptionT = Relude_OptionT
@@ -70,7 +67,7 @@ module Reader = Relude_ReaderT.Reader
 module ReaderT = Relude_ReaderT
 module Result = Relude_Result
 module ResultT = Relude_ResultT
-module RIO = Relude_RIO
+//module RIO = Relude_RIO
 module RWST = Relude_RWST
 module State = Relude_StateT.State
 module StateT = Relude_StateT

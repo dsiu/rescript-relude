@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -234,13 +231,13 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
       tail
       ->TailSequence.reverse
       ->TailSequence.uncons
-      ->Relude_Option_Instances.map(
+      ->(Relude_Option_Instances.map(
         ((tailReversedHead, tailReversedTail)) => NonEmpty(
           tailReversedHead,
           tailReversedTail->(TailSequence.append(head, _)),
         ),
         _,
-      )
+      ))
       ->(Relude_Option_Base.getOrElseLazy(() => pure(head), _))
     }
 

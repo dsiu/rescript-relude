@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @@ocaml.text(`
 This module is intended to be used as a global open (e.g. [open
 Relude.Globals;]) to bring the most core/common Relude modules, types, and
@@ -44,9 +41,9 @@ module Eq = Relude_Eq
 module Float = Relude_Float
 //module Free = Relude_Free
 module HList = Relude_HList
-module HMap = Relude_HMap
+//module HMap = Relude_HMap
 module Int = Relude_Int
-module IO = Relude_IO
+//module IO = Relude_IO
 module Ior = Relude_Ior
 module List = Relude_List
 module ListZipper = Relude_ListZipper
@@ -60,7 +57,7 @@ module Option = Relude_Option
 module OptionT = Relude_OptionT
 module Ord = Relude_Ord
 module Ordering = Relude_Ordering
-module RIO = Relude_RIO
+//module RIO = Relude_RIO
 module RJs = Relude_Js
 module ReaderT = Relude_ReaderT
 module Result = Relude_Result

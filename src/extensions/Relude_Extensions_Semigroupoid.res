@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 module SemigroupoidExtensions = (S: BsBastet.Interface.SEMIGROUPOID) => {
   let andThen = (aToB, bToC) => S.compose(bToC, aToB)
 }

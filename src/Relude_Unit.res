@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 type t = unit
@@ -54,4 +51,4 @@ module BoundedEnum: Relude_Interface.BOUNDED_ENUM with type t = unit = {
     }
   let fromEnum = () => 0
 }
-include Relude_Extensions_BoundedEnum.BoundedEnumExtensions(BoundedEnum)
+//include Relude_Extensions_BoundedEnum.BoundedEnumExtensions(BoundedEnum)

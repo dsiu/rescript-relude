@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -168,7 +165,7 @@ let stringToIntCB: (
   Result.t<int, Error.t> => IO.t<unit, Error.t>,
 ) => IO.t<unit, Error.t> = (str, onDone) =>
   Relude.Int.fromString(str)
-  ->Relude.Option.fold(IO.throw(Error.Error("Failed")), i => IO.pure(i), _)
+  ->(Relude.Option.fold(IO.throw(Error.Error("Failed")), i => IO.pure(i), _))
   ->(IO.flatMap(i => onDone(Ok(i)), _))
 
 @ocaml.doc("
@@ -199,14 +196,14 @@ describe("ContT IO", () => {
   testAsync("map", onDone =>
     stringToIntCont("42")
     ->\"<$$>"(res => res->(Result.map(a => a * 2, _)))
-    ->ContIO.runContT(
+    ->(ContIO.runContT(
       x =>
         switch x {
         | Ok(i) => assertIntIO(84, i, onDone)
         | Error(_) => failIO(onDone)
         },
       _,
-    )
+    ))
     ->(
       IO.unsafeRunAsync(
         x =>
@@ -229,14 +226,14 @@ describe("ContT IO", () => {
       stringToIntCont("42"),
       stringToIntCont("43"),
     )
-    ->ContIO.runContT(
+    ->(ContIO.runContT(
       x =>
         switch x {
         | Ok(a) => assertIntIO(85, a, onDone)
         | Error(_) => failIO(onDone)
         },
       _,
-    )
+    ))
     ->(
       IO.unsafeRunAsync(
         x =>

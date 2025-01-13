@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -8,7 +5,7 @@ module Int = Relude.Int
 module Option = Relude.Option
 
 describe("Option", () => {
-  test("some", () => expect(Option.some("foo"))->toEqual(Some("foo")))
+  test("some", () => expect(Relude.Option.some("foo"))->toEqual(Some("foo")))
 
   test("orElse (primary is none)", () =>
     expect(None->Option.orElse(~fallback=Some(1)))->toEqual(Some(1))
@@ -67,19 +64,19 @@ describe("Option", () => {
   })
 
   test("foldLazy maps value when option is Some", () =>
-    expect(Option.foldLazy(_ => "", string_of_int, Some(1)))->toEqual("1")
+    expect(Option.foldLazy(_ => "", Int.toString, Some(1)))->toEqual("1")
   )
 
   test("foldLazy uses default when option is None", () =>
-    expect(Option.foldLazy(_ => "", string_of_int, None))->toEqual("")
+    expect(Option.foldLazy(_ => "", Int.toString, None))->toEqual("")
   )
 
   test("fold maps value when option is Some", () =>
-    expect(Option.fold("", string_of_int, Some(1)))->toEqual("1")
+    expect(Option.fold("", Int.toString, Some(1)))->toEqual("1")
   )
 
   test("fold uses default when option is None", () =>
-    expect(Option.fold("", string_of_int, None))->toEqual("")
+    expect(Option.fold("", Int.toString, None))->toEqual("")
   )
 
   test("getOrElseLazy extracts value when option is Some", () =>
@@ -145,8 +142,8 @@ describe("Option", () => {
       let f = x =>
         switch x {
         | Relude_Ior_Type.This(a) => a
-        | Relude_Ior_Type.That(b) => int_of_string(b)
-        | Relude_Ior_Type.Both(a, b) => a + int_of_string(b)
+        | Relude_Ior_Type.That(b) => Int.fromString(b)->Option.getOrThrow
+        | Relude_Ior_Type.Both(a, b) => a + Int.fromString(b)->Option.getOrThrow
         }
       expect(Option.alignWith(f, fa, fb))->toEqual(expected)
     },
@@ -201,25 +198,26 @@ describe("Option", () => {
   )
 
   test("mapTuple2", () =>
-    expect((Some(1), Some(2))->(Option.mapTuple2((a, b) => a + b, _)))->toEqual(Some(3))
+    expect((Some(1), Some(2))->Option.mapTuple2((a, b) => a + b, _))->toEqual(Some(3))
   )
 
   test("mapTuple3", () =>
-    expect((Some(1), Some(2), Some(3))->(Option.mapTuple3((a, b, c) => a + b + c, _)))->toEqual(
+    expect((Some(1), Some(2), Some(3))->Option.mapTuple3((a, b, c) => a + b + c, _))->toEqual(
       Some(6),
     )
   )
 
   test("mapTuple4", () =>
     expect(
-      (Some(1), Some(2), Some(3), Some(4))->(Option.mapTuple4((a, b, c, d) => a + b + c + d, _)),
+      (Some(1), Some(2), Some(3), Some(4))->Option.mapTuple4((a, b, c, d) => a + b + c + d, _),
     )->toEqual(Some(10))
   )
 
   test("mapTuple5", () =>
     expect(
-      (Some(1), Some(2), Some(3), Some(4), Some(5))->(
-        Option.mapTuple5((a, b, c, d, e) => a + b + c + d + e, _)
+      (Some(1), Some(2), Some(3), Some(4), Some(5))->Option.mapTuple5(
+        (a, b, c, d, e) => a + b + c + d + e,
+        _,
       ),
     )->toEqual(Some(15))
   )

@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 type t = string
@@ -249,7 +246,7 @@ range of the size of the string (too high or negative), [None] is returned.
 ")
 let charCodeAt: (int, string) => option<int> = (i, str) => {
   let code = Js.String.charCodeAt(i, str)
-  Relude_Float.isNaN(code) ? None : Some(int_of_float(code))
+  Relude_Float.isNaN(code) ? None : Some(Float.toInt(code))
 }
 
 @ocaml.doc("
@@ -324,7 +321,7 @@ let charAtOrThrow: (int, string) => string = (i, str) =>
   switch charAt(i, str) {
   | None =>
     Js.Exn.raiseRangeError(
-      "Failed to get string at index " ++ (string_of_int(i) ++ (" for string: " ++ str)),
+      "Failed to get string at index " ++ (Int.toString(i) ++ (" for string: " ++ str)),
     )
   | Some(v) => v
   }
@@ -621,7 +618,7 @@ returning a new string.
 ]}
 ")
 let mapChars: (string => string, string) => string = (f, str) =>
-  toList(str)->(Relude_List_Instances.foldMap(module(Monoid), f, _))
+  toList(str)->Relude_List_Instances.foldMap(module(Monoid), f, _)
 
 @ocaml.doc("
 Pads the string to [targetLength] using [padWith] as a repeated padding on the
@@ -643,7 +640,7 @@ let padStart: (~targetLength: int, ~padWith: string=?, string) => string = (
   } else {
     let padLength = targetLength - inputLength
     let padTimes = padLength / padWithLength + 1 // Add one so we get one extra, which we'll truncate
-    let pad = repeat(padTimes, padWith)->(slice(0, padLength, _))
+    let pad = repeat(padTimes, padWith)->slice(0, padLength, _)
     pad ++ input
   }
 }
@@ -668,7 +665,7 @@ let padEnd: (~targetLength: int, ~padWith: string=?, string) => string = (
   } else {
     let padLength = targetLength - inputLength
     let padTimes = padLength / padWithLength + 1 // Add one so we get one extra, which we'll truncate
-    let pad = repeat(padTimes, padWith)->(slice(0, padLength, _))
+    let pad = repeat(padTimes, padWith)->slice(0, padLength, _)
     input ++ pad
   }
 }
@@ -695,7 +692,7 @@ let replaceFirst = (~search: string, ~replaceWith: string, input: string): strin
 ]}
 ")
 let replaceEach = (~search: string, ~replaceWith: string, input: string): string =>
-  splitList(~delimiter=search, input)->(String.concat(replaceWith, _))
+  splitList(~delimiter=search, input)->List.toArray->Array.join(_, replaceWith)
 
 @ocaml.doc("
 [replaceRegex(targetRe, newValue, str)] replaces the matched regular expression
@@ -743,7 +740,7 @@ let removeEach = (~search: string, input: string): string =>
 [fromInt(n)] returns [n] as a string. This function is a synonym for the
 built-in [string_of_int()].
 ")
-let fromInt: int => string = string_of_int
+let fromInt: int => string = Int.toString(_)
 
 @ocaml.doc("
 [toInt(str)] returns [Some(n)] if [str] is a valid string representation of the
@@ -756,10 +753,7 @@ integer [n]. Otherwise, the return value is [None].
   toInt(\"\") == None;
 ]}
 ")
-let toInt: string => option<int> = v =>
-  try Some(int_of_string(v)) catch {
-  | _ => None
-  }
+let toInt: string => option<int> = Int.fromString(_)
 
 @ocaml.doc("
 [fromFloat(x)] converts the value to a string representation. Note that, as in
@@ -786,7 +780,4 @@ the float value [x]. Otherwise, the return value is [None].
   toFloat(\"\") == None;
 ]}
 ")
-let toFloat: string => option<float> = v =>
-  try Some(float_of_string(v)) catch {
-  | _ => None
-  }
+let toFloat: string => option<float> = v => Float.fromString(v)

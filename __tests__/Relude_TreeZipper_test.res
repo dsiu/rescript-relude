@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 open! Relude.Globals
@@ -111,7 +108,10 @@ describe("TreeZipper", () => {
 
   test("getAncestors", () => {
     let actual =
-      testTree1->TreeZipper.fromTree->moveDownTimes(3, _)->(Option.map(TreeZipper.getAncestors, _))
+      testTree1
+      ->TreeZipper.fromTree
+      ->(moveDownTimes(3, _))
+      ->Option.map(TreeZipper.getAncestors, _)
     let expected = Some(list{
       (list{}, 21, list{Tree.pure(22), Tree.pure(23)}),
       (list{}, 2, list{Tree.make(3, list{Tree.make(31, list{Tree.pure(311)})}), Tree.pure(4)}),
@@ -122,14 +122,17 @@ describe("TreeZipper", () => {
 
   test("getFocusValue", () => {
     let actual =
-      testTree1->TreeZipper.fromTree->moveDownTimes(3, _)->(Option.map(TreeZipper.getFocusValue, _))
+      testTree1
+      ->TreeZipper.fromTree
+      ->(moveDownTimes(3, _))
+      ->Option.map(TreeZipper.getFocusValue, _)
     let expected = Some(211)
     expect(actual)->toEqual(expected)
   })
 
   test("tapFocusValue", () => {
     let r = ref(None)
-    testTree1->TreeZipper.fromTree->TreeZipper.tapFocusValue(a => r := Some(a), _)->ignore
+    testTree1->TreeZipper.fromTree->(TreeZipper.tapFocusValue(a => r := Some(a), _))->ignore
     let actual = r.contents
     let expected = Some(1)
     expect(actual)->toEqual(expected)
@@ -137,7 +140,7 @@ describe("TreeZipper", () => {
 
   test("setFocusValue", () => {
     let actual =
-      testTree1->TreeZipper.fromTree->moveDownTimes(3, _)->(Option.map(setFocusValue(42, _), _))
+      testTree1->TreeZipper.fromTree->(moveDownTimes(3, _))->Option.map(setFocusValue(42, _), _)
     let expected = Some({
       ancestors: list{
         (list{}, 21, list{Tree.pure(22), Tree.pure(23)}),
@@ -156,8 +159,8 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->moveDownTimes(3, _)
-      ->(Option.map(modifyFocusValue(a => a + 42, _), _))
+      ->(moveDownTimes(3, _))
+      ->Option.map(modifyFocusValue(a => a + 42, _), _)
     let expected = Some({
       ancestors: list{
         (list{}, 21, list{Tree.pure(22), Tree.pure(23)}),
@@ -177,8 +180,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->moveDown
-      ->Option.flatMap(moveRight, _)
-      ->(Option.map(TreeZipper.getFocusTree, _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.map(TreeZipper.getFocusTree, _)
     let expected: option<Tree.t<int>> = Some({
       value: 3,
       children: list{Tree.make(31, list{Tree.pure(311)})},
@@ -191,8 +194,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRightTimes(2, _), _)
-      ->(Option.map(TreeZipper.getLeftSiblings, _))
+      ->(Option.flatMap(TreeZipper.moveRightTimes(2, _), _))
+      ->Option.map(TreeZipper.getLeftSiblings, _)
     let expected = Some(list{
       Tree.make(3, list{Tree.make(31, list{Tree.pure(311)})}),
       Tree.make(
@@ -208,8 +211,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRightTimes(2, _), _)
-      ->(Option.map(TreeZipper.getLeftSiblingsInOrder, _))
+      ->(Option.flatMap(TreeZipper.moveRightTimes(2, _), _))
+      ->Option.map(TreeZipper.getLeftSiblingsInOrder, _)
     let expected = Some(list{
       Tree.make(
         2,
@@ -225,7 +228,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.flatMap(TreeZipper.setLeftSiblings(list{Tree.pure(42), Tree.pure(43)}, _), _))
+      ->Option.flatMap(TreeZipper.setLeftSiblings(list{Tree.pure(42), Tree.pure(43)}, _), _)
 
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
@@ -250,11 +253,9 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(
-        Option.flatMap(
-          TreeZipper.setLeftSiblingsFromInOrder(list{Tree.pure(43), Tree.pure(42)}, _),
-          _,
-        )
+      ->Option.flatMap(
+        TreeZipper.setLeftSiblingsFromInOrder(list{Tree.pure(43), Tree.pure(42)}, _),
+        _,
       )
 
     let expected = Some({
@@ -280,7 +281,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.map(TreeZipper.getRightSiblings, _))
+      ->Option.map(TreeZipper.getRightSiblings, _)
     let expected = Some(list{Tree.make(3, list{Tree.make(31, list{Tree.pure(311)})}), Tree.pure(4)})
     expect(actual)->toEqual(expected)
   })
@@ -290,7 +291,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.flatMap(TreeZipper.setRightSiblings(list{Tree.pure(42), Tree.pure(43)}, _), _))
+      ->Option.flatMap(TreeZipper.setRightSiblings(list{Tree.pure(42), Tree.pure(43)}, _), _)
 
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
@@ -309,7 +310,7 @@ describe("TreeZipper", () => {
 
   test("getChildren", () => {
     let actual =
-      testTree1->TreeZipper.fromTree->TreeZipper.moveDown->(Option.map(TreeZipper.getChildren, _))
+      testTree1->TreeZipper.fromTree->TreeZipper.moveDown->Option.map(TreeZipper.getChildren, _)
     let expected = Some(list{
       Tree.make(21, list{Tree.pure(211), Tree.pure(212)}),
       Tree.pure(22),
@@ -322,7 +323,7 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->(TreeZipper.setChildren(list{Tree.pure(42), Tree.pure(43)}, _))
+      ->TreeZipper.setChildren(list{Tree.pure(42), Tree.pure(43)}, _)
     let expected = {
       ancestors: list{},
       leftSiblings: list{},
@@ -344,8 +345,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRight, _)
-      ->(Option.flatMap(TreeZipper.moveLeft, _))
+      ->(Option.flatMap(TreeZipper.moveRight, _))
+      ->Option.flatMap(TreeZipper.moveLeft, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -374,8 +375,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRightTimes(2, _), _)
-      ->(Option.map(TreeZipper.moveLeftToStart, _))
+      ->(Option.flatMap(TreeZipper.moveRightTimes(2, _), _))
+      ->Option.map(TreeZipper.moveLeftToStart, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -398,8 +399,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRightTimes(2, _), _)
-      ->(Option.flatMap(TreeZipper.moveLeftTimes(2, _), _))
+      ->(Option.flatMap(TreeZipper.moveRightTimes(2, _), _))
+      ->Option.flatMap(TreeZipper.moveLeftTimes(2, _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -418,7 +419,7 @@ describe("TreeZipper", () => {
   })
 
   test("moveLeftTimes negative", () => {
-    let actual = testTree1->TreeZipper.fromTree->(TreeZipper.moveLeftTimes(-1, _))
+    let actual = testTree1->TreeZipper.fromTree->TreeZipper.moveLeftTimes(-1, _)
     let expected = None
     expect(actual)->toEqual(expected)
   })
@@ -428,8 +429,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRightTimes(2, _), _)
-      ->(Option.map(TreeZipper.moveLeftTimesWithClamp(5, _), _))
+      ->(Option.flatMap(TreeZipper.moveRightTimes(2, _), _))
+      ->Option.map(TreeZipper.moveLeftTimesWithClamp(5, _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -458,7 +459,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.flatMap(TreeZipper.moveRight, _))
+      ->Option.flatMap(TreeZipper.moveRight, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -485,7 +486,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.flatMap(TreeZipper.moveRightTimes(2, _), _))
+      ->Option.flatMap(TreeZipper.moveRightTimes(2, _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -503,7 +504,7 @@ describe("TreeZipper", () => {
   })
 
   test("moveRightTimes negative", () => {
-    let actual = testTree1->TreeZipper.fromTree->(TreeZipper.moveRightTimes(-1, _))
+    let actual = testTree1->TreeZipper.fromTree->TreeZipper.moveRightTimes(-1, _)
     let expected = None
     expect(actual)->toEqual(expected)
   })
@@ -513,7 +514,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.map(TreeZipper.moveRightTimesWithClamp(4, _), _))
+      ->Option.map(TreeZipper.moveRightTimesWithClamp(4, _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -535,7 +536,7 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->(Option.map(TreeZipper.moveRightToEnd, _))
+      ->Option.map(TreeZipper.moveRightToEnd, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -568,14 +569,14 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->TreeZipper.moveDownTimes(2, _)
-      ->(Option.flatMap(TreeZipper.moveUpTimes(2, _), _))
+      ->(TreeZipper.moveDownTimes(2, _))
+      ->Option.flatMap(TreeZipper.moveUpTimes(2, _), _)
     let expected = Some(testTree1->TreeZipper.fromTree)
     expect(actual)->toEqual(expected)
   })
 
   test("moveUpTimes negative", () => {
-    let actual = testTree1->TreeZipper.fromTree->(TreeZipper.moveUpTimes(-1, _))
+    let actual = testTree1->TreeZipper.fromTree->TreeZipper.moveUpTimes(-1, _)
     let expected = None
     expect(actual)->toEqual(expected)
   })
@@ -584,8 +585,8 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->TreeZipper.moveDownTimes(2, _)
-      ->(Option.map(TreeZipper.moveUpTimesWithClamp(5, _), _))
+      ->(TreeZipper.moveDownTimes(2, _))
+      ->Option.map(TreeZipper.moveUpTimesWithClamp(5, _), _)
     let expected = Some(testTree1->TreeZipper.fromTree)
     expect(actual)->toEqual(expected)
   })
@@ -594,8 +595,8 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->TreeZipper.moveDownTimes(2, _)
-      ->(Option.map(TreeZipper.moveUpToTop, _))
+      ->(TreeZipper.moveDownTimes(2, _))
+      ->Option.map(TreeZipper.moveUpToTop, _)
     let expected = Some(testTree1->TreeZipper.fromTree)
     expect(actual)->toEqual(expected)
   })
@@ -604,8 +605,8 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->TreeZipper.moveBy(list{#Down(2), #Right(2)}, _)
-      ->(Option.map(TreeZipper.moveUpToTop, _))
+      ->(TreeZipper.moveBy(list{#Down(2), #Right(2)}, _))
+      ->Option.map(TreeZipper.moveUpToTop, _)
     let expected = Some(testTree1->TreeZipper.fromTree)
     expect(actual)->toEqual(expected)
   })
@@ -633,8 +634,8 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->TreeZipper.fromTree
-      ->TreeZipper.moveDownTimes(3, _)
-      ->(Option.map(TreeZipper.moveDownWithClamp, _))
+      ->(TreeZipper.moveDownTimes(3, _))
+      ->Option.map(TreeZipper.moveDownWithClamp, _)
     let expected = Some({
       ancestors: list{
         (list{}, 21, list{Tree.pure(22), Tree.pure(23)}),
@@ -666,7 +667,7 @@ describe("TreeZipper", () => {
   })
 
   test("moveDownTimes", () => {
-    let actual = testTree1->TreeZipper.fromTree->(TreeZipper.moveDownTimes(3, _))
+    let actual = testTree1->TreeZipper.fromTree->TreeZipper.moveDownTimes(3, _)
     let expected = Some({
       ancestors: list{
         (list{}, 21, list{Tree.pure(22), Tree.pure(23)}),
@@ -682,13 +683,13 @@ describe("TreeZipper", () => {
   })
 
   test("moveDownTimes negative", () => {
-    let actual = testTree1->TreeZipper.fromTree->(TreeZipper.moveDownTimes(-1, _))
+    let actual = testTree1->TreeZipper.fromTree->TreeZipper.moveDownTimes(-1, _)
     let expected = None
     expect(actual)->toEqual(expected)
   })
 
   test("moveDownTimesWithClamp", () => {
-    let actual = testTree1->TreeZipper.fromTree->(TreeZipper.moveDownTimesWithClamp(5, _))
+    let actual = testTree1->TreeZipper.fromTree->TreeZipper.moveDownTimesWithClamp(5, _)
     let expected = {
       ancestors: list{
         (list{}, 21, list{Tree.pure(22), Tree.pure(23)}),
@@ -707,31 +708,29 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->fromTree
-      ->(
-        moveBy(
-          list{
-            #Down(1),
-            #Right(1),
-            #Left(1),
-            #Up(1),
-            #DownWithClamp(1),
-            #RightWithClamp(1),
-            #LeftWithClamp(1),
-            #UpWithClamp(1),
-            #DownToBottom,
-            #UpToTop,
-            #RightToEnd,
-            #LeftToStart,
-            #Down(1),
-            #Right(1),
-            #Down(1),
-          },
-          _,
-        )
+      ->moveBy(
+        list{
+          #Down(1),
+          #Right(1),
+          #Left(1),
+          #Up(1),
+          #DownWithClamp(1),
+          #RightWithClamp(1),
+          #LeftWithClamp(1),
+          #UpWithClamp(1),
+          #DownToBottom,
+          #UpToTop,
+          #RightToEnd,
+          #LeftToStart,
+          #Down(1),
+          #Right(1),
+          #Down(1),
+        },
+        _,
       )
 
     let expected =
-      testTree1->fromTree->moveDown->Option.flatMap(moveRight, _)->(Option.flatMap(moveDown, _))
+      testTree1->fromTree->moveDown->(Option.flatMap(moveRight, _))->Option.flatMap(moveDown, _)
     expect(actual)->toEqual(expected)
   })
 
@@ -739,36 +738,32 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->fromTree
-      ->(
-        foldBy(
-          list{
-            #Down(1),
-            #Right(1),
-            #Left(1),
-            #Up(1),
-            #DownWithClamp(1),
-            #RightWithClamp(1),
-            #LeftWithClamp(1),
-            #UpWithClamp(1),
-            #DownToBottom,
-            #UpToTop,
-            #RightToEnd,
-            #LeftToStart,
-            #Down(1),
-            #Right(1),
-            #Down(1),
-          },
-          (l, v) => l->(Relude_List.append(v, _)),
-          list{},
-          _,
-        )
+      ->foldBy(
+        list{
+          #Down(1),
+          #Right(1),
+          #Left(1),
+          #Up(1),
+          #DownWithClamp(1),
+          #RightWithClamp(1),
+          #LeftWithClamp(1),
+          #UpWithClamp(1),
+          #DownToBottom,
+          #UpToTop,
+          #RightToEnd,
+          #LeftToStart,
+          #Down(1),
+          #Right(1),
+          #Down(1),
+        },
+        (l, v) => l->Relude_List.append(v, _),
+        list{},
+        _,
       )
     let expectedZipper =
-      testTree1->fromTree->moveDown->Option.flatMap(moveRight, _)->(Option.flatMap(moveDown, _))
+      testTree1->fromTree->moveDown->(Option.flatMap(moveRight, _))->Option.flatMap(moveDown, _)
     expect(actual)->toEqual(
-      expectedZipper->(
-        Option.map(z => (z, list{2, 3, 2, 1, 2, 3, 2, 1, 211, 1, 1, 1, 2, 3, 31}), _)
-      ),
+      expectedZipper->Option.map(z => (z, list{2, 3, 2, 1, 2, 3, 2, 1, 211, 1, 1, 1, 2, 3, 31}), _),
     )
   })
 
@@ -777,8 +772,8 @@ describe("TreeZipper", () => {
       testTree1
       ->TreeZipper.fromTree
       ->TreeZipper.moveDown
-      ->Option.flatMap(TreeZipper.moveRight, _)
-      ->(Option.map(TreeZipper.map(string_of_int, _), _))
+      ->(Option.flatMap(TreeZipper.moveRight, _))
+      ->Option.map(TreeZipper.map(Int.toString, _), _)
     let expected = Some({
       ancestors: list{(list{}, "1", list{})},
       leftSiblings: list{
@@ -799,38 +794,38 @@ describe("TreeZipper", () => {
   })
 
   test("findInFocus", () => {
-    let actual = testTree1->fromTree->(findInFocus(a => a == 1, _))
+    let actual = testTree1->fromTree->findInFocus(a => a == 1, _)
     let expected = testTree1->fromTree->Relude_Option.pure // 1
-    let actual2 = testTree1->fromTree->(findInFocus(a => a == 0, _))
+    let actual2 = testTree1->fromTree->findInFocus(a => a == 0, _)
     let expected2 = None
     expect((actual, actual2))->toEqual((expected, expected2))
   })
 
   test("findInFocusAndChildren", () => {
-    let a = testTree2->fromTree->(findInFocusAndChildren(a => a == 213, _))
-    let e = testTree2->fromTree->moveDownTimes(3, _)->(Option.flatMap(moveRightTimes(2, _), _)) // 1 // 211 // 213
-    let a2 = testTree2->fromTree->(findInFocusAndChildren(a => a == 2433, _))
+    let a = testTree2->fromTree->findInFocusAndChildren(a => a == 213, _)
+    let e = testTree2->fromTree->(moveDownTimes(3, _))->Option.flatMap(moveRightTimes(2, _), _) // 1 // 211 // 213
+    let a2 = testTree2->fromTree->findInFocusAndChildren(a => a == 2433, _)
     // 1 -> 21 -> 24 -> 241 -> 243 -> 2431 -> 2433
     let e2 =
       testTree2
       ->fromTree
-      ->moveDownTimes(2, _)
-      ->Option.flatMap(moveRightTimes(3, _), _)
-      ->Option.flatMap(moveDown, _)
-      ->Option.flatMap(moveRightTimes(2, _), _)
-      ->Option.flatMap(moveDown, _)
+      ->(moveDownTimes(2, _))
+      ->(Option.flatMap(moveRightTimes(3, _), _))
+      ->(Option.flatMap(moveDown, _))
       ->(Option.flatMap(moveRightTimes(2, _), _))
-    let a3 = testTree2->fromTree->(findInFocusAndChildren(a => a == 533, _))
+      ->(Option.flatMap(moveDown, _))
+      ->Option.flatMap(moveRightTimes(2, _), _)
+    let a3 = testTree2->fromTree->findInFocusAndChildren(a => a == 533, _)
     // 1 -> 2 -> 5 -> 51 -> 53 -> 531 -> 533
     let e3 =
       testTree2
       ->fromTree
       ->moveDown
-      ->Option.flatMap(moveRightTimes(3, _), _)
-      ->Option.flatMap(moveDown, _)
-      ->Option.flatMap(moveRightTimes(2, _), _)
-      ->Option.flatMap(moveDown, _)
+      ->(Option.flatMap(moveRightTimes(3, _), _))
+      ->(Option.flatMap(moveDown, _))
       ->(Option.flatMap(moveRightTimes(2, _), _))
+      ->(Option.flatMap(moveDown, _))
+      ->Option.flatMap(moveRightTimes(2, _), _)
     expect((a, a2, a3))->toEqual((e, e2, e3))
   })
 
@@ -839,15 +834,15 @@ describe("TreeZipper", () => {
       testTree1
       ->fromTree
       ->moveDown
-      ->Option.flatMap(moveRight, _)
-      ->(Option.flatMap(findLeft(a => a == 2, _), _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.flatMap(findLeft(a => a == 2, _), _)
     let expected = testTree1->fromTree->moveDown
     expect(actual)->toEqual(expected)
   })
 
   test("findRight", () => {
-    let actual = testTree1->fromTree->moveDown->(Option.flatMap(findRight(a => a == 4, _), _))
-    let expected = testTree1->fromTree->moveDown->(Option.flatMap(moveRightTimes(2, _), _))
+    let actual = testTree1->fromTree->moveDown->Option.flatMap(findRight(a => a == 4, _), _)
+    let expected = testTree1->fromTree->moveDown->Option.flatMap(moveRightTimes(2, _), _)
     expect(actual)->toEqual(expected)
   })
 
@@ -855,34 +850,34 @@ describe("TreeZipper", () => {
     let actual =
       testTree1
       ->fromTree
-      ->moveDownTimes(3, _)
-      ->Option.flatMap(moveRight, _)
-      ->(Option.flatMap(findUp(a => a == 1, _), _))
+      ->(moveDownTimes(3, _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.flatMap(findUp(a => a == 1, _), _)
     let expected = Some(testTree1->fromTree)
     expect(actual)->toEqual(expected)
   })
 
   test("findDown", () => {
-    let actual = testTree1->fromTree->(findDown(a => a == 311, _))
+    let actual = testTree1->fromTree->findDown(a => a == 311, _)
     // 1 -> 2 -> 3 -> 31, 311
     let expected =
       testTree1
       ->fromTree
       ->moveDown
-      ->Option.flatMap(moveRight, _)
-      ->(Option.flatMap(moveDownTimes(2, _), _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.flatMap(moveDownTimes(2, _), _)
     expect(actual)->toEqual(expected)
   })
 
   test("find", () => {
-    let actual = testTree1->fromTree->moveDown->(Option.flatMap(find(a => a == 311, _), _))
+    let actual = testTree1->fromTree->moveDown->Option.flatMap(find(a => a == 311, _), _)
     // 1-> 2 -> 3 -> 31, 311
     let expected =
       testTree1
       ->fromTree
       ->moveDown
-      ->Option.flatMap(moveRight, _)
-      ->(Option.flatMap(moveDownTimes(2, _), _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.flatMap(moveDownTimes(2, _), _)
     expect(actual)->toEqual(expected)
   })
 
@@ -891,7 +886,7 @@ describe("TreeZipper", () => {
       testTree1
       ->fromTree
       ->moveDown
-      ->(Option.flatMap(insertTreeWithPushLeft(Tree.make(42, list{Tree.pure(43)}), _), _))
+      ->Option.flatMap(insertTreeWithPushLeft(Tree.make(42, list{Tree.pure(43)}), _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -911,7 +906,7 @@ describe("TreeZipper", () => {
   })
 
   test("insertWithPushLeft", () => {
-    let actual = testTree1->fromTree->moveDown->(Option.flatMap(insertWithPushLeft(42, _), _))
+    let actual = testTree1->fromTree->moveDown->Option.flatMap(insertWithPushLeft(42, _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -935,7 +930,7 @@ describe("TreeZipper", () => {
       testTree1
       ->fromTree
       ->moveDown
-      ->(Option.flatMap(insertTreeWithPushRight(Tree.make(42, list{Tree.pure(43)}), _), _))
+      ->Option.flatMap(insertTreeWithPushRight(Tree.make(42, list{Tree.pure(43)}), _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -954,7 +949,7 @@ describe("TreeZipper", () => {
   })
 
   test("insertWithPushRight", () => {
-    let actual = testTree1->fromTree->moveDown->(Option.flatMap(insertWithPushRight(42, _), _))
+    let actual = testTree1->fromTree->moveDown->Option.flatMap(insertWithPushRight(42, _), _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -977,8 +972,8 @@ describe("TreeZipper", () => {
       testTree1
       ->fromTree
       ->moveDown
-      ->Option.flatMap(moveRight, _)
-      ->(Option.flatMap(deleteWithPullLeft, _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.flatMap(deleteWithPullLeft, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},
@@ -998,8 +993,8 @@ describe("TreeZipper", () => {
       testTree1
       ->fromTree
       ->moveDown
-      ->Option.flatMap(moveRight, _)
-      ->(Option.flatMap(deleteWithPullRight, _))
+      ->(Option.flatMap(moveRight, _))
+      ->Option.flatMap(deleteWithPullRight, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{
@@ -1016,7 +1011,7 @@ describe("TreeZipper", () => {
   })
 
   test("delete", () => {
-    let actual = testTree1->fromTree->moveDown->(Option.flatMap(delete, _))
+    let actual = testTree1->fromTree->moveDown->Option.flatMap(delete, _)
     let expected = Some({
       ancestors: list{(list{}, 1, list{})},
       leftSiblings: list{},

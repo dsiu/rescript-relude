@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -98,22 +95,28 @@ describe("ListZipper", () => {
 
   test("foldLeft", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(
-        LZ.foldLeft((acc, a) => acc->(Relude.List.append(a, _)), list{}, _)
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZ.foldLeft(
+        (acc, a) => acc->Relude.List.append(a, _),
+        list{},
+        _,
       ),
     )->toEqual(list{1, 2, 3, 4, 5})
   )
 
   test("foldRight", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(
-        LZ.foldRight((a, acc) => acc->(Relude.List.append(a, _)), list{}, _)
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZ.foldRight(
+        (a, acc) => acc->Relude.List.append(a, _),
+        list{},
+        _,
       ),
     )->toEqual(list{5, 4, 3, 2, 1})
   )
 
   test("foldMap", () =>
-    expect(LZFoldMap.fold_map(string_of_int, LZ.make(list{2, 1}, 3, list{4, 5})))->toEqual("12345")
+    expect(LZFoldMap.fold_map(Int.toString(_), LZ.make(list{2, 1}, 3, list{4, 5})))->toEqual(
+      "12345",
+    )
   )
 
   test("foldMapAny", () =>
@@ -128,7 +131,7 @@ describe("ListZipper", () => {
 
   test("traverse", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZTraversable.traverse(a => Some(string_of_int(a)), _)),
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZTraversable.traverse(a => Some(Int.toString(a)), _),
     )->toEqual(Some(LZ.make(list{"2", "1"}, "3", list{"4", "5"})))
   )
 
@@ -219,13 +222,13 @@ describe("ListZipper", () => {
   test("getFocus", () => expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.getFocus)->toEqual(3))
 
   test("setFocusBy", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.setFocusBy(a => a * 10, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.setFocusBy(a => a * 10, _))->toEqual(
       LZ.make(list{2, 1}, 30, list{4, 5}),
     )
   )
 
   test("setFocus", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.setFocus(42, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.setFocus(42, _))->toEqual(
       LZ.make(list{2, 1}, 42, list{4, 5}),
     )
   )
@@ -233,7 +236,7 @@ describe("ListZipper", () => {
   test("getLeft", () => expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.getLeft)->toEqual(list{2, 1}))
 
   test("setLeft", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.setLeft(list{42, 55}, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.setLeft(list{42, 55}, _))->toEqual(
       LZ.make(list{42, 55}, 3, list{4, 5}),
     )
   )
@@ -243,7 +246,7 @@ describe("ListZipper", () => {
   )
 
   test("setRight", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.setRight(list{42, 55}, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.setRight(list{42, 55}, _))->toEqual(
       LZ.make(list{2, 1}, 3, list{42, 55}),
     )
   )
@@ -253,7 +256,7 @@ describe("ListZipper", () => {
   )
 
   test("setLeftInOrder", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.setLeftFromInOrder(list{42, 55}, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.setLeftFromInOrder(list{42, 55}, _))->toEqual(
       LZ.make(list{55, 42}, 3, list{4, 5}),
     )
   )
@@ -279,21 +282,19 @@ describe("ListZipper", () => {
   test("isAtEnd is at end", () => expect(LZ.make(list{2, 1}, 3, list{})->LZ.isAtEnd)->toEqual(true))
 
   test("isAtIndex true", () =>
-    expect(LZ.make(list{2, 1}, 3, list{})->(LZ.isAtIndex(2, _)))->toEqual(true)
+    expect(LZ.make(list{2, 1}, 3, list{})->LZ.isAtIndex(2, _))->toEqual(true)
   )
 
   test("isAtIndex false", () =>
-    expect(LZ.make(list{2, 1}, 3, list{})->(LZ.isAtIndex(1, _)))->toEqual(false)
+    expect(LZ.make(list{2, 1}, 3, list{})->LZ.isAtIndex(1, _))->toEqual(false)
   )
 
   test("isAtItemBy", () =>
-    expect(LZ.make(list{2, 1}, 3, list{})->(LZ.isAtItemBy(Relude_Int.Eq.eq, 3, _)))->toEqual(true)
+    expect(LZ.make(list{2, 1}, 3, list{})->LZ.isAtItemBy(Relude_Int.Eq.eq, 3, _))->toEqual(true)
   )
 
   test("isAtItem", () =>
-    expect(LZ.make(list{2, 1}, 3, list{})->(LZ.isAtItem(module(Relude_Int.Eq), 3, _)))->toEqual(
-      true,
-    )
+    expect(LZ.make(list{2, 1}, 3, list{})->LZ.isAtItem(module(Relude_Int.Eq), 3, _))->toEqual(true)
   )
 
   test("moveLeft", () =>
@@ -385,213 +386,213 @@ describe("ListZipper", () => {
   )
 
   test("moveLeftTimes", () =>
-    expect(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})->(LZ.moveLeftTimes(3, _)))->toEqual(
+    expect(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})->LZ.moveLeftTimes(3, _))->toEqual(
       Some(LZ.make(list{2, 1}, 3, list{4, 5, 6})),
     )
   )
 
   test("moveLeftTimes to start", () =>
-    expect(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})->(LZ.moveLeftTimes(5, _)))->toEqual(
+    expect(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})->LZ.moveLeftTimes(5, _))->toEqual(
       Some(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})),
     )
   )
 
   test("moveLeftTimes past start", () =>
-    expect(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})->(LZ.moveLeftTimes(6, _)))->toEqual(None)
+    expect(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})->LZ.moveLeftTimes(6, _))->toEqual(None)
   )
 
   test("moveLeftTimes invalid times", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveLeftTimes(-1, _)))->toEqual(None)
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveLeftTimes(-1, _))->toEqual(None)
   )
 
   test("moveRightTimes", () =>
-    expect(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})->(LZ.moveRightTimes(3, _)))->toEqual(
+    expect(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})->LZ.moveRightTimes(3, _))->toEqual(
       Some(LZ.make(list{3, 2, 1}, 4, list{5, 6})),
     )
   )
 
   test("moveRightTimes to end", () =>
-    expect(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})->(LZ.moveRightTimes(5, _)))->toEqual(
+    expect(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})->LZ.moveRightTimes(5, _))->toEqual(
       Some(LZ.make(list{5, 4, 3, 2, 1}, 6, list{})),
     )
   )
 
   test("moveRightTimes past end", () =>
-    expect(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})->(LZ.moveRightTimes(6, _)))->toEqual(None)
+    expect(LZ.make(list{}, 1, list{2, 3, 4, 5, 6})->LZ.moveRightTimes(6, _))->toEqual(None)
   )
 
   test("moveRightTimes invalid times", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveRightTimes(-1, _)))->toEqual(None)
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveRightTimes(-1, _))->toEqual(None)
   )
 
   test("moveLeftTimesWithClamp", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveLeftTimesWithClamp(5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveLeftTimesWithClamp(5, _))->toEqual(
       LZ.make(list{}, 1, list{2, 3, 4, 5}),
     )
   )
 
   test("moveRightTimesWithClamp", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveRightTimesWithClamp(5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveRightTimesWithClamp(5, _))->toEqual(
       LZ.make(list{4, 3, 2, 1}, 5, list{}),
     )
   )
 
   test("moveToIndex no-op", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndex(2, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndex(2, _))->toEqual(
       Some(LZ.make(list{2, 1}, 3, list{4, 5})),
     )
   )
 
   test("moveToIndex right", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndex(4, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndex(4, _))->toEqual(
       Some(LZ.make(list{4, 3, 2, 1}, 5, list{})),
     )
   )
 
   test("moveToIndex left", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndex(1, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndex(1, _))->toEqual(
       Some(LZ.make(list{1}, 2, list{3, 4, 5})),
     )
   )
 
   test("moveToIndex invalid", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndex(5, _)))->toEqual(None)
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndex(5, _))->toEqual(None)
   )
 
   test("moveToIndexWithMod no-op", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithMod(2, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithMod(2, _))->toEqual(
       LZ.make(list{2, 1}, 3, list{4, 5}),
     )
   )
 
   test("moveToIndexWithMod right", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithMod(4, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithMod(4, _))->toEqual(
       LZ.make(list{4, 3, 2, 1}, 5, list{}),
     )
   )
 
   test("moveToIndexWithMod left", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithMod(1, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithMod(1, _))->toEqual(
       LZ.make(list{1}, 2, list{3, 4, 5}),
     )
   )
 
   test("moveToIndexWithMod invalid", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithMod(5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithMod(5, _))->toEqual(
       LZ.make(list{}, 1, list{2, 3, 4, 5}),
     )
   )
 
   test("moveToIndexWithClamp no-op", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithClamp(2, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithClamp(2, _))->toEqual(
       LZ.make(list{2, 1}, 3, list{4, 5}),
     )
   )
 
   test("moveToIndexWithClamp right", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithClamp(4, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithClamp(4, _))->toEqual(
       LZ.make(list{4, 3, 2, 1}, 5, list{}),
     )
   )
 
   test("moveToIndexWithClamp left", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithClamp(1, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithClamp(1, _))->toEqual(
       LZ.make(list{1}, 2, list{3, 4, 5}),
     )
   )
 
   test("moveToIndexWithClamp invalid", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.moveToIndexWithClamp(5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.moveToIndexWithClamp(5, _))->toEqual(
       LZ.make(list{4, 3, 2, 1}, 5, list{}),
     )
   )
 
   test("findLeftBy", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findLeftBy(a => a == 1, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findLeftBy(a => a == 1, _))->toEqual(
       Some(LZ.make(list{}, 1, list{2, 3, 4, 5})),
     )
   )
 
   test("findLeftBy focus", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findLeftBy(a => a == 3, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findLeftBy(a => a == 3, _))->toEqual(
       Some(LZ.make(list{2, 1}, 3, list{4, 5})),
     )
   )
 
   test("findLeftBy no focus", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findLeftBy(~checkFocus=false, a => a == 3, _)),
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findLeftBy(~checkFocus=false, a => a == 3, _),
     )->toEqual(None)
   )
 
   test("findRightBy", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findRightBy(a => a == 5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findRightBy(a => a == 5, _))->toEqual(
       Some(LZ.make(list{4, 3, 2, 1}, 5, list{})),
     )
   )
 
   test("findRightBy focus", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findRightBy(a => a == 3, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findRightBy(a => a == 3, _))->toEqual(
       Some(LZ.make(list{2, 1}, 3, list{4, 5})),
     )
   )
 
   test("findRightBy no focus", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findRightBy(~checkFocus=false, a => a == 3, _)),
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findRightBy(~checkFocus=false, a => a == 3, _),
     )->toEqual(None)
   )
 
   test("findBy", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findBy(a => a == 5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findBy(a => a == 5, _))->toEqual(
       Some(LZ.make(list{4, 3, 2, 1}, 5, list{})),
     )
   )
 
   test("findItemLeftBy", () =>
-    expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findItemLeftBy(Relude_Int.Eq.eq, 1, _)),
-    )->toEqual(Some(LZ.make(list{}, 1, list{2, 3, 4, 5})))
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findItemLeftBy(Relude_Int.Eq.eq, 1, _))->toEqual(
+      Some(LZ.make(list{}, 1, list{2, 3, 4, 5})),
+    )
   )
 
   test("findItemRightBy", () =>
-    expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findItemRightBy(Relude_Int.Eq.eq, 5, _)),
-    )->toEqual(Some(LZ.make(list{4, 3, 2, 1}, 5, list{})))
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findItemRightBy(Relude_Int.Eq.eq, 5, _))->toEqual(
+      Some(LZ.make(list{4, 3, 2, 1}, 5, list{})),
+    )
   )
 
   test("findItemBy", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findItemBy(Relude_Int.Eq.eq, 5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findItemBy(Relude_Int.Eq.eq, 5, _))->toEqual(
       Some(LZ.make(list{4, 3, 2, 1}, 5, list{})),
     )
   )
 
   test("findItemLeft", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findItemLeft(module(Relude_Int.Eq), 1, _)),
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findItemLeft(module(Relude_Int.Eq), 1, _),
     )->toEqual(Some(LZ.make(list{}, 1, list{2, 3, 4, 5})))
   )
 
   test("findItemRight", () =>
     expect(
-      LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findItemRight(module(Relude_Int.Eq), 5, _)),
+      LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findItemRight(module(Relude_Int.Eq), 5, _),
     )->toEqual(Some(LZ.make(list{4, 3, 2, 1}, 5, list{})))
   )
 
   test("findItem", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.findItem(module(Relude_Int.Eq), 5, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.findItem(module(Relude_Int.Eq), 5, _))->toEqual(
       Some(LZ.make(list{4, 3, 2, 1}, 5, list{})),
     )
   )
 
   test("insertWithPushLeft", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.insertWithPushLeft(42, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.insertWithPushLeft(42, _))->toEqual(
       LZ.make(list{3, 2, 1}, 42, list{4, 5}),
     )
   )
 
   test("insertWithPushRight", () =>
-    expect(LZ.make(list{2, 1}, 3, list{4, 5})->(LZ.insertWithPushRight(42, _)))->toEqual(
+    expect(LZ.make(list{2, 1}, 3, list{4, 5})->LZ.insertWithPushRight(42, _))->toEqual(
       LZ.make(list{2, 1}, 42, list{3, 4, 5}),
     )
   )
@@ -626,13 +627,13 @@ describe("ListZipper", () => {
 
   test("showBy", () => {
     let x = LZ.make(list{2, 1}, 3, list{4, 5})
-    let y = x->(LZ.showBy(string_of_int, _))
+    let y = x->LZ.showBy(Int.toString(_), _)
     expect(y)->toEqual("Zipper([2, 1], 3, [4, 5])")
   })
 
   test("show", () => {
     let x = LZ.make(list{2, 1}, 3, list{4, 5})
-    let y = x->(LZ.show(module(Relude.Int.Show), _))
+    let y = x->LZ.show(module(Relude.Int.Show), _)
     expect(y)->toEqual("Zipper([2, 1], 3, [4, 5])")
   })
 

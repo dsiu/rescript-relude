@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -124,56 +121,56 @@ describe("Validation", () => {
 
   test("tap success", () => {
     let x = ref(0)
-    Validation.VOk(123)->Validation.tap(i => x := i, _)->ignore
+    Validation.VOk(123)->(Validation.tap(i => x := i, _))->ignore
     expect(x.contents)->toEqual(123)
   })
 
   test("tap error", () => {
     let x = ref(0)
-    Validation.VError(123)->Validation.tap(i => x := i, _)->ignore
+    Validation.VError(123)->(Validation.tap(i => x := i, _))->ignore
     expect(x.contents)->toEqual(0)
   })
 
   test("mapError success", () => {
-    let actual = Validation.VError(123)->(Validation.mapError(i => i + 1, _))
+    let actual = Validation.VError(123)->Validation.mapError(i => i + 1, _)
     expect(actual)->toEqual(Validation.VError(124))
   })
 
   test("mapError error", () => {
-    let actual = Validation.VOk(123)->(Validation.mapError(i => i + 1, _))
+    let actual = Validation.VOk(123)->Validation.mapError(i => i + 1, _)
     expect(actual)->toEqual(Validation.VOk(123))
   })
 
   test("mapErrorsNel success", () => {
-    let actual = Validation.VError(NonEmptyList.pure(123))->(Validation.mapErrorsNel(i => i + 1, _))
+    let actual = Validation.VError(NonEmptyList.pure(123))->Validation.mapErrorsNel(i => i + 1, _)
     expect(actual)->toEqual(Validation.VError(NonEmptyList.pure(124)))
   })
 
   test("mapErrorsNel error", () => {
-    let actual = Validation.VOk(123)->(Validation.mapErrorsNel(i => i + 1, _))
+    let actual = Validation.VOk(123)->Validation.mapErrorsNel(i => i + 1, _)
     expect(actual)->toEqual(Validation.VOk(123))
   })
 
   test("tapError success", () => {
     let x = ref(0)
-    Validation.VError(123)->Validation.tapError(i => x := i, _)->ignore
+    Validation.VError(123)->(Validation.tapError(i => x := i, _))->ignore
     expect(x.contents)->toEqual(123)
   })
 
   test("tapError error", () => {
     let x = ref(0)
-    Validation.VOk(123)->Validation.tapError(i => x := i, _)->ignore
+    Validation.VOk(123)->(Validation.tapError(i => x := i, _))->ignore
     expect(x.contents)->toEqual(0)
   })
 
   test("bimap success", () =>
-    expect(Validation.VOk(123)->(Validation.bimap(i => i + 1, i => i - 1, _)))->toEqual(
+    expect(Validation.VOk(123)->Validation.bimap(i => i + 1, i => i - 1, _))->toEqual(
       Validation.VOk(124),
     )
   )
 
   test("bimap error", () =>
-    expect(Validation.VError(123)->(Validation.bimap(i => i + 1, i => i - 1, _)))->toEqual(
+    expect(Validation.VError(123)->Validation.bimap(i => i + 1, i => i - 1, _))->toEqual(
       Validation.VError(122),
     )
   )
@@ -182,7 +179,7 @@ describe("Validation", () => {
     let x = ref(0)
 
     Validation.VOk(123)
-    ->Validation.bitap(i => x := i + 1, i => x := i - 1, _)
+    ->(Validation.bitap(i => x := i + 1, i => x := i - 1, _))
     ->ignore
 
     expect(x.contents)->toEqual(124)
@@ -192,7 +189,7 @@ describe("Validation", () => {
     let x = ref(0)
 
     Validation.VError(123)
-    ->Validation.bitap(i => x := i + 1, i => x := i - 1, _)
+    ->(Validation.bitap(i => x := i + 1, i => x := i - 1, _))
     ->ignore
 
     expect(x.contents)->toEqual(122)
@@ -233,11 +230,11 @@ describe("Validation", () => {
   )
 
   test("fromOption some", () =>
-    expect(Validation.fromOption("error", Option.some(123)))->toEqual(Validation.VOk(123))
+    expect(Validation.fromOption("error", Relude_Option.some(123)))->toEqual(Validation.VOk(123))
   )
 
   test("fromOption none", () =>
-    expect(Validation.fromOption("error", Option.none))->toEqual(Validation.VError("error"))
+    expect(Validation.fromOption("error", Relude_Option.none))->toEqual(Validation.VError("error"))
   )
 
   test("fold success", () => {
@@ -336,8 +333,8 @@ describe("Validation", () => {
       let f = x =>
         switch x {
         | Relude_Ior_Type.This(a) => a
-        | Relude_Ior_Type.That(b) => int_of_string(b)
-        | Relude_Ior_Type.Both(a, b) => a + int_of_string(b)
+        | Relude_Ior_Type.That(b) => Int.fromString(b)->Option.getOrThrow
+        | Relude_Ior_Type.Both(a, b) => a + Int.fromString(b)->Option.getOrThrow
         }
       let actual = Validation.alignWithWithAppendErrors((a, b) => a ++ b, f, inputA, inputB)
       expect(actual)->toEqual(expected)

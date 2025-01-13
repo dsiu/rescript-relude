@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 open! Relude.Globals
@@ -17,44 +14,44 @@ describe("Result", () => {
   test("map Error", () => expect(Result.map(a => a + 2, Error("error")))->toEqual(Error("error")))
 
   test("mapError Ok", () =>
-    expect(Result.ok(42)->(Result.mapError(x => x ++ x, _)))->toEqual(Result.ok(42))
+    expect(Result.ok(42)->Result.mapError(x => x ++ x, _))->toEqual(Result.ok(42))
   )
 
   test("mapError Error", () =>
-    expect(Result.error("hi")->(Result.mapError(x => x ++ x, _)))->toEqual(Result.error("hihi"))
+    expect(Result.error("hi")->Result.mapError(x => x ++ x, _))->toEqual(Result.error("hihi"))
   )
 
   test("bimap Ok", () =>
-    expect(Result.ok(42)->(Result.bimap(a => a + 10, e => e ++ e, _)))->toEqual(Result.ok(52))
+    expect(Result.ok(42)->Result.bimap(a => a + 10, e => e ++ e, _))->toEqual(Result.ok(52))
   )
 
   test("bimap Error", () =>
-    expect(Result.error("hi")->(Result.bimap(a => a + 10, e => e ++ e, _)))->toEqual(
+    expect(Result.error("hi")->Result.bimap(a => a + 10, e => e ++ e, _))->toEqual(
       Result.error("hihi"),
     )
   )
 
   test("tap Ok", () => {
     let x = ref(0)
-    Result.ok(42)->Result.tap(i => x := i, _)->ignore
+    Result.ok(42)->(Result.tap(i => x := i, _))->ignore
     expect(x.contents)->toEqual(42)
   })
 
   test("tap Error", () => {
     let x = ref(0)
-    Result.error(42)->Result.tap(i => x := i, _)->ignore
+    Result.error(42)->(Result.tap(i => x := i, _))->ignore
     expect(x.contents)->toEqual(0)
   })
 
   test("tapError Ok", () => {
     let x = ref(0)
-    Result.ok(42)->Result.tapError(i => x := i, _)->ignore
+    Result.ok(42)->(Result.tapError(i => x := i, _))->ignore
     expect(x.contents)->toEqual(0)
   })
 
   test("tapError Error", () => {
     let x = ref(0)
-    Result.error(42)->Result.tapError(i => x := i, _)->ignore
+    Result.error(42)->(Result.tapError(i => x := i, _))->ignore
     expect(x.contents)->toEqual(42)
   })
 
@@ -82,8 +79,8 @@ describe("Result", () => {
     let f = x =>
       switch x {
       | Relude_Ior_Type.This(a) => a
-      | That(b) => int_of_string(b)
-      | Both(a, b) => a + int_of_string(b)
+      | That(b) => Int.fromString(b)->Option.getOrThrow
+      | Both(a, b) => a + Int.fromString(b)->Option.getOrThrow
       }
     expect(Result.alignWith(f, Result.ok(42), Result.ok("99")))->toEqual(Result.ok(141))
   })
@@ -92,8 +89,8 @@ describe("Result", () => {
     let f = x =>
       switch x {
       | Relude_Ior_Type.This(a) => a
-      | That(b) => int_of_string(b)
-      | Both(a, b) => a + int_of_string(b)
+      | That(b) => Int.fromString(b)->Option.getOrThrow
+      | Both(a, b) => a + Int.fromString(b)->Option.getOrThrow
       }
     expect(Result.alignWith(f, Result.ok(42), Result.error("99")))->toEqual(Result.ok(42))
   })
@@ -102,8 +99,8 @@ describe("Result", () => {
     let f = x =>
       switch x {
       | Relude_Ior_Type.This(a) => a
-      | That(b) => int_of_string(b)
-      | Both(a, b) => a + int_of_string(b)
+      | That(b) => Int.fromString(b)->Option.getOrThrow
+      | Both(a, b) => a + Int.fromString(b)->Option.getOrThrow
       }
     expect(Result.alignWith(f, Result.error(42), Result.ok("99")))->toEqual(Result.ok(99))
   })
@@ -112,8 +109,8 @@ describe("Result", () => {
     let f = x =>
       switch x {
       | Relude_Ior_Type.This(a) => a
-      | That(b) => int_of_string(b)
-      | Both(a, b) => a + int_of_string(b)
+      | That(b) => Int.fromString(b)->Option.getOrThrow
+      | Both(a, b) => a + Int.fromString(b)->Option.getOrThrow
       }
     expect(Result.alignWith(f, Result.error("a"), Result.error("b")))->toEqual(Result.error("a"))
   })
@@ -161,36 +158,36 @@ describe("Result", () => {
 
   test("fold Error", () => expect(Result.fold(_ => "error", _ => "ok", Error(1)))->toEqual("error"))
 
-  test("getOrElseBy Ok", () => expect(Result.ok(42)->(Result.getOrElseBy(_ => 5, _)))->toEqual(42))
+  test("getOrElseBy Ok", () => expect(Result.ok(42)->Result.getOrElseBy(_ => 5, _))->toEqual(42))
 
   test("getOrElseBy Error", () =>
-    expect(Result.error(42)->(Result.getOrElseBy(x => x / 7, _)))->toEqual(6)
+    expect(Result.error(42)->Result.getOrElseBy(x => x / 7, _))->toEqual(6)
   )
 
-  test("getOrElse Ok", () => expect(Result.ok(42)->(Result.getOrElse(5, _)))->toEqual(42))
+  test("getOrElse Ok", () => expect(Result.ok(42)->Result.getOrElse(5, _))->toEqual(42))
 
-  test("getOrElse Error", () => expect(Result.error("abc")->(Result.getOrElse(5, _)))->toEqual(5))
+  test("getOrElse Error", () => expect(Result.error("abc")->Result.getOrElse(5, _))->toEqual(5))
 
   test("getOrElseLazy Ok", () =>
-    expect(Result.ok(42)->(Result.getOrElseLazy(_ => 5, _)))->toEqual(42)
+    expect(Result.ok(42)->Result.getOrElseLazy(_ => 5, _))->toEqual(42)
   )
 
   test("getOrElseLazy Error", () =>
-    expect(Result.error("abc")->(Result.getOrElseLazy(_ => 5, _)))->toEqual(5)
+    expect(Result.error("abc")->Result.getOrElseLazy(_ => 5, _))->toEqual(5)
   )
 
-  test("getErrorOrElse Ok", () => expect(Result.ok(42)->(Result.getErrorOrElse(5, _)))->toEqual(5))
+  test("getErrorOrElse Ok", () => expect(Result.ok(42)->Result.getErrorOrElse(5, _))->toEqual(5))
 
   test("getErrorOrElse Error", () =>
-    expect(Result.error(42)->(Result.getErrorOrElse(5, _)))->toEqual(42)
+    expect(Result.error(42)->Result.getErrorOrElse(5, _))->toEqual(42)
   )
 
   test("getErrorOrElseBy Ok", () =>
-    expect(Result.ok(42)->(Result.getErrorOrElseBy(x => x / 7, _)))->toEqual(6)
+    expect(Result.ok(42)->Result.getErrorOrElseBy(x => x / 7, _))->toEqual(6)
   )
 
   test("getErrorOrElseBy Error", () =>
-    expect(Result.error(42)->(Result.getErrorOrElseBy(x => x / 7, _)))->toEqual(42)
+    expect(Result.error(42)->Result.getErrorOrElseBy(x => x / 7, _))->toEqual(42)
   )
 
   test("merge Error", () => expect(Result.merge(Error(1)))->toEqual(1))
@@ -218,41 +215,51 @@ describe("Result", () => {
   test("getError when Ok", () => expect(Result.getError(Ok(1)))->toEqual(None))
 
   test("catchError success", () =>
-    expect(Result.pure(42)->(Result.catchError((e: string) => Result.error(e ++ e), _)))->toEqual(
+    expect(Result.pure(42)->Result.catchError((e: string) => Result.error(e ++ e), _))->toEqual(
       Ok(42),
     )
   )
 
   test("catchError failure", () =>
     expect(
-      Result.error("42")->(
-        Result.catchError(
-          e => {
-            let intValue = Relude.Int.fromString(e)->(Relude.Option.getOrElse(0, _))
-            Result.error(intValue * 2)
-          },
-          _,
-        )
+      Result.error("42")->Result.catchError(
+        e => {
+          let intValue = Relude.Int.fromString(e)->Relude.Option.getOrElse(0, _)
+          Result.error(intValue * 2)
+        },
+        _,
       ),
     )->toEqual(Error(84))
   )
 
   test("handleError success", () =>
-    expect(Result.pure(42)->(Result.handleError((_e: string) => 84, _)))->toEqual(Ok(42))
+    expect(Result.pure(42)->Result.handleError((_e: string) => 84, _))->toEqual(Ok(42))
   )
 
   test("handleError failure", () =>
-    expect(Result.error("42")->(Result.handleError(e => int_of_string(e) * 2, _)))->toEqual(Ok(84))
+    expect(
+      Result.error("42")->Result.handleError(e => Int.fromString(e)->Option.getOrThrow * 2, _),
+    )->toEqual(Ok(84))
   )
 
   test("mapHandleError success", () =>
-    expect(Result.pure(42)->(Result.mapHandleError(a => a * 2, int_of_string, _)))->toEqual(Ok(84))
+    expect(
+      Result.pure(42)->Result.mapHandleError(
+        a => a * 2,
+        s => s->Int.fromString->Option.getOrThrow,
+        _,
+      ),
+    )->toEqual(Ok(84))
   )
 
   test("mapHandleError failure", () =>
-    expect(Result.error("42")->(Result.mapHandleError(a => a * 2, int_of_string, _)))->toEqual(
-      Ok(42),
-    )
+    expect(
+      Result.error("42")->Result.mapHandleError(
+        a => a * 2,
+        s => s->Int.fromString->Option.getOrThrow,
+        _,
+      ),
+    )->toEqual(Ok(42))
   )
 
   test("eqBy when eq, both Ok", () =>
@@ -303,10 +310,10 @@ describe("Result", () => {
     })
     module ResultA = ResultE.WithApplicative(Option.Applicative)
     let success: option<result<int, string>> =
-      Ok(42)->(ResultA.bitraverse(i => Some(i + 3), err => Some(err ++ err), _))
+      Ok(42)->ResultA.bitraverse(i => Some(i + 3), err => Some(err ++ err), _)
 
     let failure: option<result<int, string>> =
-      Error("fail")->(ResultA.bitraverse(i => Some(i + 3), err => Some(err ++ err), _))
+      Error("fail")->ResultA.bitraverse(i => Some(i + 3), err => Some(err ++ err), _)
 
     expect((success, failure))->toEqual((Some(Ok(45)), Some(Error("failfail"))))
   })

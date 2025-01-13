@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 module Fn = Relude_Function
@@ -820,6 +817,6 @@ let rec chunk: 'a. (int, array<'a>) => array<array<'a>> = (size, xs) =>
     : xs->length <= size
     ? [xs]
     : xs
-      ->drop(size, _)
-      ->chunk(size, _)
+      ->(drop(size, _))
+      ->(chunk(size, _))
       ->(Relude_Array_Instances.concat([xs->(take(size, _))], _))

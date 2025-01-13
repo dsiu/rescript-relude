@@ -1,7 +1,4 @@
-@@uncurried
-@@uncurried.swap
-
-let listAppend = (value, list) => List.concat(list{list, list{value}})
+let listAppend = (value, list) => List.concat(list{value}, list)
 //let arrayAppend = (value, array) => Array.concat([array, [|value|]]);
 
 module EnumExtensions = (E: Relude_Interface.ENUM) => {

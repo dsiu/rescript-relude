@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 
 @@ocaml.text(`
@@ -57,7 +54,7 @@ let flip: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
   compose(double, square, 3) == 18;
 ]}
 ")
-let compose: 'a 'b 'c. (. 'b => 'c, 'a => 'b) => 'a => 'c = (f, g) => a => f(g(a))
+let compose: 'a 'b 'c. ('b => 'c, 'a => 'b) => 'a => 'c = (f, g) => a => f(g(a))
 
 @ocaml.doc("
 [flipCompose(f, g, a)] is the equivalent of [g(f(a))].
@@ -376,11 +373,11 @@ let negate = (f: 'a => bool): ('a => bool) => a => !f(a)
 // utils for converting curried functions to chained-uncurried function of single argument
 // this is needed to simulate curried callbacks in ReScript v11 default uncurried mode
 //
-let uncurryFn2: 'a 'b 'r. ((. 'a, 'b) => 'r) => 'a => 'b => 'r = f => {
+let uncurryFn2: 'a 'b 'r. (('a, 'b) => 'r) => 'a => 'b => 'r = f => {
   a => b => f(a, b)
 }
 
-let uncurryFn3: 'a 'b 'c 'r. ((. 'a, 'b, 'c) => 'r) => 'a => 'b => 'c => 'r = f => {
+let uncurryFn3: 'a 'b 'c 'r. (('a, 'b, 'c) => 'r) => 'a => 'b => 'c => 'r = f => {
   a => b => c => f(a, b, c)
 }
 

@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @ocaml.doc("
 A zipper for a non-empty multi-way/rose tree
 
@@ -316,7 +313,7 @@ Move the focus to the left a number of times, stopping if the leftmost sibling i
 ")
 let moveLeftTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
   zipper
-  ->moveLeftTimes(times, _)
+  ->(moveLeftTimes(times, _))
   ->(Relude_Option.getOrElseLazy(() => moveLeftToStart(zipper), _))
 
 @ocaml.doc("
@@ -370,7 +367,7 @@ Move the focus to the right a number of times, stopping if the rightmost sibling
 ")
 let moveRightTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
   zipper
-  ->moveRightTimes(times, _)
+  ->(moveRightTimes(times, _))
   ->(Relude_Option.getOrElseLazy(() => zipper->moveRightToEnd, _))
 
 @ocaml.doc("
@@ -431,7 +428,7 @@ Moves the zipper up a number of times, stopping if the top is reached
 ")
 let moveUpTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
   zipper
-  ->moveUpTimes(times, _)
+  ->(moveUpTimes(times, _))
   ->(Relude_Option.getOrElseLazy(() => zipper->moveUpToTop, _))
 
 @ocaml.doc("
@@ -484,7 +481,7 @@ staying on the left-most child branches.
 ")
 let moveDownTimesWithClamp: 'a. (int, t<'a>) => t<'a> = (times, zipper) =>
   zipper
-  ->moveDownTimes(times, _)
+  ->(moveDownTimes(times, _))
   ->(Relude_Option.getOrElseLazy(() => zipper->moveDownToBottom, _))
 
 @ocaml.doc("
@@ -548,7 +545,7 @@ let foldBy: 'a 'b. (list<movement>, ('b, 'a) => 'b, 'b, t<'a>) => option<(t<'a>,
   moves->(Relude_List.foldLeft((zipperAccOpt, move) => {
       zipperAccOpt->(Relude_Option.flatMap(((zipper, acc)) => {
           zipper
-          ->moveOnceBy(move, _)
+          ->(moveOnceBy(move, _))
           ->(
             Relude_Option.map(
               nextZipper => {
@@ -602,9 +599,9 @@ Equivalent to a depth first search in the currently focused tree.
 let findInFocusAndChildren: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) => {
   let rec dfs = zipper =>
     findInFocus(pred, zipper)
-    ->Relude_Option.orElseLazy(~fallback=() => {
+    ->(Relude_Option.orElseLazy(~fallback=() => {
       moveDown(zipper)->(Relude_Option.flatMap(dfs, _))
-    }, _)
+    }, _))
     ->(Relude_Option.orElseLazy(~fallback=() => {
         moveRight(zipper)->(Relude_Option.flatMap(dfs, _))
       }, _))
@@ -671,7 +668,7 @@ and findUp: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) =>
   ->moveUp
   ->(Relude_Option.flatMap(parentZipper =>
       parentZipper
-      ->findLeftOrRight(pred, _)
+      ->(findLeftOrRight(pred, _))
       ->(Relude_Option.orElseLazy(~fallback=() => parentZipper->(findUp(pred, _)), _))
     , _))
 // TODO: I think this is repeatedly searching some of the same values as we move up
@@ -685,7 +682,7 @@ and findDown: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) =>
   ->moveDown
   ->(Relude_Option.flatMap(childZipper =>
       childZipper
-      ->findRight(pred, _)
+      ->(findRight(pred, _))
       ->(Relude_Option.orElseLazy(~fallback=() => childZipper->(findDown(pred, _)), _))
     , _))
 
@@ -694,8 +691,8 @@ Attempts to find a value anywhere in the zipper, left/right/up/down
 ")
 and find: 'a. ('a => bool, t<'a>) => option<t<'a>> = (pred, zipper) =>
   zipper
-  ->findLeftOrRight(pred, _)
-  ->Relude_Option.orElseLazy(~fallback=() => zipper->(findUp(pred, _)), _)
+  ->(findLeftOrRight(pred, _))
+  ->(Relude_Option.orElseLazy(~fallback=() => zipper->(findUp(pred, _)), _))
   ->(Relude_Option.orElseLazy(~fallback=() => zipper->(findDown(pred, _)), _))
 
 @ocaml.doc("
@@ -804,7 +801,7 @@ discarding the current focus and children.
 let delete: 'a. t<'a> => option<t<'a>> = zipper =>
   zipper
   ->deleteWithPullLeft
-  ->Relude_Option.orElseLazy(~fallback=() => zipper->deleteWithPullRight, _)
+  ->(Relude_Option.orElseLazy(~fallback=() => zipper->deleteWithPullRight, _))
   ->(Relude_Option.orElseLazy(~fallback=() =>
       zipper
       ->getAncestors
@@ -836,7 +833,7 @@ let showBy: 'a. ('a => string, t<'a>) => string = (
           Relude_List.showBy(Relude_Tree.showBy(showA, ...), ...),
           ...
         ),
-        _,
+        _
       )
     )
 

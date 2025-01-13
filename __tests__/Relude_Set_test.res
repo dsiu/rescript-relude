@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -98,14 +95,14 @@ describe("Set", () => {
   test("mergeMany (all unique)", () =>
     expect({
       open IntSet
-      singleton(1)->mergeMany([2, 3], _)->eq(fromList(list{1, 2, 3}))
+      singleton(1)->(mergeMany([2, 3], _))->eq(fromList(list{1, 2, 3}))
     })->toEqual(true)
   )
 
   test("mergeMany (some duplicates)", () =>
     expect({
       open IntSet
-      fromList(list{1, 2, 3})->mergeMany([2, 3, 4], _)->eq(fromList(list{1, 2, 3, 4}))
+      fromList(list{1, 2, 3})->(mergeMany([2, 3, 4], _))->eq(fromList(list{1, 2, 3, 4}))
     })->toEqual(true)
   )
 })

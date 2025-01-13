@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 @@ocaml.text(`
 [Relude.Extensions] is a namespace module which provides access to all of the
 extension module functors.
@@ -14,7 +11,7 @@ module Bifoldable = Relude_Extensions_Bifoldable
 module Bifunctor = Relude_Extensions_Bifunctor
 module Bitraversable = Relude_Extensions_Bitraversable
 module Bounded = Relude_Extensions_Bounded
-module BoundedEnum = Relude_Extensions_BoundedEnum
+//module BoundedEnum = Relude_Extensions_BoundedEnum
 module Comonad = Relude_Extensions_Comonad
 module Contravariant = Relude_Extensions_Contravariant
 module Enum = Relude_Extensions_Enum

@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -9,7 +6,7 @@ module WithFunctor = (F: FUNCTOR) => {
     | Pure('a): t<'a>
     | Apply(F.t<'x>, t<'x => 'a>): t<'a>
 
-  let rec map: 'a 'b. (. 'a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
+  let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
     switch freeA {
     | Pure(a) => Pure(aToB(a))
     | Apply(fx, freeXToA) => Apply(fx, map(xToA => \">>"(xToA, aToB, ...), freeXToA))
@@ -22,7 +19,7 @@ module WithFunctor = (F: FUNCTOR) => {
   include Relude_Extensions_Functor.FunctorExtensions(Functor)
 
   let flip_orig: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
-  let flip_fix: 'a 'b 'c. (. ('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
+  let flip_fix: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
 
   let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {

@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 open! Relude.Globals
@@ -56,7 +53,7 @@ module User = {
 
   let compareByNameThenAge: (t, t) => ordering = Ord.by(
     user => (user.name, user.age),
-    Tuple.Tuple2.compareBy(String.compare, Int.compare, ...),
+    Tuple.Tuple2.compareBy(String.compare, Int.compare, ...)
   )
 
   module OrdByNameThenAge1: ORD with type t = t = {

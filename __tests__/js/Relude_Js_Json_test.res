@@ -1,6 +1,3 @@
-@@uncurried
-@@uncurried.swap
-
 open Jest
 open Expect
 
@@ -80,7 +77,7 @@ describe("Json", () => {
     expect(
       [Js.Dict.fromList(list{("a", JE.bool(true))})]
       ->JE.arrayOfDict
-      ->Json.toArrayOfJsonOrElse([JE.bool(false)], _)
+      ->(Json.toArrayOfJsonOrElse([JE.bool(false)], _))
       ->JE.array
       ->Json.show(~indentSpaces=0),
     )->toEqual(`[{"a":true}]`)
@@ -90,7 +87,7 @@ describe("Json", () => {
     expect(
       %raw(`""`)
       ->JE.arrayOfDict
-      ->Json.toArrayOfJsonOrElse([JE.bool(false)], _)
+      ->(Json.toArrayOfJsonOrElse([JE.bool(false)], _))
       ->JE.array
       ->Json.show(~indentSpaces=0),
     )->toEqual(`[false]`)
@@ -133,7 +130,7 @@ describe("Json", () => {
     expect(
       list{Js.Dict.fromList(list{("a", JE.bool(true))})}
       ->JE.listOfDict
-      ->Json.toListOfJsonOrElse(list{JE.bool(false)}, _)
+      ->(Json.toListOfJsonOrElse(list{JE.bool(false)}, _))
       ->JE.list
       ->Json.show(~indentSpaces=0),
     )->toEqual(`[{"a":true}]`)
@@ -142,7 +139,7 @@ describe("Json", () => {
   test("toListOfJsonOrElse none", () =>
     expect(
       %raw(`""`)
-      ->Json.toListOfJsonOrElse(list{JE.bool(false)}, _)
+      ->(Json.toListOfJsonOrElse(list{JE.bool(false)}, _))
       ->JE.list
       ->Json.show(~indentSpaces=0),
     )->toEqual("[false]")
@@ -445,13 +442,13 @@ describe("Json", () => {
   })
 
   test("nullAt (success)", () =>
-    [JE.string("hi"), JE.null]->JE.array->JD.nullAt(1, _)->expect->toEqual(Validation.ok())
+    [JE.string("hi"), JE.null]->JE.array->(JD.nullAt(1, _))->expect->toEqual(Validation.ok())
   )
 
   test("nullAt (error)", () =>
     [JE.string("hi"), JE.string("bye")]
     ->JE.array
-    ->JD.nullAt(1, _)
+    ->(JD.nullAt(1, _))
     ->expect
     ->toEqual(Validation.error(NonEmptyArray.make("1: JSON value is not a null: \"bye\"", [])))
   )
