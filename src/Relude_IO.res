@@ -1,3 +1,6 @@
+@@uncurried
+@@uncurried.swap
+
 open BsBastet.Interface
 open Relude_Function.Infix
 
@@ -469,11 +472,11 @@ let rec compose: 'a 'b 'c 'e. (t<'b => 'c, 'e>, t<'a => 'b, 'e>) => t<'a => 'c, 
   switch ioAToB {
   | Pure(aToB) => composePure(aToB, ioBToC)
   | Throw(e) => composeThrow(e, ioBToC)
-  | Suspend(getAToB) => composeSuspend((_, x) => getAToB()(x), ioBToC)
+  | Suspend(getAToB) => composeSuspend(getAToB, ioBToC)
   | SuspendIO(getIOAToB) => composeSuspendIO(getIOAToB, ioBToC)
   | Async(onDoneAToB) => composeAsync(onDoneAToB, ioBToC)
-  | Map(r0ToAToB, ioR0) => composeMap((r, a) => r0ToAToB(r)(a), ioR0, ioBToC)
-  //| Apply(ioR0ToAToB, ioR0) => composeApply(ioR0ToAToB, ioR0, ioBToC)
+  | Map(r0ToAToB, ioR0) => composeMap(r0ToAToB, ioR0, ioBToC)
+  | Apply(ioR0ToAToB, ioR0) => composeApply(ioR0ToAToB, ioR0, ioBToC)
   | FlatMap(r0ToIOAToB, ioR0) => composeFlatMap(r0ToIOAToB, ioR0, ioBToC)
   }
 
@@ -521,35 +524,35 @@ and composeThrow: 'a 'b 'c 'e. ('e, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (e, io
 @ocaml.doc("
 compose specialization for a left-hand-side Suspend
 ")
-and composeSuspend: 'a 'b 'c 'e. ((unit, 'a) => 'b, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (
+and composeSuspend: 'a 'b 'c 'e. (unit => 'a => 'b, t<'b => 'c, 'e>) => t<'a => 'c, 'e> = (
   getAToB,
   ioBToC,
 ) =>
   switch ioBToC {
-  | Pure(bToC) => Suspend(() => \">>"(x => getAToB((), x), bToC, ...))
+  | Pure(bToC) => Suspend(() => \">>"(x => getAToB()(x), bToC, ...))
   | Throw(_) as t => t
-  | Suspend(getBToC) => Suspend(() => \">>"(x => getAToB((), x), getBToC(), ...))
+  | Suspend(getBToC) => Suspend(() => \">>"(x => getAToB()(x), getBToC(), ...))
   | SuspendIO(getIOBToC) =>
-    SuspendIO(() => getIOBToC()->map(bToC => \">>"(x => getAToB((), x), bToC, ...), _))
+    SuspendIO(() => getIOBToC()->map(bToC => \">>"(x => getAToB()(x), bToC, ...), _))
   | Async(onDoneBToC) =>
     Async(
       onDone =>
         onDoneBToC(x =>
           switch x {
           | Error(_) as resultE => onDone(resultE)
-          | Ok(bToC) => onDone(Ok(\">>"(x => getAToB((), x), bToC, ...)))
+          | Ok(bToC) => onDone(Ok(\">>"(x => getAToB()(x), bToC, ...)))
           }
         ),
     )
-  | Map(r0ToBToC, ioR0) => ioR0->map(r0 => \">>"(x => getAToB((), x), r0ToBToC(r0), ...), _)
+  | Map(r0ToBToC, ioR0) => ioR0->map(r0 => \">>"(x => getAToB()(x), r0ToBToC(r0), ...), _)
   | Apply(ioR0ToBToC, ioR0) =>
     ioR0->apply(
-      ioR0ToBToC->map(r0ToBToC => r0 => \">>"(x => getAToB((), x), r0ToBToC(r0), ...), _),
+      ioR0ToBToC->map(r0ToBToC => r0 => \">>"(x => getAToB()(x), r0ToBToC(r0), ...), _),
       _,
     )
 
   | FlatMap(r0ToIOBToC, ioR0) =>
-    ioR0->flatMap(r0 => r0ToIOBToC(r0)->map(bToC => \">>"(x => getAToB((), x), bToC, ...), _), _)
+    ioR0->flatMap(r0 => r0ToIOBToC(r0)->map(bToC => \">>"(x => getAToB()(x), bToC, ...), _), _)
   }
 
 @ocaml.doc("
@@ -705,24 +708,24 @@ and composeAsync: 'a 'b 'c 'e. (
 compose specialization for a left-hand-side Map
 ")
 and composeMap: 'a 'b 'c 'r0 'e. (
-  ('r0, 'a) => 'b,
+  'r0 => 'a => 'b,
   t<'r0, 'e>,
   t<'b => 'c, 'e>,
 ) => t<'a => 'c, 'e> = (r0ToAToB, ioR0, ioBToC) =>
-  ioR0->flatMap(r0 => ioBToC->map(bToC => \">>"(x => r0ToAToB(r0, x), bToC, ...), _), _)
+  ioR0->flatMap(r0 => ioBToC->map(bToC => \">>"(x => r0ToAToB(r0)(x), bToC, _), _), _)
 
 @ocaml.doc("
 compose specialization for a left-hand-side Apply
 ")
 and composeApply: 'a 'b 'c 'r0 'e. (
-  t<('r0, 'a) => 'b, 'e>,
+  t<'r0 => 'a => 'b, 'e>,
   t<'r0, 'e>,
   t<'b => 'c, 'e>,
 ) => t<'a => 'c, 'e> = (ioR0ToAToB, ioR0, ioBToC) => {
   // todo: this is a hack??
   ioR0ToAToB->flatMap(r0ToAToB => {
     ioR0->flatMap(r0 => {
-      ioBToC->(map(bToC => \">>"(a => r0ToAToB(r0, a, ...), bToC, ...), ...))
+      ioBToC->map(bToC => \">>"(r0ToAToB(r0), bToC, _), _)
     }, _)
   }, _)
 }
