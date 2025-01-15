@@ -1,5 +1,7 @@
 // Inspired by https://github.com/dbuenzli/hmap
 
+module Map = Ocaml_map
+
 @ocaml.doc("
 Witness contains a type [t] with an existential type variable - a type that we
 capture, but lose knowledge of once captured.
