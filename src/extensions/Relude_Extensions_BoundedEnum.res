@@ -1,4 +1,4 @@
-let listAppend = (value, list) => List.concat(list{value}, list)
+let listAppend = (value, list) => List.concat(list, list{value})
 //let arrayAppend = (value, array) => Array.concat([array, [|value|]]);
 module Map = Ocaml_map
 
