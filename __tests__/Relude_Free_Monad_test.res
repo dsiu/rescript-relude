@@ -13,7 +13,7 @@ module StorageF = {
   // Define map, because we need this type to be a functor in order to make a free monad for it
   let map = (aToB, fa) =>
     switch fa {
-    | Get(key, getNext) => Get(key, \">>"(getNext, aToB))
+    | Get(key, getNext) => Get(key, \">>"(getNext, aToB, _))
     | Put(key, value, next) => Put(key, value, aToB(next))
     | Delete(key, next) => Delete(key, aToB(next))
     }
@@ -121,7 +121,7 @@ describe("Relude_Free_Monad", () =>
           StorageAPI.foldFree(StorageAPI.interpreter, program),
         )
 
-        toEqual((Some(42), Some(5), Some(99)), expect(results))
+        toEqual(expect(results), (Some(42), Some(5), Some(99)))
       },
     )
   )

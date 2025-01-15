@@ -2,183 +2,161 @@ open Jest
 open Expect
 open! Relude.Globals
 
+let int_of_string = s => s->Int.fromString->Option.getOrThrow
+let string_of_int = i => i->Int.toString
+let float_of_int = i => i->Float.fromInt
+
 let throwJSError: unit => int = %raw(` function() { throw new Error("Error from JS"); } `)
 
 Jest.useFakeTimers() // This applies to the whole file, so any tests that use delay must use the mock timer manipulation functions
 
 describe("IO basics", () => {
   testAsync("pure unsafeRunAsync", onDone =>
-    IO.pure(42)->(
-      IO.unsafeRunAsync(
-        x => {
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          }
-        },
-        _,
-      )
+    IO.pure(42)->IO.unsafeRunAsync(
+      x => {
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        }
+      },
+      _,
     )
   )
 
   testAsync("pureWithVoid unsafeRunAsync", onDone =>
-    IO.pureWithVoid(42)->(
-      IO.unsafeRunAsync(
-        x => {
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          }
-        },
-        _,
-      )
+    IO.pureWithVoid(42)->IO.unsafeRunAsync(
+      x => {
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        }
+      },
+      _,
     )
   )
 
   testAsync("throw unsafeRunAsync", onDone =>
-    IO.throwWithVoid("this is a test")->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_a) => onDone(fail("Failed"))
-          | Error(_err) => onDone(pass)
-          },
-        _,
-      )
+    IO.throwWithVoid("this is a test")->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_a) => onDone(fail("Failed"))
+        | Error(_err) => onDone(pass)
+        },
+      _,
     )
   )
 
   testAsync("suspend unsafeRunAsync", onDone =>
-    IO.suspend(() => 42)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.suspend(() => 42)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("suspendWithVoid unsafeRunAsync", onDone =>
-    IO.suspendWithVoid(() => 42)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.suspendWithVoid(() => 42)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("suspendIO pure unsafeRunAsync", onDone =>
-    IO.suspendIO(() => IO.pure(42))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.suspendIO(() => IO.pure(42))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("suspendIO suspend unsafeRunAsync", onDone =>
-    IO.suspendIO(() => IO.suspend(() => 42))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.suspendIO(() => IO.suspend(() => 42))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("suspendIO suspendIO pure unsafeRunAsync", onDone =>
-    IO.suspendIO(() => IO.suspendIO(() => IO.pure(42)))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.suspendIO(() => IO.suspendIO(() => IO.pure(42)))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("suspendIO async unsafeRunAsync", onDone =>
-    IO.suspendIO(() => IO.async(onDone => onDone(Ok(42))))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.suspendIO(() => IO.async(onDone => onDone(Ok(42))))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("async Ok unsafeRunAsync", onDone =>
-    IO.async(onDone => onDone(Ok(42)))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.async(onDone => onDone(Ok(42)))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("async Error unsafeRunAsync", onDone =>
-    IO.async(onDone => onDone(Error("it failed")))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(msg) => onDone(expect(msg)->toEqual("it failed"))
-          },
-        _,
-      )
+    IO.async(onDone => onDone(Error("it failed")))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(msg) => onDone(expect(msg)->toEqual("it failed"))
+        },
+      _,
     )
   )
 
   testAsync("pure map unsafeRunAsync", onDone =>
     IO.pure(42)
     ->(IO.map(a => a + 10, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(52))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(52))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("pure map <$$> unsafeRunAsync", onDone => {
     let \"<$$>" = IO.\"<$$>"
 
-    \"<$$>"(IO.pure(42), a => a + 10)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(52))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    \"<$$>"(IO.pure(42), a => a + 10)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(52))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   })
 
@@ -187,15 +165,13 @@ describe("IO basics", () => {
 
     IO.pure(42)
     ->(IO.tap(b => a := b, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_value) => onDone(expect(a.contents)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_value) => onDone(expect(a.contents)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   })
 
@@ -204,82 +180,70 @@ describe("IO basics", () => {
 
     IO.throw(42)
     ->(IO.tapError(b => a := b, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(_) => onDone(expect(a.contents)->toEqual(42))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(_) => onDone(expect(a.contents)->toEqual(42))
+        },
+      _,
     )
   })
 
   testAsync("pure apply unsafeRunAsync", onDone =>
     IO.pure(42)
     ->(IO.apply(IO.pure(a => a * 2), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(84))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(84))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("align pure pure", onDone =>
-    IO.align(IO.pure(42), IO.pure("a"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(ior) => onDone(expect(ior)->toEqual(Relude_Ior_Type.Both(42, "a")))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    IO.align(IO.pure(42), IO.pure("a"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(ior) => onDone(expect(ior)->toEqual(Relude_Ior_Type.Both(42, "a")))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 
   testAsync("align pure throw", onDone =>
-    IO.align(IO.pure(42), IO.throw("e2"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(ior) => onDone(expect(ior)->toEqual(Relude_Ior_Type.This(42)))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    IO.align(IO.pure(42), IO.throw("e2"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(ior) => onDone(expect(ior)->toEqual(Relude_Ior_Type.This(42)))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 
   testAsync("align throw pure", onDone =>
-    IO.align(IO.throw("e1"), IO.pure(99))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(ior) => onDone(expect(ior)->toEqual(Relude_Ior_Type.That(99)))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    IO.align(IO.throw("e1"), IO.pure(99))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(ior) => onDone(expect(ior)->toEqual(Relude_Ior_Type.That(99)))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 
   testAsync("align throw throw", onDone =>
-    IO.align(IO.throw("e1"), IO.throw("e2"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Fail"))
-          | Error(e) => onDone(expect(e)->toEqual("e1"))
-          },
-        _,
-      )
+    IO.align(IO.throw("e1"), IO.throw("e2"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Fail"))
+        | Error(e) => onDone(expect(e)->toEqual("e1"))
+        },
+      _,
     )
   )
 
@@ -290,15 +254,13 @@ describe("IO basics", () => {
       | Relude_Ior_Type.That(b) => int_of_string(b)
       | Relude_Ior_Type.Both(a, b) => a + int_of_string(b)
       }
-    IO.alignWith(f, IO.pure(42), IO.pure("99"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(v) => onDone(expect(v)->toEqual(141))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    IO.alignWith(f, IO.pure(42), IO.pure("99"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(v) => onDone(expect(v)->toEqual(141))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   })
 
@@ -309,15 +271,13 @@ describe("IO basics", () => {
       | Relude_Ior_Type.That(b) => int_of_string(b)
       | Relude_Ior_Type.Both(a, b) => a + int_of_string(b)
       }
-    IO.alignWith(f, IO.pure(42), IO.throw("e2"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(v) => onDone(expect(v)->toEqual(42))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    IO.alignWith(f, IO.pure(42), IO.throw("e2"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(v) => onDone(expect(v)->toEqual(42))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   })
 
@@ -328,15 +288,13 @@ describe("IO basics", () => {
       | Relude_Ior_Type.That(b) => int_of_string(b)
       | Relude_Ior_Type.Both(a, b) => a + int_of_string(b)
       }
-    IO.alignWith(f, IO.throw("e1"), IO.pure("99"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(v) => onDone(expect(v)->toEqual(99))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    IO.alignWith(f, IO.throw("e1"), IO.pure("99"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(v) => onDone(expect(v)->toEqual(99))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   })
 
@@ -347,45 +305,39 @@ describe("IO basics", () => {
       | Relude_Ior_Type.That(b) => int_of_string(b)
       | Relude_Ior_Type.Both(a, b) => a + int_of_string(b)
       }
-    IO.alignWith(f, IO.throw("e1"), IO.throw("e2"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Fail"))
-          | Error(e) => onDone(expect(e)->toEqual("e1"))
-          },
-        _,
-      )
+    IO.alignWith(f, IO.throw("e1"), IO.throw("e2"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Fail"))
+        | Error(e) => onDone(expect(e)->toEqual("e1"))
+        },
+      _,
     )
   })
 
   testAsync("pure flatMap pure unsafeRunAsync", onDone =>
     IO.pure(42)
     ->(IO.flatMap(a => IO.pure(a + 10), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(52))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(52))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("throw flatMap unsafeRunAsync", onDone =>
     IO.throw(42)
     ->(IO.flatMap(a => IO.pure(a + 1), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(value) => onDone(expect(value)->toEqual(42))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(value) => onDone(expect(value)->toEqual(42))
+        },
+      _,
     )
   )
 
@@ -394,86 +346,74 @@ describe("IO basics", () => {
     ->(IO.flatMap(a => IO.pure(a + 10), _))
     ->(IO.flatMap(a => IO.pure(a + 10), _))
     ->(IO.flatMap(a => IO.pure(a + 10), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(72))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(72))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("pure flatMap suspend flatMap pure unsafeRunAsync", onDone =>
     IO.pure(42)
-    ->(IO.flatMap(a => IO.suspend(_ => a + 10)->(IO.flatMap(b => IO.pure(b * 2), _)), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(value) => onDone(expect(value)->toEqual(104))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->(IO.flatMap(a => IO.suspend(_ => a + 10)->IO.flatMap(b => IO.pure(b * 2), _), _))
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(value) => onDone(expect(value)->toEqual(104))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 })
 
 describe("IO fromOption", () => {
   testAsync("fromOption Some unsafeRunAsync", onDone =>
-    IO.fromOption(() => "Failed", Some(32))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(32))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.fromOption(() => "Failed", Some(32))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(32))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("fromOption None unsafeRunAsync", onDone =>
-    IO.fromOption(() => "Messed up", None)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(error) => onDone(expect(error)->toEqual("Messed up"))
-          },
-        _,
-      )
+    IO.fromOption(() => "Messed up", None)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(error) => onDone(expect(error)->toEqual("Messed up"))
+        },
+      _,
     )
   )
 })
 
 describe("IO fromResult", () => {
   testAsync("fromResult Ok unsafeRunAsync", onDone =>
-    IO.fromResult(Ok(32))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(32))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.fromResult(Ok(32))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(32))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("fromResult Error unsafeRunAsync", onDone =>
-    IO.fromResult(Error("Messed up"))->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(error) => onDone(expect(error)->toEqual("Messed up"))
-          },
-        _,
-      )
+    IO.fromResult(Error("Messed up"))->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(error) => onDone(expect(error)->toEqual("Messed up"))
+        },
+      _,
     )
   )
 })
@@ -483,30 +423,26 @@ describe("IO cond", () => {
     IO.pure("hello")
     ->(IO.cond(a => a->String.length == 5, "is five", "boom explosions", _))
     ->(IO.map(a => expect(a)->toEqual("is five"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | _ => onDone(fail("fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | _ => onDone(fail("fail"))
+        },
+      _,
     )
   )
 
   testAsync("throw cond error unsafeRunAsync", onDone =>
     IO.pure("hel")
     ->(IO.cond(a => a->String.length == 5, "is five", "boom explosions", _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("fail"))
-          | Error(a) => onDone(expect(a)->toEqual("boom explosions"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("fail"))
+        | Error(a) => onDone(expect(a)->toEqual("boom explosions"))
+        },
+      _,
     )
   )
 
@@ -514,30 +450,26 @@ describe("IO cond", () => {
     IO.pure("hello world")
     ->(IO.condError(a => a->String.length == 5, "string is too long", _))
     ->(IO.mapError(a => expect(a)->toEqual("string is too long"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("fail"))
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("fail"))
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
   testAsync("pure condError ok unsafeRunAsync", onDone =>
     IO.pure("hello")
     ->(IO.condError(a => a->String.length == 5, "string is too long", _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual("hello"))
-          | Error(_) => onDone(fail("fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual("hello"))
+        | Error(_) => onDone(fail("fail"))
+        },
+      _,
     )
   )
 })
@@ -554,15 +486,13 @@ describe("IO compose", () => {
         {
           open IO
           \"<<<"(ioBToC, ioAToB)
-        }->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        }->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -575,15 +505,13 @@ describe("IO compose", () => {
         {
           open IO
           \">>>"(ioAToB, ioBToC)
-        }->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        }->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -593,15 +521,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -611,15 +537,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -629,15 +553,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -647,15 +569,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Result.ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -665,15 +585,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Result.error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -683,15 +601,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -701,15 +617,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -720,15 +634,13 @@ describe("IO compose", () => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
         let ioAToB = IO.pure(a => a ++ "1")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a("0"))->toEqual("012"))
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -742,15 +654,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(i => i + 42)
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -760,15 +670,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error 2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -778,15 +686,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => i => i + 42)
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -796,15 +702,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(i => i + 42))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -814,15 +718,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Result.ok(i => i + 42)))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -832,15 +734,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Result.error("error 2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -850,15 +750,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(a => b => a + b, IO.pure(1))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -868,15 +766,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(a => b => a + b), IO.pure(1))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -886,15 +782,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(a => IO.pure(b => a + b), IO.pure(0))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => onDone(expect(e)->toEqual("error"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => onDone(expect(e)->toEqual("error"))
+            },
+          _,
         )
       },
     )
@@ -908,15 +802,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -926,15 +818,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -944,15 +834,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -962,15 +850,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -980,15 +866,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -998,15 +882,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1016,15 +898,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1034,15 +914,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1052,15 +930,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1074,15 +950,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1092,15 +966,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1110,15 +982,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1128,15 +998,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1146,15 +1014,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1164,15 +1030,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1182,15 +1046,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1200,15 +1062,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1218,15 +1078,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1240,15 +1098,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1258,15 +1114,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1276,15 +1130,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1294,15 +1146,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1312,15 +1162,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(_b => Result.error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual(Result.error("error"))->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual(Result.error("error"))->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1330,15 +1178,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1348,15 +1194,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1366,15 +1210,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1384,15 +1226,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1402,15 +1242,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1424,15 +1262,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1442,15 +1278,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1460,15 +1294,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1478,15 +1310,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1496,15 +1326,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1514,15 +1342,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1532,15 +1358,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1550,15 +1374,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1568,15 +1390,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1590,15 +1410,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1608,15 +1426,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1626,15 +1442,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1644,15 +1458,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1662,15 +1474,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1680,15 +1490,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1698,15 +1506,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1716,15 +1522,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1734,15 +1538,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1756,15 +1558,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1774,15 +1574,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1792,15 +1590,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1810,15 +1606,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1828,15 +1622,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1846,15 +1638,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1864,15 +1654,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1882,15 +1670,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1900,15 +1686,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1922,15 +1706,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.pure(b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1940,15 +1722,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.throw("error")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -1958,15 +1738,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspend(() => b => b ++ "2")
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1976,15 +1754,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.suspendIO(() => IO.pure(b => b ++ "2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -1994,15 +1770,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Ok(b => b ++ "2")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -2012,15 +1786,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.async(onDone => onDone(Error("error")))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("fail"))
-              | Error(e) => expect(e)->toEqual("error")->onDone
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("fail"))
+            | Error(e) => expect(e)->toEqual("error")->onDone
+            },
+          _,
         )
       },
     )
@@ -2030,15 +1802,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.map(two => b => b ++ two, IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -2048,15 +1818,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.apply(IO.pure(two => b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -2066,15 +1834,13 @@ describe("IO compose", () => {
       onDone => {
         let ioBToC = IO.flatMap(two => IO.pure(b => b ++ two), IO.pure("2"))
 
-        IO.compose(ioBToC, ioAToB)->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a("0"))->toEqual("012")->onDone
-              | Error(_) => onDone(fail("fail"))
-              },
-            _,
-          )
+        IO.compose(ioBToC, ioAToB)->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a("0"))->toEqual("012")->onDone
+            | Error(_) => onDone(fail("fail"))
+            },
+          _,
         )
       },
     )
@@ -2085,30 +1851,26 @@ describe("IO mapError", () => {
   testAsync("pure mapError unsafeRunAsync", onDone =>
     IO.pure(42)
     ->(IO.mapError(_ => "error", _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("throw mapError unsafeRunAsync", onDone =>
     IO.throw("this is a test")
     ->(IO.mapError(msg => Relude_Js_Exn.make(msg), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_a) => onDone(fail("Failed"))
-          | Error(_err) => onDone(pass)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_a) => onDone(fail("Failed"))
+        | Error(_err) => onDone(pass)
+        },
+      _,
     )
   )
 })
@@ -2117,15 +1879,13 @@ describe("IO catchError", () => {
   testAsync("pure catchError unsafeRunAsync", onDone =>
     IO.pure(42)
     ->(IO.catchError((e: string) => IO.throw(e ++ e), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(42))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(42))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
@@ -2133,20 +1893,18 @@ describe("IO catchError", () => {
     IO.throw("42")
     ->(IO.catchError(
       (e: string) => {
-        let intValue = Relude.Int.fromString(e)->(Relude.Option.getOrElse(0, _))
+        let intValue = Relude.Int.fromString(e)->Relude.Option.getOrElse(0, _)
         IO.throw(intValue * 2)
       },
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(v) => onDone(expect(v)->toEqual(84))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(v) => onDone(expect(v)->toEqual(84))
+        },
+      _,
     )
   )
 
@@ -2154,45 +1912,39 @@ describe("IO catchError", () => {
     IO.pure(42)
     ->(IO.flatMap(a => IO.throw(string_of_int(a)), _))
     ->(IO.catchError(_ => IO.pure(55), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(55))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(55))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 
   testAsync("async (ok) catchError unsafeRunAsync", onDone =>
     IO.async(onDone => onDone(Result.ok("0")))
     ->(IO.catchError((e: string) => IO.throw(e ++ "1"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual("0"))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual("0"))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("async (error) catchError unsafeRunAsync", onDone =>
     IO.async(onDone => onDone(Result.error("0")))
     ->(IO.catchError((e: string) => IO.throw(e ++ "1"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(e) => onDone(expect(e)->toEqual("01"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(e) => onDone(expect(e)->toEqual("01"))
+        },
+      _,
     )
   )
 
@@ -2204,15 +1956,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.pure("0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2221,15 +1971,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.throw("0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual("02"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual("02"))
+            },
+          _,
         ),
     )
 
@@ -2238,15 +1986,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.suspend(() => "0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2255,15 +2001,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.suspendIO(() => IO.pure("0")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2272,15 +2016,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.async(onDone => onDone(Result.ok("0"))))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2289,15 +2031,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.async(onDone => onDone(Result.error("0"))))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual("02"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual("02"))
+            },
+          _,
         ),
     )
 
@@ -2306,15 +2046,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.map(a => a ++ "0", IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2323,15 +2061,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.apply(IO.pure(a => a ++ "0"), IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2340,15 +2076,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.map(r0ToA, IO.flatMap(a => IO.pure(a ++ "0"), IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
   })
@@ -2361,15 +2095,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.pure("0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2378,15 +2110,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.throw("0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual("02"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual("02"))
+            },
+          _,
         ),
     )
 
@@ -2395,15 +2125,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.suspend(() => "0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2412,15 +2140,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.suspendIO(() => IO.pure("0")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2429,15 +2155,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.async(onDone => onDone(Result.ok("0"))))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2446,15 +2170,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.async(onDone => onDone(Result.error("0"))))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual("02"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual("02"))
+            },
+          _,
         ),
     )
 
@@ -2463,15 +2185,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.map(a => a ++ "0", IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2480,15 +2200,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.apply(IO.pure(a => a ++ "0"), IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2497,15 +2215,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.apply(ioR0ToA, IO.flatMap(a => IO.pure(a ++ "0"), IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
   })
@@ -2518,15 +2234,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.pure("0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2535,15 +2249,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.throw("0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual("02"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual("02"))
+            },
+          _,
         ),
     )
 
@@ -2552,15 +2264,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.suspend(() => "0"))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2569,15 +2279,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.suspendIO(() => IO.pure("0")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2586,15 +2294,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.async(onDone => onDone(Result.ok("0"))))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2603,15 +2309,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.async(onDone => onDone(Result.error("0"))))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual("02"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual("02"))
+            },
+          _,
         ),
     )
 
@@ -2620,15 +2324,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.map(a => a ++ "0", IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2637,15 +2339,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.apply(IO.pure(a => a ++ "0"), IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -2654,15 +2354,13 @@ describe("IO catchError", () => {
       onDone =>
         IO.flatMap(r0ToIOA, IO.flatMap(a => IO.pure(a ++ "0"), IO.pure("+")))
         ->(IO.catchError((e: string) => IO.throw(e ++ "2"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual("+01"))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual("+01"))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
   })
@@ -2672,15 +2370,13 @@ describe("IO handleError", () =>
   testAsync("throw handleError unsafeRunAsync", onDone =>
     IO.throw("42")
     ->(IO.handleError(e => int_of_string(e), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(42))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(42))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 )
@@ -2689,30 +2385,26 @@ describe("IO mapHandleError", () => {
   testAsync("pure mapHandleError unsafeRunAsync", onDone =>
     IO.pure(42)
     ->(IO.mapHandleError(a => a * 2, int_of_string, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(b) => onDone(expect(b)->toEqual(84))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(b) => onDone(expect(b)->toEqual(84))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 
   testAsync("pure mapHandleError unsafeRunAsync", onDone =>
     IO.throw("42")
     ->(IO.mapHandleError(a => a * 2, int_of_string, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(b) => onDone(expect(b)->toEqual(42))
-          | Error(_) => onDone(fail("Fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(b) => onDone(expect(b)->toEqual(42))
+        | Error(_) => onDone(fail("Fail"))
+        },
+      _,
     )
   )
 })
@@ -2722,15 +2414,13 @@ describe("IO bimap/bitap", () => {
     IO.suspend(() => 42)
     ->(IO.bimap(a => a * 2, e => e ++ e, _))
     ->(IO.bimap(a => expect(a)->toEqual(84), _ => fail("fail"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -2739,15 +2429,13 @@ describe("IO bimap/bitap", () => {
 
     IO.pure(42)
     ->(IO.bitap(b => a := b + 1, e => a := e - 1, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(expect(a.contents)->toEqual(43))
-          | Error(_) => onDone(fail("fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(expect(a.contents)->toEqual(43))
+        | Error(_) => onDone(fail("fail"))
+        },
+      _,
     )
   })
 
@@ -2756,15 +2444,13 @@ describe("IO bimap/bitap", () => {
 
     IO.throw(42)
     ->(IO.bitap(b => a := b + 1, e => a := e - 1, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("fail"))
-          | Error(_) => onDone(expect(a.contents)->toEqual(41))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("fail"))
+        | Error(_) => onDone(expect(a.contents)->toEqual(41))
+        },
+      _,
     )
   })
 })
@@ -2780,15 +2466,13 @@ describe("IO alt", () => {
       _ => fail("Failed"),
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 
@@ -2810,15 +2494,13 @@ describe("IO alt", () => {
       _ => fail("Failed"),
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 
@@ -2832,15 +2514,13 @@ describe("IO alt", () => {
       _ => fail("Failed"),
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 
@@ -2859,15 +2539,13 @@ describe("IO alt", () => {
       _ => fail("Failed"),
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 
@@ -2884,15 +2562,13 @@ describe("IO alt", () => {
       _ => fail("Failed"),
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 
@@ -2917,61 +2593,53 @@ describe("IO alt", () => {
       _ => fail("Failed"),
       _,
     ))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 })
 
 describe("IO tries/exceptions", () => {
   testAsync("tries unsafeRunAsync", onDone =>
-    IO.tries(throwJSError)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Should not be Ok"))
-          | Error(Js.Exn.Error(jsExn)) =>
-            let msg = Js.Exn.message(jsExn)
-            onDone(expect(msg)->toEqual(Some("Error from JS")))
-          | Error(_) => onDone(fail("Should have been an Js.Exn"))
-          },
-        _,
-      )
+    IO.tries(throwJSError)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Should not be Ok"))
+        | Error(Js.Exn.Error(jsExn)) =>
+          let msg = Js.Exn.message(jsExn)
+          onDone(expect(msg)->toEqual(Some("Error from JS")))
+        | Error(_) => onDone(fail("Should have been an Js.Exn"))
+        },
+      _,
     )
   )
 
   testAsync("triesJS unsafeRunAsync", onDone =>
-    IO.triesJS(throwJSError)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Should not be Ok"))
-          | Error(jsExn) =>
-            let msg = Js.Exn.message(jsExn)
-            onDone(expect(msg)->toEqual(Some("Error from JS")))
-          },
-        _,
-      )
+    IO.triesJS(throwJSError)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Should not be Ok"))
+        | Error(jsExn) =>
+          let msg = Js.Exn.message(jsExn)
+          onDone(expect(msg)->toEqual(Some("Error from JS")))
+        },
+      _,
     )
   )
 
   testAsync("triesJS with Reason Js.Exn.raiseError", onDone =>
-    IO.triesJS(() => Js.Exn.raiseError("Fail"))->(
-      IO.unsafeRunAsync(
-        result =>
-          switch result {
-          | Ok(_) => onDone(fail("Should not be Ok"))
-          | Error(e) => onDone(expect(Js.Exn.message(e))->toEqual(Some("Fail")))
-          },
-        _,
-      )
+    IO.triesJS(() => Js.Exn.raiseError("Fail"))->IO.unsafeRunAsync(
+      result =>
+        switch result {
+        | Ok(_) => onDone(fail("Should not be Ok"))
+        | Error(e) => onDone(expect(Js.Exn.message(e))->toEqual(Some("Fail")))
+        },
+      _,
     )
   )
 
@@ -2982,15 +2650,13 @@ describe("IO tries/exceptions", () => {
       }
     `)
 
-    IO.triesJS(() => jsThrow())->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Should not be Ok"))
-          | Error(e) => onDone(expect(Js.Exn.message(e))->toEqual(Some("This sucks")))
-          },
-        _,
-      )
+    IO.triesJS(() => jsThrow())->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Should not be Ok"))
+        | Error(e) => onDone(expect(Js.Exn.message(e))->toEqual(Some("This sucks")))
+        },
+      _,
     )
   })
 
@@ -3000,19 +2666,15 @@ describe("IO tries/exceptions", () => {
   Skip.testAsync("triesJS with exn", onDone => {
     exception MyExn(string)
 
-    IO.triesJS(() => raise(MyExn("Custom error")))->(
-      IO.unsafeRunAsync(
-        result =>
-          switch result {
-          | Ok(_) => onDone(fail("Should not be Ok"))
-          | Error(e) =>
-            Js.log(e)
-            onDone(
-              expect(Js.Exn.message(e))->toEqual(Some("Unexpected error: MyExn,8,Custom error")),
-            )
-          },
-        _,
-      )
+    IO.triesJS(() => raise(MyExn("Custom error")))->IO.unsafeRunAsync(
+      result =>
+        switch result {
+        | Ok(_) => onDone(fail("Should not be Ok"))
+        | Error(e) =>
+          Js.log(e)
+          onDone(expect(Js.Exn.message(e))->toEqual(Some("Unexpected error: MyExn,8,Custom error")))
+        },
+      _,
     )
   })
 })
@@ -3021,75 +2683,65 @@ describe("IO flip", () => {
   testAsync("pure flip unsafeRunAsync", onDone =>
     IO.pure(42)
     ->IO.flip
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(e) => onDone(expect(e)->toEqual(42))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(e) => onDone(expect(e)->toEqual(42))
+        },
+      _,
     )
   )
 
   testAsync("throw flip unsafeRunAsync", onDone =>
     IO.throw("my error")
     ->IO.flip
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual("my error"))
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual("my error"))
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("suspend flip unsafeRunAsync", onDone =>
     IO.suspend(() => 42)
     ->IO.flip
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(e) => onDone(expect(e)->toEqual(42))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(e) => onDone(expect(e)->toEqual(42))
+        },
+      _,
     )
   )
 
   testAsync("suspendIO flip unsafeRunAsync", onDone =>
     IO.suspendIO(() => Pure(42))
     ->IO.flip
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(e) => onDone(expect(e)->toEqual(42))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(e) => onDone(expect(e)->toEqual(42))
+        },
+      _,
     )
   )
 
   testAsync("async flip unsafeRunAsync", onDone =>
     IO.async(onDone => onDone(Ok(42)))
     ->IO.flip
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(e) => onDone(expect(e)->toEqual(42))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(e) => onDone(expect(e)->toEqual(42))
+        },
+      _,
     )
   )
 
@@ -3100,15 +2752,13 @@ describe("IO flip", () => {
         IO.pure(42)
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3118,15 +2768,13 @@ describe("IO flip", () => {
         IO.throw(42)
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual(42))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual(42))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -3136,15 +2784,13 @@ describe("IO flip", () => {
         IO.suspend(() => 42)
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3154,15 +2800,13 @@ describe("IO flip", () => {
         IO.suspendIO(() => IO.pure(42))
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3172,15 +2816,13 @@ describe("IO flip", () => {
         IO.async(onDone => onDone(Result.ok(42)))
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3190,15 +2832,13 @@ describe("IO flip", () => {
         IO.async(onDone => onDone(Result.error(42)))
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual(42))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual(42))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -3208,15 +2848,13 @@ describe("IO flip", () => {
         IO.map(b => b + 42, IO.pure(0))
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3226,15 +2864,13 @@ describe("IO flip", () => {
         IO.apply(IO.pure(b => b + 42), IO.pure(0))
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3244,15 +2880,13 @@ describe("IO flip", () => {
         IO.flatMap(b => IO.pure(b + 42), IO.pure(0))
         ->(IO.map(a => a + 10, _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
   })
@@ -3264,15 +2898,13 @@ describe("IO flip", () => {
         IO.pure(42)
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3282,15 +2914,13 @@ describe("IO flip", () => {
         IO.throw(42)
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual(42))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual(42))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -3300,15 +2930,13 @@ describe("IO flip", () => {
         IO.suspend(() => 42)
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3318,15 +2946,13 @@ describe("IO flip", () => {
         IO.suspendIO(() => IO.pure(42))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3336,15 +2962,13 @@ describe("IO flip", () => {
         IO.async(onDone => onDone(Result.ok(42)))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3354,15 +2978,13 @@ describe("IO flip", () => {
         IO.async(onDone => onDone(Result.error(42)))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual(42))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual(42))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -3372,15 +2994,13 @@ describe("IO flip", () => {
         IO.map(b => b + 42, IO.pure(0))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3390,15 +3010,13 @@ describe("IO flip", () => {
         IO.apply(IO.pure(b => b + 42), IO.pure(0))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3408,15 +3026,13 @@ describe("IO flip", () => {
         IO.map(b => b + 42, IO.pure(0))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3426,15 +3042,13 @@ describe("IO flip", () => {
         IO.flatMap(b => IO.pure(b + 42), IO.pure(0))
         ->(IO.apply(IO.pure(a => a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
   })
@@ -3443,15 +3057,13 @@ describe("IO flip", () => {
     IO.pure(42)
     ->(IO.flatMap(a => Pure(a + 10), _))
     ->IO.flip
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(fail("Failed"))
-          | Error(e) => onDone(expect(e)->toEqual(52))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(fail("Failed"))
+        | Error(e) => onDone(expect(e)->toEqual(52))
+        },
+      _,
     )
   )
 
@@ -3465,15 +3077,13 @@ describe("IO flip", () => {
         ->(IO.map(a => a + 1000, _))
         ->(IO.flatMap(a => IO.async(onDone => onDone(Result.ok(a + 10000))), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(11152))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(11152))
+            },
+          _,
         ),
     )
 
@@ -3483,15 +3093,13 @@ describe("IO flip", () => {
         IO.throw(42)
         ->(IO.flatMap(a => Pure(a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => onDone(expect(a)->toEqual(42))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => onDone(expect(a)->toEqual(42))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         ),
     )
 
@@ -3501,15 +3109,13 @@ describe("IO flip", () => {
         IO.suspend(() => 42)
         ->(IO.flatMap(a => Pure(a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3519,15 +3125,13 @@ describe("IO flip", () => {
         IO.suspendIO(() => IO.pure(42))
         ->(IO.flatMap(a => Pure(a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3538,15 +3142,13 @@ describe("IO flip", () => {
         ->(IO.flatMap(a => IO.suspend(() => a), _))
         ->IO.flip
         ->(IO.bimap(_ => fail("fail"), e => expect(e)->toEqual(42), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3556,15 +3158,13 @@ describe("IO flip", () => {
         IO.map(a => a + 42, IO.pure(0))
         ->(IO.flatMap(a => Pure(a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3574,15 +3174,13 @@ describe("IO flip", () => {
         IO.apply(IO.pure(a => a + 42), IO.pure(0))
         ->(IO.flatMap(a => Pure(a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
 
@@ -3592,15 +3190,13 @@ describe("IO flip", () => {
         IO.flatMap(a => IO.pure(a + 42), IO.pure(0))
         ->(IO.flatMap(a => Pure(a + 10), _))
         ->IO.flip
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(fail("Failed"))
-              | Error(e) => onDone(expect(e)->toEqual(52))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(fail("Failed"))
+            | Error(e) => onDone(expect(e)->toEqual(52))
+            },
+          _,
         ),
     )
   })
@@ -3611,15 +3207,13 @@ describe("IO summonError", () => {
     IO.pure(42)
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Ok(42)), _e => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3627,15 +3221,13 @@ describe("IO summonError", () => {
     IO.suspend(() => 42)
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Ok(42)), _e => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3643,15 +3235,13 @@ describe("IO summonError", () => {
     IO.suspendIO(() => IO.pure(42))
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Ok(42)), _e => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3659,31 +3249,27 @@ describe("IO summonError", () => {
     IO.suspendIO(() => IO.throw("error!"))
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Error("error!")), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
   testAsync("suspendIO pure map flatMap pure summonError bimap unsafeRunAsync", onDone =>
-    IO.suspendIO(() => IO.pure(42)->(IO.map(a => a + 10, _))->(IO.flatMap(a => IO.pure(a + 11), _)))
+    IO.suspendIO(() => IO.pure(42)->(IO.map(a => a + 10, _))->IO.flatMap(a => IO.pure(a + 11), _))
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Ok(63)), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3692,15 +3278,13 @@ describe("IO summonError", () => {
     ->(IO.flatMap(IO.pure, _))
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Ok(42)), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3709,15 +3293,13 @@ describe("IO summonError", () => {
     ->(IO.flatMap(IO.throw, _))
     ->IO.summonError
     ->(IO.bimap(resA => expect(resA)->toEqual(Error(42)), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3726,15 +3308,13 @@ describe("IO summonError", () => {
     ->(IO.flatMap(a => IO.suspend(() => a), _))
     ->IO.summonError
     ->(IO.bimap(res => expect(res)->toEqual(Ok(42)), Relude.Void.absurd, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -3744,15 +3324,13 @@ describe("IO summonError", () => {
       onDone =>
         IO.map(a => a + 42, IO.throw(1))
         ->IO.summonError
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(a) => expect(a->Result.getError)->toEqual(Some(1))->onDone
-              | Error(_) => fail("Failed")->onDone
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(a) => expect(a->Result.getError)->toEqual(Some(1))->onDone
+            | Error(_) => fail("Failed")->onDone
+            },
+          _,
         ),
     )
 
@@ -3762,15 +3340,13 @@ describe("IO summonError", () => {
         IO.map(a => a + 42, IO.suspend(() => 1))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(43)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3780,15 +3356,13 @@ describe("IO summonError", () => {
         IO.map(a => a + 42, IO.suspendIO(() => IO.pure(1)))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(43)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3798,15 +3372,13 @@ describe("IO summonError", () => {
         IO.map(a => a + 42, IO.async(onDone => onDone(Result.ok(1))))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(43)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3816,15 +3388,13 @@ describe("IO summonError", () => {
         IO.map(a => a + 42, IO.map(b => b + 2, IO.pure(1)))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(45)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3834,15 +3404,13 @@ describe("IO summonError", () => {
         IO.map(a => a + 42, IO.apply(IO.pure(b => b + 2), IO.pure(1)))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(45)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3852,15 +3420,13 @@ describe("IO summonError", () => {
         IO.map(a => a + 42, IO.flatMap(b => IO.pure(b + 2), IO.pure(1)))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(45)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
   })
@@ -3873,15 +3439,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3894,15 +3458,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.tap(b => a := b->Result.getError, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(expect(a.contents)->toEqual(Some(2)))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(expect(a.contents)->toEqual(Some(2)))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         )
       },
     )
@@ -3914,15 +3476,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3933,15 +3493,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3952,15 +3510,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -3973,15 +3529,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.tap(b => a := b->Result.getError, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(expect(a.contents)->toEqual(Some(42)))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(expect(a.contents)->toEqual(Some(42)))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         )
       },
     )
@@ -3993,15 +3547,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4012,15 +3564,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4031,15 +3581,13 @@ describe("IO summonError", () => {
         ->(IO.apply(IO.pure(a => a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
   })
@@ -4052,15 +3600,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4073,15 +3619,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.tap(b => a := b->Result.getError, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(expect(a.contents)->toEqual(Some(2)))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(expect(a.contents)->toEqual(Some(2)))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         )
       },
     )
@@ -4093,15 +3637,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4112,15 +3654,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4131,15 +3671,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4152,15 +3690,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.tap(b => a := b->Result.getError, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(_) => onDone(expect(a.contents)->toEqual(Some(42)))
-              | Error(_) => onDone(fail("Failed"))
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(_) => onDone(expect(a.contents)->toEqual(Some(42)))
+            | Error(_) => onDone(fail("Failed"))
+            },
+          _,
         )
       },
     )
@@ -4172,15 +3708,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4191,15 +3725,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4210,15 +3742,13 @@ describe("IO summonError", () => {
         ->(IO.flatMap(a => IO.pure(a * 2), _))
         ->IO.summonError
         ->(IO.bimap(res => expect(res)->toEqual(Ok(84)), Relude.Void.absurd, _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
   })
@@ -4229,15 +3759,13 @@ describe("IO unsummonError", () => {
     IO.pure(Ok(42))
     ->IO.unsummonError
     ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4245,15 +3773,13 @@ describe("IO unsummonError", () => {
     IO.pure(Error("e!"))
     ->IO.unsummonError
     ->(IO.bimap(_ => fail("Failed"), error => expect(error)->toEqual("e!"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4261,15 +3787,13 @@ describe("IO unsummonError", () => {
     IO.suspend(() => Ok(42))
     ->IO.unsummonError
     ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4277,15 +3801,13 @@ describe("IO unsummonError", () => {
     IO.suspend(() => Error("e!"))
     ->IO.unsummonError
     ->(IO.bimap(_ => fail("Failed"), error => expect(error)->toEqual("e!"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4293,15 +3815,13 @@ describe("IO unsummonError", () => {
     IO.suspendIO(() => IO.pure(Ok(42)))
     ->IO.unsummonError
     ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4309,15 +3829,13 @@ describe("IO unsummonError", () => {
     IO.suspendIO(() => IO.pure(Error("e!")))
     ->IO.unsummonError
     ->(IO.bimap(_ => fail("Failed"), error => expect(error)->toEqual("e!"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4329,15 +3847,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.pure(Ok(a + 42)), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4348,15 +3864,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.pure(Ok(a + 42)), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4367,15 +3881,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.pure(Ok(a + 42)), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4386,15 +3898,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.suspend(() => a), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(42), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4405,15 +3915,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.pure(Ok(a + 42)), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(43), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4424,15 +3932,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.pure(Ok(a + 42)), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(43), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4443,15 +3949,13 @@ describe("IO unsummonError", () => {
         ->(IO.flatMap(a => IO.pure(Ok(a + 42)), _))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(43), _ => fail("fail"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
   })
@@ -4463,15 +3967,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.pure(0))
         ->IO.unsummonError
         ->(IO.bimap(_ => pass, _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4481,15 +3983,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.suspend(() => 0))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(1), _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4499,15 +3999,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.suspendIO(() => IO.pure(0)))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(1), _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4517,15 +4015,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.async(onDone => onDone(Ok(0))))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(1), _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4535,15 +4031,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.map(a => a + 1, IO.pure(0)))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(2), _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4553,15 +4047,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.apply(IO.pure(a => a + 1), IO.pure(0)))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(2), _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
 
@@ -4571,15 +4063,13 @@ describe("IO unsummonError", () => {
         IO.map(a => Ok(a + 1), IO.flatMap(a => IO.pure(a + 1), IO.pure(0)))
         ->IO.unsummonError
         ->(IO.bimap(a => expect(a)->toEqual(2), _ => fail("Failed"), _))
-        ->(
-          IO.unsafeRunAsync(
-            x =>
-              switch x {
-              | Ok(assertion) => onDone(assertion)
-              | Error(assertion) => onDone(assertion)
-              },
-            _,
-          )
+        ->IO.unsafeRunAsync(
+          x =>
+            switch x {
+            | Ok(assertion) => onDone(assertion)
+            | Error(assertion) => onDone(assertion)
+            },
+          _,
         ),
     )
   })
@@ -4591,15 +4081,13 @@ describe("IO unsummonError", () => {
     ->IO.summonError
     ->IO.unsummonError
     ->(IO.bimap(a => expect(a)->toEqual(63), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   )
 
@@ -4607,24 +4095,22 @@ describe("IO unsummonError", () => {
     IO.pure(42)
     ->(IO.apply(IO.pure(a => a * 2), _))
     ->IO.summonError
-    ->(IO.apply(IO.pure(res => res->(Result.map(a => a * 3, _))), _))
+    ->(IO.apply(IO.pure(res => res->Result.map(a => a * 3, _)), _))
     ->IO.unsummonError
     ->(IO.bimap(a => expect(a)->toEqual(252), _ => fail("Failed"), _))
-    ->(IO.unsafeRunAsync(res => res->Result.merge->onDone, _))
+    ->IO.unsafeRunAsync(res => res->Result.merge->onDone, _)
   )
 })
 
 describe("IO delay", () => {
   testAsync("delay unsafeRunAsync", onDone => {
-    IO.delay(10)->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(pass)
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    IO.delay(10)->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(pass)
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
 
     Jest.advanceTimersByTime(10)
@@ -4633,15 +4119,13 @@ describe("IO delay", () => {
   testAsync("pure withDelay unsafeRunAsync", onDone => {
     IO.pure(42)
     ->(IO.withDelay(10, _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(a) => onDone(expect(a)->toEqual(42))
-          | Error(_) => onDone(fail("fail"))
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(a) => onDone(expect(a)->toEqual(42))
+        | Error(_) => onDone(fail("fail"))
+        },
+      _,
     )
 
     Jest.advanceTimersByTime(10)
@@ -4649,24 +4133,24 @@ describe("IO delay", () => {
 })
 
 testAsync("IO delayWithVoid unsafeRunAsync", onDone => {
-  IO.delayWithVoid(10)->(IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(_) => onDone(pass)
-      | Error(_) => onDone(fail("Failed"))
-      }
-    , _))
+  IO.delayWithVoid(10)->IO.unsafeRunAsync(x =>
+    switch x {
+    | Ok(_) => onDone(pass)
+    | Error(_) => onDone(fail("Failed"))
+    }
+  , _)
   Jest.advanceTimersByTime(10)
 })
 
 testAsync("IO withDelayBefore unsafeRunAsync", onDone => {
   IO.pure(0)
   ->(IO.withDelayBefore(10, _))
-  ->(IO.unsafeRunAsync(x =>
-      switch x {
-      | Ok(_) => onDone(pass)
-      | Error(_) => onDone(fail("Failed"))
-      }
-    , _))
+  ->IO.unsafeRunAsync(x =>
+    switch x {
+    | Ok(_) => onDone(pass)
+    | Error(_) => onDone(fail("Failed"))
+    }
+  , _)
   Jest.advanceTimersByTime(10)
 })
 
@@ -4708,24 +4192,22 @@ describe("IO debounce", () => {
     debouncedIO()
     ->(IO.flatMap(\">>"(ignore, debouncedIO, _), _))
     ->(IO.flatMap(_ => IO.delay(300), _))
-    ->(
-      IO.unsafeRunAsync(
-        _ =>
-          switch timeIntervals.contents {
-          | list{x2, x1, x0}
-            if areTimestampsSpacedCorrectly(x0, x1) && areTimestampsSpacedCorrectly(x1, x2) => pass
-          | list{_, _, _} => fail("debounced IO did not time executions correctly")
-          | list{_}
-          | list{_, _} =>
-            fail("debounced IO was executed too few times")
-          | xs =>
-            fail(
-              "debounced IO was executed too many times. Was executed " ++
-              (xs->List.length - 1)->string_of_int,
-            )
-          }->onDone,
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      _ =>
+        switch timeIntervals.contents {
+        | list{x2, x1, x0}
+          if areTimestampsSpacedCorrectly(x0, x1) && areTimestampsSpacedCorrectly(x1, x2) => pass
+        | list{_, _, _} => fail("debounced IO did not time executions correctly")
+        | list{_}
+        | list{_, _} =>
+          fail("debounced IO was executed too few times")
+        | xs =>
+          fail(
+            "debounced IO was executed too many times. Was executed " ++
+            (xs->List.length - 1)->string_of_int,
+          )
+        }->onDone,
+      _,
     )
   })
 
@@ -4751,37 +4233,35 @@ describe("IO debounce", () => {
         ...
       )
 
-    debouncedIO()->(IO.unsafeRunAsync(ignore, _))
+    debouncedIO()->IO.unsafeRunAsync(ignore, _)
 
-    debouncedIO()->(IO.unsafeRunAsync(ignore, _))
+    debouncedIO()->IO.unsafeRunAsync(ignore, _)
 
     debouncedIO()
     ->(IO.flatMap(Relude_Option.fold(IO.pure(None), debouncedIO, _), _))
-    ->(IO.unsafeRunAsync(ignore, _))
+    ->IO.unsafeRunAsync(ignore, _)
 
     debouncedIO()
     ->(IO.flatMap(Relude_Option.fold(IO.pure(None), debouncedIO, _), _))
     ->(IO.flatMap(_ => IO.delay(300), _))
-    ->(
-      IO.unsafeRunAsync(
-        _ =>
-          switch timeIntervals.contents {
-          | list{x3, x2, x1, x0}
-            if Float.approximatelyEqual(~tolerance=2.0, x1, x0) &&
-            (areTimestampsSpacedCorrectly(x1, x2) &&
-            Float.approximatelyEqual(~tolerance=2.0, x2, x3)) => pass
-          | list{_, _, _, _} => fail("debounced IO did not time executions correctly")
-          | list{_}
-          | list{_, _} =>
-            fail("debounced IO was executions too few times")
-          | xs =>
-            fail(
-              "debounced IO was executions too many times. Was executed " ++
-              (xs->List.length - 1)->string_of_int,
-            )
-          }->onDone,
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      _ =>
+        switch timeIntervals.contents {
+        | list{x3, x2, x1, x0}
+          if Float.approximatelyEqual(~tolerance=2.0, x1, x0) &&
+          (areTimestampsSpacedCorrectly(x1, x2) &&
+          Float.approximatelyEqual(~tolerance=2.0, x2, x3)) => pass
+        | list{_, _, _, _} => fail("debounced IO did not time executions correctly")
+        | list{_}
+        | list{_, _} =>
+          fail("debounced IO was executions too few times")
+        | xs =>
+          fail(
+            "debounced IO was executions too many times. Was executed " ++
+            (xs->List.length - 1)->string_of_int,
+          )
+        }->onDone,
+      _,
     )
   })
 })
@@ -4802,33 +4282,31 @@ describe("IO throttle", () => {
         ...
       )
 
-    throttledIO()->(IO.unsafeRunAsync(ignore, _))
+    throttledIO()->IO.unsafeRunAsync(ignore, _)
 
-    throttledIO()->(IO.unsafeRunAsync(ignore, _))
+    throttledIO()->IO.unsafeRunAsync(ignore, _)
 
-    throttledIO()->(IO.flatMap(\">>"(ignore, throttledIO, _), _))->(IO.unsafeRunAsync(ignore, _))
+    throttledIO()->(IO.flatMap(\">>"(ignore, throttledIO, _), _))->IO.unsafeRunAsync(ignore, _)
 
     IO.delay(300)
     ->(IO.flatMap(throttledIO, _))
-    ->(
-      IO.unsafeRunAsync(
-        _ =>
-          switch timeIntervals.contents {
-          | list{x2, x1, x0}
-            if x2 -. x1 >= intervalMs->float_of_int &&
-              Float.approximatelyEqual(~tolerance=2.0, x1, x0) => pass
-          | list{_, _, _} => fail("throttled IO did not time executions correctly")
-          | list{_}
-          | list{_, _} =>
-            fail("throttled IO was executed too few times")
-          | xs =>
-            fail(
-              "throttled IO was executed too many times. Was executed " ++
-              (xs->List.length - 1)->string_of_int,
-            )
-          }->onDone,
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      _ =>
+        switch timeIntervals.contents {
+        | list{x2, x1, x0}
+          if x2 -. x1 >= intervalMs->float_of_int &&
+            Float.approximatelyEqual(~tolerance=2.0, x1, x0) => pass
+        | list{_, _, _} => fail("throttled IO did not time executions correctly")
+        | list{_}
+        | list{_, _} =>
+          fail("throttled IO was executed too few times")
+        | xs =>
+          fail(
+            "throttled IO was executed too many times. Was executed " ++
+            (xs->List.length - 1)->string_of_int,
+          )
+        }->onDone,
+      _,
     )
   })
 
@@ -4839,15 +4317,13 @@ describe("IO throttle", () => {
     list{IO.pure(1), IO.pure(2), IO.pure(3)}
     ->IOE.all
     ->(IO.bimap(a => expect(a)->toEqual(list{1, 2, 3}), _ => fail("Failed"), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(assertion) => onDone(assertion)
-          },
-        _,
-      )
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(assertion) => onDone(assertion)
+        },
+      _,
     )
   })
 })
@@ -4870,14 +4346,12 @@ describe("IO parallel", () =>
         },
       )
       ->(IO.withDelay(100, _))
-      ->(
-        IO.map(
-          t => {
-            a := false
-            (t, (a.contents, b.contents, c.contents))
-          },
-          _,
-        )
+      ->IO.map(
+        t => {
+          a := false
+          (t, (a.contents, b.contents, c.contents))
+        },
+        _,
       )
 
     let ioB =
@@ -4888,14 +4362,12 @@ describe("IO parallel", () =>
         },
       )
       ->(IO.withDelay(100, _))
-      ->(
-        IO.map(
-          t => {
-            b := false
-            (t, (a.contents, b.contents, c.contents))
-          },
-          _,
-        )
+      ->IO.map(
+        t => {
+          b := false
+          (t, (a.contents, b.contents, c.contents))
+        },
+        _,
       )
 
     let ioC =
@@ -4906,14 +4378,12 @@ describe("IO parallel", () =>
         },
       )
       ->(IO.withDelay(100, _))
-      ->(
-        IO.map(
-          t => {
-            c := false
-            (t, (a.contents, b.contents, c.contents))
-          },
-          _,
-        )
+      ->IO.map(
+        t => {
+          c := false
+          (t, (a.contents, b.contents, c.contents))
+        },
+        _,
       )
 
     let a0 = (a.contents, b.contents, c.contents)
@@ -4934,31 +4404,27 @@ describe("IO parallel", () =>
     // when c is run c sees all a, b, and c running
     // after delay c completes and sees a, b, c not running
     let ioAll =
-      (ioA, ioB, ioC)->(
-        IOE.mapTuple3(
-          ((a1, a2), (b1, b2), (c1, c2)) =>
-            expect((a0, a1, a2, b1, b2, c1, c2))->toEqual((
-              (false, false, false),
-              (true, false, false),
-              (false, true, true),
-              (true, true, false),
-              (false, false, true),
-              (true, true, true),
-              (false, false, false),
-            )),
-          _,
-        )
-      )
-
-    ioAll->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(_) => onDone(fail("Failed"))
-          },
+      (ioA, ioB, ioC)->IOE.mapTuple3(
+        ((a1, a2), (b1, b2), (c1, c2)) =>
+          expect((a0, a1, a2, b1, b2, c1, c2))->toEqual((
+            (false, false, false),
+            (true, false, false),
+            (false, true, true),
+            (true, true, false),
+            (false, false, true),
+            (true, true, true),
+            (false, false, false),
+          )),
         _,
       )
+
+    ioAll->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
 
     // We should only need to advance by a total of 100ms to get all the IOs to
@@ -5008,30 +4474,24 @@ describe("IO realish examples", () => {
   testAsync("example >>=", onDone =>
     \">>="(
       \">>="(
-        \">>="(getData->(IO.mapError(eGet, _)), \">>"(parseData, IO.mapError(eParse, _), _)),
+        \">>="(getData->IO.mapError(eGet, _), \">>"(parseData, IO.mapError(eParse, _), _)),
         \">>"(printNumber, IO.mapError(ePrint, _), _),
       ),
       _ => IO.pure(pass),
-    )->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    )->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
   testAsync("example >=>", onDone => {
     let getIO = \">=>"(
       \">=>"(
-        \">=>"(
-          _ => getData->(IO.mapError(eGet, _)),
-          \">>"(parseData, IO.mapError(eParse, _), _),
-          _,
-        ),
+        \">=>"(_ => getData->IO.mapError(eGet, _), \">>"(parseData, IO.mapError(eParse, _), _), _),
         \">>"(printNumber, IO.mapError(ePrint, _), _),
         _,
       ),
@@ -5039,32 +4499,28 @@ describe("IO realish examples", () => {
       _,
     )
 
-    getIO()->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    getIO()->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   })
 
   testAsync("example flatMap", onDone =>
     getData
     ->(IO.mapError(e => EGet(e), _))
-    ->(IO.flatMap(str => parseData(str)->(IO.mapError(e => EParse(e), _)), _))
-    ->(IO.flatMap(num => printNumber(num)->(IO.mapError(e => EPrint(e), _)), _))
-    ->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(_) => onDone(pass)
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    ->(IO.flatMap(str => parseData(str)->IO.mapError(e => EParse(e), _), _))
+    ->(IO.flatMap(num => printNumber(num)->IO.mapError(e => EPrint(e), _), _))
+    ->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(_) => onDone(pass)
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 })
@@ -5080,7 +4536,7 @@ let \">>=" = IOJsExn.Infix.\">>="
 let \">=>" = IOJsExn.Infix.\">=>"
 
 describe("IO FS examples", () => {
-  beforeAll(() => FS.IO.writeFileSync(testFilePath, "")->(IO.unsafeRunAsync(ignore, _)))
+  beforeAll(() => FS.IO.writeFileSync(testFilePath, "")->IO.unsafeRunAsync(ignore, _))
 
   testAsync("read and writeFileSync", onDone =>
     \">>="(
@@ -5089,15 +4545,13 @@ describe("IO FS examples", () => {
         _ => FS.IO.readFileSync(testFilePath),
       ),
       content => IO.pure(expect(content)->toEqual("IO Eff test")),
-    )->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(_jsExn) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    )->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(_jsExn) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 
@@ -5106,20 +4560,19 @@ describe("IO FS examples", () => {
       \">>="(
         \">>="(FS.IO.writeFile(testFilePath, "IO Aff test"), _ => FS.IO.readFile(testFilePath)),
         content =>
-          Relude_String.toNonWhitespace(content)->(
-            IO.fromOption(_ => Relude_Js_Exn.make("Failed to get non-empty file content"), _)
+          Relude_String.toNonWhitespace(content)->IO.fromOption(
+            _ => Relude_Js_Exn.make("Failed to get non-empty file content"),
+            _,
           ),
       ),
       content => IO.pure(expect(content)->toEqual("IO Aff test")),
-    )->(
-      IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(_) => onDone(fail("Failed"))
-          },
-        _,
-      )
+    )->IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(_) => onDone(fail("Failed"))
+        },
+      _,
     )
   )
 })

@@ -23,7 +23,7 @@ module WithFunctor = (F: FUNCTOR) => {
 
   let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {
-    | Pure(aToB) => freeA->(map(aToB, _))
+    | Pure(aToB) => freeA->map(aToB, _)
     | Apply(fx, freeXToAToB) =>
       //      let freeAToXToB = map( => Relude_Function.flip(x, ...), freeXToAToB)
 

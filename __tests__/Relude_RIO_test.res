@@ -1,6 +1,8 @@
 open Jest
 open Expect
 
+let string_of_int = i => i->Int.toString
+
 type env = {
   intValue: int,
   stringValue: string,
@@ -40,15 +42,13 @@ describe("Reader IO", () =>
     ->(RIO.semiflatMap(c => Relude_IO.pure(c ++ "semi"), _))
     ->(RIO.runRIO(testEnv, _))
     ->(Relude_IO.map(a => expect(a)->toEqual("-42abcsemi"), _))
-    ->(
-      Relude_IO.unsafeRunAsync(
-        x =>
-          switch x {
-          | Ok(assertion) => onDone(assertion)
-          | Error(_) => onDone(fail("fail"))
-          },
-        _,
-      )
+    ->Relude_IO.unsafeRunAsync(
+      x =>
+        switch x {
+        | Ok(assertion) => onDone(assertion)
+        | Error(_) => onDone(fail("fail"))
+        },
+      _,
     )
   )
 )

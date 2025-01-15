@@ -36,7 +36,7 @@ module Void = Relude_Void
 module Array = Relude_Array
 module ArrayZipper = Relude_ArrayZipper
 module HList = Relude_HList
-//module HMap = Relude_HMap
+module HMap = Relude_HMap
 module List = Relude_List
 
 module ListZipper = Relude_ListZipper
@@ -58,7 +58,7 @@ module AsyncData = Relude_AsyncData
 module AsyncResult = Relude_AsyncResult
 module Cont = Relude_ContT.Cont
 module ContT = Relude_ContT
-//module Free = Relude_Free
+module Free = Relude_Free
 module IO = Relude_IO
 module Ior = Relude_Ior
 module Option = Relude_Option
