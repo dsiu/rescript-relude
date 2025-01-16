@@ -1,5 +1,5 @@
 {
-  "name": "relude",
+  "name": "rescript-relude",
   "description": "Alternative standard library (prelude) for ReasonML",
   "homepage": "https://github.com/reazen/relude",
   "bugs": "https://github.com/reazen/relude/issues",
@@ -46,7 +46,7 @@
       "^.+\\.m?jsx?$": "@swc/jest"
     },
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!(rescript|@rescript/core|@glennsl/rescript-jest|bs-bastet)/)"
+      "<rootDir>/node_modules/(?!(rescript|@rescript/core|@glennsl/rescript-jest|rescript-bastet)/)"
     ],
     "moduleFileExtensions": [
       "js",
@@ -58,9 +58,9 @@
     "@glennsl/rescript-jest": "github:dsiu/rescript-jest#rescript-v12",
     "@swc/core": "^1.10.4",
     "@swc/jest": "^0.2.37",
-    "bs-bastet": "github:dsiu/rescript-bastet#rescript-v12",
     "docsify-cli": "~4.4.0",
-    "rescript": "^12.0.0-alpha.7"
+    "rescript": "^12.0.0-alpha.7",
+    "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12-namespace"
   },
   "dependencies": {
     "@rescript/core": "^1.6.1"

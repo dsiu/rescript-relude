@@ -1,5 +1,5 @@
 {
-  "name": "relude",
+  "name": "rescript-relude",
   "bsc-flags": [
     "-bs-no-version-header"
   ],
@@ -21,7 +21,7 @@
   },
   "suffix": ".mjs",
   "bs-dependencies": [
-    "bs-bastet"
+    "rescript-bastet"
   ],
   "bs-dev-dependencies": [
     "@glennsl/rescript-jest"
