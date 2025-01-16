@@ -60,7 +60,7 @@
     "@swc/jest": "^0.2.37",
     "docsify-cli": "~4.4.0",
     "rescript": "^12.0.0-alpha.7",
-    "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12-namespace"
+    "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
   },
   "dependencies": {
     "@rescript/core": "^1.6.1"
