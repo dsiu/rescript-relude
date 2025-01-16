@@ -729,15 +729,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rescript/core@npm:^1.6.1":
-  version: 1.6.1
-  resolution: "@rescript/core@npm:1.6.1"
-  peerDependencies:
-    rescript: ">=11.1.0"
-  checksum: 10c0/04e7fc14dc050de0a9da8eb0642fb0800bc80c8978ef79aada1823bc2080b47a4d40c1168c63b53642009935342a4feb833fc190a71aa45e83af5d896269b95d
-  languageName: node
-  linkType: hard
-
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8
   resolution: "@sinclair/typebox@npm:0.27.8"
@@ -4409,7 +4400,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rescript-bastet@github:dsiu/rescript-bastet#rescript-v12-namespace":
+"rescript-bastet@github:dsiu/rescript-bastet#rescript-v12":
   version: 0.0.1
   resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=a313a452ae95afb1ba81062e4be932b9fa12440e"
   checksum: 10c0/7cd72bb2188da4a37c1ac628ad45b939d7e0618bb54cea217e2ffff4a6307d82b0375c7c500fa8dd5abe46438417dbf3b89152b3cdfb9ef6e8eda74db47ab087
@@ -4421,12 +4412,11 @@ __metadata:
   resolution: "rescript-relude@workspace:."
   dependencies:
     "@glennsl/rescript-jest": "github:dsiu/rescript-jest#rescript-v12"
-    "@rescript/core": "npm:^1.6.1"
     "@swc/core": "npm:^1.10.4"
     "@swc/jest": "npm:^0.2.37"
     docsify-cli: "npm:~4.4.0"
     rescript: "npm:^12.0.0-alpha.7"
-    rescript-bastet: "github:dsiu/rescript-bastet#rescript-v12-namespace"
+    rescript-bastet: "github:dsiu/rescript-bastet#rescript-v12"
   languageName: unknown
   linkType: soft
 
