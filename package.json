@@ -61,5 +61,12 @@
     "docsify-cli": "~4.4.0",
     "rescript": "^12.0.0-alpha.7",
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
+  },
+  "peerDependencies": {
+    "rescript": "^12.0.0-alpha.7",
+    "rescript-bastet": "*"
+  },
+  "dependencies": {
+    "bisect_ppx": "^2.7.1"
   }
 }
