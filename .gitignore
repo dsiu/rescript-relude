@@ -2,8 +2,8 @@
 .merlin
 .bsb.lock
 *.bs.js
-/src/**/*.mjs
-/__tests__/**/*.mjs
+/src/**/*.res.mjs
+/__tests__/**/*.res.mjs
 npm-debug.log
 /lib/bs/
 /lib/ocaml/
