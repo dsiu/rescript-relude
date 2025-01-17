@@ -59,6 +59,7 @@
     "@swc/core": "^1.10.4",
     "@swc/jest": "^0.2.37",
     "docsify-cli": "~4.4.0",
+    "jest": "^27.0.6",
     "rescript": "^12.0.0-alpha.7",
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
   },

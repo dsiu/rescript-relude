@@ -3393,7 +3393,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^27.3.1":
+"jest@npm:^27.0.6, jest@npm:^27.3.1":
   version: 27.5.1
   resolution: "jest@npm:27.5.1"
   dependencies:
@@ -4427,6 +4427,7 @@ __metadata:
     "@swc/jest": "npm:^0.2.37"
     bisect_ppx: "npm:^2.7.1"
     docsify-cli: "npm:~4.4.0"
+    jest: "npm:^27.0.6"
     rescript: "npm:^12.0.0-alpha.7"
     rescript-bastet: "github:dsiu/rescript-bastet#rescript-v12"
   peerDependencies:
