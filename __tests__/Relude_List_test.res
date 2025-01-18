@@ -3,7 +3,7 @@ open Expect
 
 module Int = Relude_Int
 module List = Relude.List
-//module IO = Relude.IO
+module IO = Relude.IO
 
 describe("List", () => {
   test("length empty list", () => expect(List.length(list{}))->toEqual(0))
@@ -763,7 +763,6 @@ describe("List", () => {
     )
   )
 
-  /*
   testAsync("List.IO.sequence", onDone => {
     // Try a bunch of random IOs to seek out problems
     let io1 = IO.pure(1)
@@ -807,5 +806,4 @@ describe("List", () => {
       _,
     )
   })
-*/
 })

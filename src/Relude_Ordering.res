@@ -118,4 +118,4 @@ module BoundedEnum: Relude_Interface.BOUNDED_ENUM with type t = t = {
   let toEnum = i => Some(fromInt(i))
   let fromEnum = toInt
 }
-//include Relude_Extensions_BoundedEnum.BoundedEnumExtensions(BoundedEnum)
+include Relude_Extensions_BoundedEnum.BoundedEnumExtensions(BoundedEnum)
