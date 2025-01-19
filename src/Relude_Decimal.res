@@ -48,9 +48,11 @@ let make: (int, int) => t = (mantissa, exponent) => Decimal(mantissa, exponent)
 ")
 let fromInt: int => t = intValue => Decimal(intValue, 0)
 
-@ocaml.doc("
+@@ocaml.doc("
 [Decimal.fromString] attempts to parse a [Decimal] from a [string]
+   let fromString: string => option(t) = _ => None; // TODO
 ")
+
 @ocaml.doc("
 [Decimal.show] renders the [Decimal] value to a [string], as if the [Decimal]
 was represented as a [float].
@@ -60,9 +62,7 @@ was represented as a [float].
   Decimal(12345, 3) |> Decimal.toString // \"12345000\"
 ]}
 ")
-let // let fromString: string => option(t) = _ => None; // TODO
-
-show: t => string = (Decimal(mantissa, exponent)) =>
+let show: t => string = (Decimal(mantissa, exponent)) =>
   if exponent == 0 {
     Int.toString(mantissa)
   } else if exponent > 0 {
@@ -154,28 +154,26 @@ overflow.
 
 Note: the arguments are in order of [lhs], [rhs]
 ")
-@@ocaml.doc(// TODO
-//  let multiply: (t, t) => t =
-//    (lhs, _rhs) => {
-//      lhs;
-//    };
+let multiply: (t, t) => t = (lhs, _rhs) => {
+  lhs
+}
 
-"
+@@ocaml.doc("
 Infix operator for [multiply]
 ")
-@@ocaml.doc(//let ( *.. ) = multiply;
+let \"*.." = multiply
 
-"
+@@ocaml.doc("
 Divides two [Decimal] values using the given [rounding] preference.
 
 Note: the arguments are in order of [lhs], [rhs]
 ")
-@@ocaml.doc(// TODO
-//  let divide: (t, t, rounding) => t =
-//    (lhs, _rhs, _rounding) => {
-//      lhs;
-//    };
 
-"
+let divide: (t, t, rounding) => t = (lhs, _rhs, _rounding) => {
+  lhs
+}
+
+@@ocaml.doc("
 Infix operator for [divide]
-" /* let (/..) = divide */)
+")
+let \"/.." = divide
