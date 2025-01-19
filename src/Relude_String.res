@@ -17,7 +17,7 @@ JavaScript [String.length] function, it works properly with Unicode characters.
   String.length({js|대한민국|js}) == 4;
 ]}
 ")
-let length: string => int = s => s->Js.String.length
+let length: string => int = s => s->String.length
 
 @ocaml.doc("
 [String.isEmpty] returns [true] if the provided string is the empty string [\"\"],
@@ -58,7 +58,7 @@ in <https://www.ecma-international.org/ecma-262/5.1/#sec-7.2>) removed from [s].
   trim({js|\n\u00a0 \t abc \f\r \t|js}) == \"abc\";
 ]}
 ")
-let trim: string => string = s => s->Js.String.trim
+let trim: string => string = s => s->String.trim
 
 // TODO
 //let trimLeft: string => string = ???
@@ -153,7 +153,7 @@ format for that data type.
   make([|1, 2, 3, 4|]) == \"1,2,3,4\";
 ]}
 ")
-let make: 'a => string = f => Js.String.make(f)
+let make: 'a => string = String.make
 
 @ocaml.doc("
 [makeWithIndex(n, f)] returns a string that is the result of concatenating
@@ -198,7 +198,7 @@ capitalizes to two [\"S\"]es in a row.
   toUpperCase({js|πς|js}) == {js|ΠΣ|js}; // sigma in final position
 ]}
 ")
-let toUpperCase: string => string = s => s->Js.String.toUpperCase
+let toUpperCase: string => string = String.toUpperCase
 
 @ocaml.doc("
 [toLowerCase(str)] converts [str] to lower case using the locale-insensitive
@@ -215,7 +215,7 @@ single lowercase glyph [ß], but [toLowerCase()] will not do this transformation
   toLowerCase({js|ΠΣ|js}) == {js|πς|js}; // sigma in final position
 ]}
 ")
-let toLowerCase: string => string = s => s->Js.String.toLowerCase
+let toLowerCase: string => string = String.toLowerCase
 
 @ocaml.doc("
 [fromCharCode(n)] creates a string containing the character corresponding to
@@ -231,7 +231,7 @@ Thus, [fromCharCode(0x1F63A)] gives the same result as [fromCharCode(0xF63A)].
   fromCharCode(-64568) == {js|ψ|js};
 ]}
 ")
-let fromCharCode: int => string = c => c->Js.String.fromCharCode
+let fromCharCode: int => string = String.fromCharCode
 
 @ocaml.doc("
 [charCodeAt(n, str)] returns (optionally) the numeric character code at the
@@ -245,7 +245,7 @@ range of the size of the string (too high or negative), [None] is returned.
 ]}
 ")
 let charCodeAt: (int, string) => option<int> = (i, str) => {
-  let code = Js.String.charCodeAt(i, str)
+  let code = String.charCodeAt(str, i)
   Relude_Float.isNaN(code) ? None : Some(Float.toInt(code))
 }
 
@@ -300,7 +300,7 @@ If [n] is out of bounds, [charAtNullable()] returns [Js.Nullable.undefined].
 ]}
 ")
 let charAtNullable: (int, string) => Js.Nullable.t<string> = (i, str) =>
-  Js.String.get(str, i)->Js.Nullable.return
+  String.get(str, i)->Js.Nullable.fromOption
 
 @ocaml.doc("
 [charAtOrThrow(n, str)] returns a string consisting of the character at
@@ -440,7 +440,7 @@ module Set = Relude_Set.WithOrd(Ord)
   endsWith(~search=\"\", \"everything\") == true;
 ]}
 ")
-let endsWith = (~search: string, input: string): bool => Js.String.endsWith(search, input)
+let endsWith = (~search: string, input: string): bool => String.endsWith(input, search)
 
 @ocaml.doc("
 [startsWith(~search, input)] returns [true] if [input] starts with the
@@ -453,7 +453,7 @@ characters in [search]; [false] otherwise.
   startsWith(~search=\"\", \"everything\") == true;
 ]}
 ")
-let startsWith = (~search: string, input: string): bool => Js.String.startsWith(search, input)
+let startsWith = (~search: string, input: string): bool => String.startsWith(input, search)
 
 @ocaml.doc("
 [contains(~search, input)] returns [true] if [search] appears anywhere in
@@ -466,7 +466,7 @@ let startsWith = (~search: string, input: string): bool => Js.String.startsWith(
   contains(~search=\"ato\", \"fraction\") == false;
 ]}
 ")
-let contains = (~search: string, input: string): bool => Js.String.includes(search, input)
+let contains = (~search: string, input: string): bool => String.includes(input, search)
 
 @ocaml.doc("
 [indexOf(test, str)] returns [Some(n)], where [n] is the starting position of
@@ -481,7 +481,7 @@ return value is [None].
 ]}
 ")
 let indexOf = (~search: string, input: string): option<int> => {
-  let index = Js.String.indexOf(search, input)
+  let index = String.indexOf(input, search)
   if index < 0 {
     None
   } else {
@@ -502,7 +502,7 @@ return value is [false].
 ]}
 ")
 let lastIndexOf = (~search: string, input: string): option<int> => {
-  let index = Js.String.lastIndexOf(search, input)
+  let index = String.lastIndexOf(input, search)
   if index < 0 {
     None
   } else {
@@ -530,7 +530,7 @@ If [n1] is greater than [n2], [slice()] returns the empty string.
 ]}
 ")
 let slice: (int, int, string) => string = (fromIndex, toIndex, input) =>
-  Js.String.slice(~from=fromIndex, ~to_=toIndex, input)
+  String.slice(input, ~start=fromIndex, ~end=toIndex)
 
 @ocaml.doc("
 [sliceToEnd(n, str)] returns the substring of [str] starting at character [n] to
@@ -548,7 +548,7 @@ returns the empty string.
 ]}
 ")
 let sliceToEnd: (int, string) => string = (fromIndex, str) =>
-  Js.String.sliceToEnd(~from=fromIndex, str)
+  String.sliceToEnd(str, ~start=fromIndex)
 
 @ocaml.doc("
 [splitArray(delimiter, str)] splits the given [str] at every occurrence of
@@ -562,7 +562,7 @@ let sliceToEnd: (int, string) => string = (fromIndex, str) =>
 ]}
 ")
 let splitArray = (~delimiter: string, input: string): array<string> =>
-  Js.String.split(delimiter, input)
+  String.split(input, delimiter)
 
 @ocaml.doc("
 [String.splitAsArray] is an alias for {!val:splitArray}.
@@ -680,7 +680,7 @@ with [newValue] in [str], returning a new string.
 ]}
 ")
 let replaceFirst = (~search: string, ~replaceWith: string, input: string): string =>
-  Js.String.replace(search, replaceWith, input)
+  String.replace(input, search, replaceWith)
 
 @ocaml.doc("
 [replaceEach(target, newValue, str)]replaces each occurrence of [target] with
@@ -710,7 +710,7 @@ pattern.
 ]}
 ")
 let replaceRegex = (~search: Js.Re.t, ~replaceWith: string, input: string): string =>
-  Js.String.replaceByRe(search, replaceWith, input)
+  String.replaceRegExp(input, search, replaceWith)
 
 @ocaml.doc("
 [removeFirst(target, str)] returns a new string with the first occurrence of
@@ -766,7 +766,7 @@ when specifying [x].
   fromFloat(1.0e3) == \"1000\";
 ]}
 ")
-let fromFloat: float => string = f => f->Js.Float.toString
+let fromFloat: float => string = Float.toString(_)
 
 @ocaml.doc("
 [toFloat(str)] returns [Some(x)] if [str] is a valid string representation of
@@ -780,4 +780,4 @@ the float value [x]. Otherwise, the return value is [None].
   toFloat(\"\") == None;
 ]}
 ")
-let toFloat: string => option<float> = v => Float.fromString(v)
+let toFloat: string => option<float> = Float.fromString(_)
