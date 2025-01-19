@@ -27,14 +27,14 @@ module WithMonad = (M: MONAD) => {
   result, and the writer log.
   ")
   let evalRWST: 'a 'r 's 'w. ('r, 's, t<'a, 'r, 's, 'w>) => M.t<('a, 'w)> = (r, s, RWST(f)) =>
-    f(r, s)->(M.map((RWSResult(a, _s, w)) => (a, w), _))
+    f(r, s)->M.map((RWSResult(a, _s, w)) => (a, w), _)
 
   @ocaml.doc("
   Same as runRWST, but discards the final result value, only returning the final
   state, and the writer log.
   ")
   let execRWST: 'a 'r 's 'w. ('r, 's, t<'a, 'r, 's, 'w>) => M.t<('s, 'w)> = (r, s, RWST(f)) =>
-    f(r, s)->(M.map((RWSResult(_a, s, w)) => (s, w), _))
+    f(r, s)->M.map((RWSResult(_a, s, w)) => (s, w), _)
 
   @ocaml.doc("
   Change the result type and writer log type.  Note: this should normally allow
@@ -63,7 +63,7 @@ module WithMonad = (M: MONAD) => {
     RWST(f),
   ) => RWST(
     (r, s) =>
-      f(r, s)->(M.map((RWSResult.RWSResult(a, s, w)) => RWSResult.RWSResult(aToB(a), s, w), _)),
+      f(r, s)->M.map((RWSResult.RWSResult(a, s, w)) => RWSResult.RWSResult(aToB(a), s, w), _),
   )
 
   let applyWithAppendLog: 'a 'b 'r 's 'w. (
@@ -95,7 +95,7 @@ module WithMonad = (M: MONAD) => {
     (r1, s1) =>
       runA(r1, s1)->M.flat_map((RWSResult(a, s2, w1)) => {
         let RWST(runB) = aToRWSTB(a)
-        runB(r1, s2)->(M.map((RWSResult(b, s3, w2)) => RWSResult(b, s3, appendLog(w1, w2)), _))
+        runB(r1, s2)->M.map((RWSResult(b, s3, w2)) => RWSResult(b, s3, appendLog(w1, w2)), _)
       }),
   )
 
