@@ -40,12 +40,12 @@ let nan: float = Float.Constants.nan
 @ocaml.doc("
 Positive infinity
 ")
-let infinity: float = infinity
+let infinity: float = Float.Constants.positiveInfinity
 
 @ocaml.doc("
 Negative infinity
 ")
-let negativeInfinity: float = neg_infinity
+let negativeInfinity: float = Float.Constants.negativeInfinity
 
 @ocaml.doc("
 [Float.add] finds the sum of two floats.
@@ -87,13 +87,13 @@ let sqrt = Math.sqrt
 @ocaml.doc("
 [Float.top] is the constant representing the maximum float value.
 ")
-let top: float = max_float
+let top: float = Float.Constants.maxValue
 
 @ocaml.doc("
 [Float.bottom] is the minimum float value. Note that when using Melange, this
 value is hard-coded and is not necessarily equal to [Number.MIN_VALUE] in JS.
 ")
-let bottom: float = min_float
+let bottom: float = Float.Constants.minValue
 
 @ocaml.doc("
 [Float.isNaN] determines whether the provided floating point number is [nan].
@@ -156,7 +156,7 @@ If a negative [~tolerance] is provided, the returned value will always be
 ]}
 ")
 let approximatelyEqual: (~tolerance: float, float, float) => bool = (~tolerance, x, y) =>
-  Js.Math.abs_float(x -. y) <= tolerance
+  Math.abs(x -. y) <= tolerance
 
 @ocaml.doc("
 [Float.toInt] converts a float to an int by dropping the fractional part.

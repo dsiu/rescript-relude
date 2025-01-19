@@ -59,22 +59,22 @@ let divideWithModulo: (int, int) => (int, int) = (a, b) => (divide(a, b), modulo
 @ocaml.doc("
 Converts two int values to floats, then performs a float division
 ")
-let divideAsFloat: (int, int) => float = (a, b) => Float.fromInt(a) /. Float.fromInt(b)
+let divideAsFloat: (int, int) => float = (a, b) => toFloat(a) /. toFloat(b)
 
 @ocaml.doc("
 The top bound (max value) of 32 bit int
 ")
-let top = Js.Int.max
+let top = Int.Constants.maxValue
 
 @ocaml.doc("
 The bottom bound (min value) of 32 bit int
 ")
-let bottom = Js.Int.min
+let bottom = Int.Constants.minValue
 
 @ocaml.doc("
 Degree finds the smaller of the absolute value of the given in, or the max int value
 ")
-let degree: int => int = a => Js.Math.min_int(Js.Math.abs_int(a), top)
+let degree: int => int = a => Math.Int.min(Math.Int.abs(a), top)
 
 @ocaml.doc("
 [rangeAsList(n, m)] returns a list of integers
