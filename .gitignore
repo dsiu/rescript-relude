@@ -10,3 +10,11 @@ npm-debug.log
 /node_modules/
 /.idea/sonarlint/issuestore/
 /__tests__/testUtils/Eff_test.txt
+
+# yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
