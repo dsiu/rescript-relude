@@ -163,55 +163,55 @@ describe("Ior", () => {
   })
 
   test("map2 This This", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, This(1), This(2)))->toEqual(This(3))
+    expect(Ior.map2(\"++", (a, b) => a + b, This(1), This(2)))->toEqual(This(3))
   )
 
   test("map2 This That", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, This(1), That("W2")))->toEqual(That("W2"))
+    expect(Ior.map2(\"++", (a, b) => a + b, This(1), That("W2")))->toEqual(That("W2"))
   )
 
   test("map2 This Both", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, This(1), Both(2, "W2")))->toEqual(Both(3, "W2"))
+    expect(Ior.map2(\"++", (a, b) => a + b, This(1), Both(2, "W2")))->toEqual(Both(3, "W2"))
   )
 
   test("map2 That This", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, That("W1"), This(1)))->toEqual(That("W1"))
+    expect(Ior.map2(\"++", (a, b) => a + b, That("W1"), This(1)))->toEqual(That("W1"))
   )
 
   test("map2 That That", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, That("W1"), That("W2")))->toEqual(That("W1W2"))
+    expect(Ior.map2(\"++", (a, b) => a + b, That("W1"), That("W2")))->toEqual(That("W1W2"))
   )
 
   test("map2 That Both", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, That("W1"), Both(1, "W2")))->toEqual(That("W1W2"))
+    expect(Ior.map2(\"++", (a, b) => a + b, That("W1"), Both(1, "W2")))->toEqual(That("W1W2"))
   )
 
   test("map2 Both This", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, Both(1, "W1"), This(2)))->toEqual(Both(3, "W1"))
+    expect(Ior.map2(\"++", (a, b) => a + b, Both(1, "W1"), This(2)))->toEqual(Both(3, "W1"))
   )
 
   test("map2 Both That", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, Both(1, "W1"), That("W2")))->toEqual(That("W1W2"))
+    expect(Ior.map2(\"++", (a, b) => a + b, Both(1, "W1"), That("W2")))->toEqual(That("W1W2"))
   )
 
   test("map2 Both Both", () =>
-    expect(Ior.map2(\"^", (a, b) => a + b, Both(1, "W1"), Both(2, "W2")))->toEqual(Both(3, "W1W2"))
+    expect(Ior.map2(\"++", (a, b) => a + b, Both(1, "W1"), Both(2, "W2")))->toEqual(Both(3, "W1W2"))
   )
 
   test("map3 This This This", () =>
-    expect(Ior.map3(\"^", (a, b, c) => a + b + c, This(1), This(2), This(3)))->toEqual(This(6))
+    expect(Ior.map3(\"++", (a, b, c) => a + b + c, This(1), This(2), This(3)))->toEqual(This(6))
   )
 
   test("map4 This This This This", () =>
     expect(
-      Ior.map4(\"^", (a, b, c, d) => a + b + c + d, This(1), This(2), This(3), This(4)),
+      Ior.map4(\"++", (a, b, c, d) => a + b + c + d, This(1), This(2), This(3), This(4)),
     )->toEqual(This(10))
   )
 
   test("map5 This This This This This", () =>
     expect(
       Ior.map5(
-        \"^",
+        \"++",
         (a, b, c, d, f) => a + b + c + d + f,
         This(1),
         This(2),
