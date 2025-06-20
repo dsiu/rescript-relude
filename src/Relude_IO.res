@@ -2,7 +2,7 @@
 @@uncurried.swap
 
 open BsBastet.Interface
-open Relude_Function.Infix
+open! Relude_Function.Infix
 
 @@ocaml.text(`
 [Relude.IO] contains a type [t('a, 'e)] and related functions for representing

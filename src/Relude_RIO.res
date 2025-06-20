@@ -1,5 +1,5 @@
 open BsBastet.Interface
-open Relude_Function.Infix
+open! Relude_Function.Infix
 
 module WithError = (ERR: TYPE) => {
   module IOE = Relude_IO.WithError(ERR)

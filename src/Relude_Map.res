@@ -312,7 +312,7 @@ let groupListBy: (
   'value => 'key,
   list<'value>,
 ) => t<'key, list<'value>, 'id> = (comparable, groupBy, l) => {
-  open Relude_Function.Infix
+  open! Relude_Function.Infix
   let addItemToGroup = (x, dict) =>
     \">>"(getOrElse(groupBy(x), list{}, ...), xs => list{x, ...xs}, dict)
   let addItemToMap = (dict, x) => dict->(set(groupBy(x), dict->(addItemToGroup(x, _)), _))
@@ -324,7 +324,7 @@ let groupArrayBy: (
   'value => 'key,
   array<'value>,
 ) => t<'key, array<'value>, 'id> = (comparable, groupBy, arr) => {
-  open Relude_Function.Infix
+  open! Relude_Function.Infix
   let addItemToGroup = (x, dict) =>
     \">>"(getOrElse(groupBy(x), [], ...), Belt.Array.concat(_, [x]), dict)
   let addItemToMap = (dict, x) => dict->(set(groupBy(x), dict->(addItemToGroup(x, _)), _))

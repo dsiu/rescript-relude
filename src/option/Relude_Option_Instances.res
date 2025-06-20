@@ -1,5 +1,5 @@
 open BsBastet.Interface
-open Relude_Function.Infix
+open! Relude_Function.Infix
 
 let compose: 'a 'b 'c. (option<'b => 'c>, option<'a => 'b>) => option<'a => 'c> = (
   optionBToC,

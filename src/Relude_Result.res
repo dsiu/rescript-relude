@@ -1,5 +1,5 @@
 open BsBastet.Interface
-open Relude_Function.Infix
+open! Relude_Function.Infix
 
 type t<'a, 'e> = result<'a, 'e> = Ok('a) | Error('e)
 

@@ -503,7 +503,7 @@ describe("IO compose", () => {
         let ioBToC = IO.pure(b => b ++ "2")
 
         {
-          open IO
+          open! IO
           \">>>"(ioAToB, ioBToC)
         }->IO.unsafeRunAsync(
           x =>

@@ -1,5 +1,5 @@
 open BsBastet.Interface
-open Relude_Function.Infix
+open! Relude_Function.Infix
 
 module WithMonad = (M: MONAD) => {
   @ocaml.doc("

@@ -1,6 +1,6 @@
 open Jest
 open Expect
-open Relude.Globals
+open! Relude.Globals
 
 // The storage algebra
 // This is the set of operations we want to allow for accessing key/value storage
