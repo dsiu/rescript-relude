@@ -13,7 +13,7 @@
   "scripts": {
     "clean": "rescript clean",
     "build": "rescript build",
-    "watch": "rescript build -w",
+    "watch": "rescript watch",
     "test": "jest",
     "coverage": "npm run test",
     "docs": "docsify serve ./docs",
@@ -60,11 +60,11 @@
     "@swc/jest": "^0.2.37",
     "docsify-cli": "~4.4.0",
     "jest": "^29.7.0",
-    "rescript": "^12.0.0-alpha.14",
+    "rescript": "^12.0.0-beta.2",
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
   },
   "peerDependencies": {
-    "rescript": "^12.0.0-alpha.14",
+    "rescript": "^12.0.0-beta.2",
     "rescript-bastet": "*"
   },
   "dependencies": {

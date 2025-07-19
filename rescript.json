@@ -21,10 +21,10 @@
   },
   "suffix": ".res.mjs",
   "bs-dependencies": [
-    "rescript-bastet"
+    "rescript-bastet",
+    "@glennsl/rescript-jest"
   ],
   "bs-dev-dependencies": [
-    "@glennsl/rescript-jest"
   ],
   "warnings": {
     "number": "+A-4-29-40-42-60+102",
