@@ -1,6 +1,6 @@
 {
   "name": "rescript-relude",
-  "bsc-flags": [
+  "compiler-flags": [
     "-bs-no-version-header"
   ],
   "version": "0.1.0",
@@ -20,11 +20,11 @@
     "in-source": true
   },
   "suffix": ".res.mjs",
-  "bs-dependencies": [
+  "dependencies": [
     "rescript-bastet",
     "@glennsl/rescript-jest"
   ],
-  "bs-dev-dependencies": [
+  "dev-dependencies": [
   ],
   "warnings": {
     "number": "+A-4-29-40-42-60+102",
