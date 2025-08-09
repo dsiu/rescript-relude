@@ -393,11 +393,11 @@ __metadata:
 
 "@glennsl/rescript-jest@github:dsiu/rescript-jest#rescript-v12":
   version: 0.11.0
-  resolution: "@glennsl/rescript-jest@https://github.com/dsiu/rescript-jest.git#commit=6bf16720ec448caa87b7b63d6bff3c194ec3c3cb"
+  resolution: "@glennsl/rescript-jest@https://github.com/dsiu/rescript-jest.git#commit=d1ccebe4abdaa2a3ed4bb79875355a64e0e5002d"
   peerDependencies:
     jest: ^29.7.0
-    rescript: ^12.0.0-beta.4
-  checksum: 10c0/3eb83a3d51192b748e0db477a70f22b3e68352ebeec0f03a35ba23d945a159928e09f0c281682e388d64e8d19c681249cace900124107d87f89ec675242d79f1
+    rescript: ^12.0.0-beta.5
+  checksum: 10c0/17b566ffcd381f295ab72ba4a57af6640ce7bb77364e3a6bfa20557f257815aac218fc9bb8616c4582890d3f307eafab7bed929aa7296ffe43d9d7fc7c43e50e
   languageName: node
   linkType: hard
 
@@ -780,37 +780,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rescript/darwin-arm64@npm:12.0.0-beta.4":
-  version: 12.0.0-beta.4
-  resolution: "@rescript/darwin-arm64@npm:12.0.0-beta.4"
+"@rescript/darwin-arm64@npm:12.0.0-beta.5":
+  version: 12.0.0-beta.5
+  resolution: "@rescript/darwin-arm64@npm:12.0.0-beta.5"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rescript/darwin-x64@npm:12.0.0-beta.4":
-  version: 12.0.0-beta.4
-  resolution: "@rescript/darwin-x64@npm:12.0.0-beta.4"
+"@rescript/darwin-x64@npm:12.0.0-beta.5":
+  version: 12.0.0-beta.5
+  resolution: "@rescript/darwin-x64@npm:12.0.0-beta.5"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@rescript/linux-arm64@npm:12.0.0-beta.4":
-  version: 12.0.0-beta.4
-  resolution: "@rescript/linux-arm64@npm:12.0.0-beta.4"
+"@rescript/linux-arm64@npm:12.0.0-beta.5":
+  version: 12.0.0-beta.5
+  resolution: "@rescript/linux-arm64@npm:12.0.0-beta.5"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rescript/linux-x64@npm:12.0.0-beta.4":
-  version: 12.0.0-beta.4
-  resolution: "@rescript/linux-x64@npm:12.0.0-beta.4"
+"@rescript/linux-x64@npm:12.0.0-beta.5":
+  version: 12.0.0-beta.5
+  resolution: "@rescript/linux-x64@npm:12.0.0-beta.5"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@rescript/win32-x64@npm:12.0.0-beta.4":
-  version: 12.0.0-beta.4
-  resolution: "@rescript/win32-x64@npm:12.0.0-beta.4"
+"@rescript/win32-x64@npm:12.0.0-beta.5":
+  version: 12.0.0-beta.5
+  resolution: "@rescript/win32-x64@npm:12.0.0-beta.5"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -991,11 +991,11 @@ __metadata:
   linkType: hard
 
 "@swc/types@npm:^0.1.23":
-  version: 0.1.23
-  resolution: "@swc/types@npm:0.1.23"
+  version: 0.1.24
+  resolution: "@swc/types@npm:0.1.24"
   dependencies:
     "@swc/counter": "npm:^0.1.3"
-  checksum: 10c0/edbfe4a72257f40137e27b537bc17d47ccab28de7727471b859c00a1e67f5feac5e01e4b4e0a2365907ce024bb8c3de4b26b6260733e1b601094db54ae9b7477
+  checksum: 10c0/4ca95a338f070f48303e705996bacfc1219f606c45274bed4f6e3488b86b7b20397bd52792e58fdea0fa924fc939695b5eb5ff7f3ff4737382148fe6097e235a
   languageName: node
   linkType: hard
 
@@ -1093,11 +1093,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 24.1.0
-  resolution: "@types/node@npm:24.1.0"
+  version: 24.2.1
+  resolution: "@types/node@npm:24.2.1"
   dependencies:
-    undici-types: "npm:~7.8.0"
-  checksum: 10c0/6c4686bc144f6ce7bffd4cadc3e1196e2217c1da4c639c637213719c8a3ee58b6c596b994befcbffeacd9d9eb0c3bff6529d2bc27da5d1cb9d58b1da0056f9f4
+    undici-types: "npm:~7.10.0"
+  checksum: 10c0/439a3c7edf88a298e0c92e46f670234070b892589c3b06e82cc86c47a7e1cf220f4a4b4736ec6ac7e4b9e1c40d7b6d443a1e22f99dd17f13f9dd15de3b32011b
   languageName: node
   linkType: hard
 
@@ -1484,9 +1484,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001726":
-  version: 1.0.30001731
-  resolution: "caniuse-lite@npm:1.0.30001731"
-  checksum: 10c0/d8cddf817d5bec8e7c2106affdbf1bfc3923463ca16697c992b2efeb043e6a5d9dcb70cda913bc6acf9112fd66f9e80279316c08e7800359116925066a63fdfa
+  version: 1.0.30001733
+  resolution: "caniuse-lite@npm:1.0.30001733"
+  checksum: 10c0/2c03ad3362be7c93c09537f3853156ade5c70fb131888971dd538631971873ba27b83c5aad48dd06b6cde005fe57caae2db5d0f467d0c63a315391add70f01f5
   languageName: node
   linkType: hard
 
@@ -1956,9 +1956,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.173":
-  version: 1.5.194
-  resolution: "electron-to-chromium@npm:1.5.194"
-  checksum: 10c0/7d72617857055d54552380b34be411933966fa1156dc8653e321d14e82e2af84114bac607e9e2926f885d560b2697a324981e4204d3da4e0f9604d4a468eeba1
+  version: 1.5.199
+  resolution: "electron-to-chromium@npm:1.5.199"
+  checksum: 10c0/5586d20455407edc583e33422e370bbdc07913d8f5c73da2ae1c6adcc79c3be7384ecaf893978027cb26a410c1354f199a05edb99b1ab03dd0346e2201525148
   languageName: node
   linkType: hard
 
@@ -4166,10 +4166,10 @@ __metadata:
 
 "rescript-bastet@github:dsiu/rescript-bastet#rescript-v12":
   version: 0.0.1
-  resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=9b677944832c20bf8768a3a2685cb8bb49eeb20f"
+  resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=0913b235c11a55f8ec00278bc255ad408491b28a"
   peerDependencies:
-    rescript: ^12.0.0-beta.4
-  checksum: 10c0/5c2c92ff10e7b4ffcc460cf6c3d9b92bbc16d814224528dd27372e5d973c4da1ac5e617faf8d0957c5e1c976ea8f7954a3b7329a47a4f0588fc414517c4c2aeb
+    rescript: ^12.0.0-beta.5
+  checksum: 10c0/02632ec4f22adecd8a79154ddfeca3f1d8080ba1f5b71d6fb9992bbb20eeb1b013ea1b7180f72fed8532e741c709a9e2c7e08360020f3e6da0c1c65db46b36f2
   languageName: node
   linkType: hard
 
@@ -4183,23 +4183,23 @@ __metadata:
     bisect_ppx: "npm:^2.7.1"
     docsify-cli: "npm:~4.4.0"
     jest: "npm:^29.7.0"
-    rescript: "npm:^12.0.0-beta.4"
+    rescript: "npm:^12.0.0-beta.5"
     rescript-bastet: "github:dsiu/rescript-bastet#rescript-v12"
   peerDependencies:
-    rescript: ^12.0.0-beta.4
+    rescript: ^12.0.0-beta.5
     rescript-bastet: "*"
   languageName: unknown
   linkType: soft
 
-"rescript@npm:^12.0.0-beta.4":
-  version: 12.0.0-beta.4
-  resolution: "rescript@npm:12.0.0-beta.4"
+"rescript@npm:^12.0.0-beta.5":
+  version: 12.0.0-beta.5
+  resolution: "rescript@npm:12.0.0-beta.5"
   dependencies:
-    "@rescript/darwin-arm64": "npm:12.0.0-beta.4"
-    "@rescript/darwin-x64": "npm:12.0.0-beta.4"
-    "@rescript/linux-arm64": "npm:12.0.0-beta.4"
-    "@rescript/linux-x64": "npm:12.0.0-beta.4"
-    "@rescript/win32-x64": "npm:12.0.0-beta.4"
+    "@rescript/darwin-arm64": "npm:12.0.0-beta.5"
+    "@rescript/darwin-x64": "npm:12.0.0-beta.5"
+    "@rescript/linux-arm64": "npm:12.0.0-beta.5"
+    "@rescript/linux-x64": "npm:12.0.0-beta.5"
+    "@rescript/win32-x64": "npm:12.0.0-beta.5"
   dependenciesMeta:
     "@rescript/darwin-arm64":
       optional: true
@@ -4217,7 +4217,7 @@ __metadata:
     rescript: cli/rescript.js
     rescript-legacy: cli/rescript-legacy.js
     rescript-tools: cli/rescript-tools.js
-  checksum: 10c0/8a1e15766122e844a2b2fc59e967673492c86ae1cd1802f325f49729a87132c16aca8edbea2c6cdf93b5bf56b6a96787f2c14e19fdfab5ab62379b7ee89451cf
+  checksum: 10c0/2743a503e7ecd41ea86fba8d38f4ca322f1dd473660b79e846e1447ab5a917e240abcd515e8f5c8ea4fa7bd9d454612e210c3c96994c4c954adbade033dfdeba
   languageName: node
   linkType: hard
 
@@ -4769,10 +4769,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.8.0":
-  version: 7.8.0
-  resolution: "undici-types@npm:7.8.0"
-  checksum: 10c0/9d9d246d1dc32f318d46116efe3cfca5a72d4f16828febc1918d94e58f6ffcf39c158aa28bf5b4fc52f410446bc7858f35151367bd7a49f21746cab6497b709b
+"undici-types@npm:~7.10.0":
+  version: 7.10.0
+  resolution: "undici-types@npm:7.10.0"
+  checksum: 10c0/8b00ce50e235fe3cc601307f148b5e8fb427092ee3b23e8118ec0a5d7f68eca8cee468c8fc9f15cbb2cf2a3797945ebceb1cbd9732306a1d00e0a9b6afa0f635
   languageName: node
   linkType: hard
 
