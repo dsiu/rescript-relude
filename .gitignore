@@ -1,6 +1,8 @@
 .DS_Store
 .merlin
 .bsb.lock
+rescript.lock
+
 *.bs.js
 /src/**/*.res.mjs
 /__tests__/**/*.res.mjs
