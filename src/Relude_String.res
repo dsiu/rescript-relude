@@ -246,7 +246,8 @@ range of the size of the string (too high or negative), [None] is returned.
 ")
 let charCodeAt: (int, string) => option<int> = (i, str) => {
   let code = String.charCodeAt(str, i)
-  Relude_Float.isNaN(code) ? None : Some(Float.toInt(code))
+  // Relude_Float.isNaN(code) ? None : Some(Float.toInt(code))
+  code
 }
 
 @ocaml.doc("
