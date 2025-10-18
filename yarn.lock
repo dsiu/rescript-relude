@@ -383,11 +383,11 @@ __metadata:
 
 "@glennsl/rescript-jest@github:dsiu/rescript-jest#rescript-v12":
   version: 0.11.0
-  resolution: "@glennsl/rescript-jest@https://github.com/dsiu/rescript-jest.git#commit=59896b3b3e3cb7dd8b4b3717a78a421d6f6d5604"
+  resolution: "@glennsl/rescript-jest@https://github.com/dsiu/rescript-jest.git#commit=fe3cef85344a0779f98292c67768a868b3b9cd1c"
   peerDependencies:
     jest: ^29.7.0
-    rescript: 12.0.0-beta.14
-  checksum: 10c0/141f580b5d6b912c941aebab6e52f67571424e15c73a3ae9fca1deee43d4defb269ae46e187c640fba874b610f84e6e75e79b45e2dffe20324c384b0f1c1a0c4
+    rescript: 12.0.0-rc.2
+  checksum: 10c0/51b65bcab0e0791813103b32c086b4622dfb33a3271da0e246aa88646d5d2c1f51fdc8f16b8e84670ad54b7e7740d30cd80343acb6e1e1847ed640561dee2715
   languageName: node
   linkType: hard
 
@@ -780,44 +780,44 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rescript/darwin-arm64@npm:12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "@rescript/darwin-arm64@npm:12.0.0-beta.14"
+"@rescript/darwin-arm64@npm:12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "@rescript/darwin-arm64@npm:12.0.0-rc.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rescript/darwin-x64@npm:12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "@rescript/darwin-x64@npm:12.0.0-beta.14"
+"@rescript/darwin-x64@npm:12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "@rescript/darwin-x64@npm:12.0.0-rc.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@rescript/linux-arm64@npm:12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "@rescript/linux-arm64@npm:12.0.0-beta.14"
+"@rescript/linux-arm64@npm:12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "@rescript/linux-arm64@npm:12.0.0-rc.2"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rescript/linux-x64@npm:12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "@rescript/linux-x64@npm:12.0.0-beta.14"
+"@rescript/linux-x64@npm:12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "@rescript/linux-x64@npm:12.0.0-rc.2"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@rescript/runtime@npm:12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "@rescript/runtime@npm:12.0.0-beta.14"
-  checksum: 10c0/3e4a6e5df9a673f7095b29f971d0dc67958bc617c3219980050742257f3d66797acfee87b136fb61dc1009c6499a48ffe921a5a47eab233f77b5dc3eaf9d691b
+"@rescript/runtime@npm:12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "@rescript/runtime@npm:12.0.0-rc.2"
+  checksum: 10c0/ce9fa3098e5a76c4a1b6a4567fe9aa37f8eced6d68a84caad51c5c11220c4330aeb77c0ec48a907ea29aa2084d2d06319c2a7b40871e33bf8623b52d5e8da8db
   languageName: node
   linkType: hard
 
-"@rescript/win32-x64@npm:12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "@rescript/win32-x64@npm:12.0.0-beta.14"
+"@rescript/win32-x64@npm:12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "@rescript/win32-x64@npm:12.0.0-rc.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -1100,11 +1100,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 24.6.2
-  resolution: "@types/node@npm:24.6.2"
+  version: 24.8.1
+  resolution: "@types/node@npm:24.8.1"
   dependencies:
-    undici-types: "npm:~7.13.0"
-  checksum: 10c0/d029757711be85ec468686f66cd8eca78f5996d7e2b1a5b818436e0299b19925b0fb4f7509a6b62750abdc72d66f5750ce22fb8b55559baca86df89a9c44722e
+    undici-types: "npm:~7.14.0"
+  checksum: 10c0/d185f2f14aa26cc2b482aa730bfc452943f9636df37aad6ceed80aa397f1278f894043336bd72f74c47b3dbef23e772ac9b1a256168984aa8aee26836132d290
   languageName: node
   linkType: hard
 
@@ -1345,11 +1345,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.9":
-  version: 2.8.11
-  resolution: "baseline-browser-mapping@npm:2.8.11"
+  version: 2.8.17
+  resolution: "baseline-browser-mapping@npm:2.8.17"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/9c345d41152782c20cc11ad0aff273d252d6063efdfc45a602abd8798b50d81deeb89aa3ab6eedd33dce2ad714d16de96783e248f850e95b6063e81cd2ea62ba
+  checksum: 10c0/114d0a406920d66415388f57e372a45ebefe1aadf460172c7cf15ab2bc783825ff52d7a15b60905ea45a68de9548ba803635236082a92669221669ac2e72bb5f
   languageName: node
   linkType: hard
 
@@ -1501,9 +1501,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001746":
-  version: 1.0.30001747
-  resolution: "caniuse-lite@npm:1.0.30001747"
-  checksum: 10c0/cef0c7fff34d4c0ac3edc33660f07785301c98858bb4a6b8702b7b09ca2b0fd5457a7772af7b9fc3591fdd13862f649e57eed824f4cb6cf4aedf563e58fc7d0c
+  version: 1.0.30001751
+  resolution: "caniuse-lite@npm:1.0.30001751"
+  checksum: 10c0/c3f2d448f3569004ace160fd9379ea0def8e7a7bc6e65611baadb57d24e1f418258647a6210e46732419f5663e2356c22aa841f92449dd3849eb6471bb7ad592
   languageName: node
   linkType: hard
 
@@ -1651,9 +1651,9 @@ __metadata:
   linkType: hard
 
 "collect-v8-coverage@npm:^1.0.0":
-  version: 1.0.2
-  resolution: "collect-v8-coverage@npm:1.0.2"
-  checksum: 10c0/ed7008e2e8b6852c5483b444a3ae6e976e088d4335a85aa0a9db2861c5f1d31bd2d7ff97a60469b3388deeba661a619753afbe201279fb159b4b9548ab8269a1
+  version: 1.0.3
+  resolution: "collect-v8-coverage@npm:1.0.3"
+  checksum: 10c0/bc62ba251bcce5e3354a8f88fa6442bee56e3e612fec08d4dfcf66179b41ea0bf544b0f78c4ebc0f8050871220af95bb5c5578a6aef346feea155640582f09dc
   languageName: node
   linkType: hard
 
@@ -1980,9 +1980,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.227":
-  version: 1.5.230
-  resolution: "electron-to-chromium@npm:1.5.230"
-  checksum: 10c0/b8bf382868b2780fa0c7ba3bce0644e94ec21af8f9b199ee094273904a575b46c8705fa4c10a22a0ed90e42dbbf72efbc3089bbecf8324a9db099c8c6c1c1101
+  version: 1.5.237
+  resolution: "electron-to-chromium@npm:1.5.237"
+  checksum: 10c0/b9a9ba6ba3db5cc7e402fcc78f2ddf8bfc4b142dfcfa83e37a6ba99337d186025c4311db345d95ecf2b404e9d3fcd5ec7b1be56e6b998ff6b8fe348569eaf4b7
   languageName: node
   linkType: hard
 
@@ -2162,9 +2162,9 @@ __metadata:
   linkType: hard
 
 "exponential-backoff@npm:^3.1.1":
-  version: 3.1.2
-  resolution: "exponential-backoff@npm:3.1.2"
-  checksum: 10c0/d9d3e1eafa21b78464297df91f1776f7fbaa3d5e3f7f0995648ca5b89c069d17055033817348d9f4a43d1c20b0eab84f75af6991751e839df53e4dfd6f22e844
+  version: 3.1.3
+  resolution: "exponential-backoff@npm:3.1.3"
+  checksum: 10c0/77e3ae682b7b1f4972f563c6dbcd2b0d54ac679e62d5d32f3e5085feba20483cf28bd505543f520e287a56d4d55a28d7874299941faf637e779a1aa5994d1267
   languageName: node
   linkType: hard
 
@@ -3703,8 +3703,8 @@ __metadata:
   linkType: hard
 
 "node-gyp@npm:latest":
-  version: 11.4.2
-  resolution: "node-gyp@npm:11.4.2"
+  version: 11.5.0
+  resolution: "node-gyp@npm:11.5.0"
   dependencies:
     env-paths: "npm:^2.2.0"
     exponential-backoff: "npm:^3.1.1"
@@ -3718,7 +3718,7 @@ __metadata:
     which: "npm:^5.0.0"
   bin:
     node-gyp: bin/node-gyp.js
-  checksum: 10c0/0bfd3e96770ed70f07798d881dd37b4267708966d868a0e585986baac487d9cf5831285579fd629a83dc4e434f53e6416ce301097f2ee464cb74d377e4d8bdbe
+  checksum: 10c0/31ff49586991b38287bb15c3d529dd689cfc32f992eed9e6997b9d712d5d21fe818a8b1bbfe3b76a7e33765c20210c5713212f4aa329306a615b87d8a786da3a
   languageName: node
   linkType: hard
 
@@ -3730,9 +3730,9 @@ __metadata:
   linkType: hard
 
 "node-releases@npm:^2.0.21":
-  version: 2.0.21
-  resolution: "node-releases@npm:2.0.21"
-  checksum: 10c0/0eb94916eeebbda9d51da6a9ea47428a12b2bb0dd94930c949632b0c859356abf53b2e5a2792021f96c5fda4f791a8e195f2375b78ae7dba8d8bc3141baa1469
+  version: 2.0.25
+  resolution: "node-releases@npm:2.0.25"
+  checksum: 10c0/d4aeb1e04578d96e54d6c40540122e6240671b971887f04aca07b6805752a78de1f1c1522f3fa3843706bf8acf6de2cb35f104914957f269e328b41a9fa9fd2f
   languageName: node
   linkType: hard
 
@@ -4173,10 +4173,10 @@ __metadata:
 
 "rescript-bastet@github:dsiu/rescript-bastet#rescript-v12":
   version: 0.0.1
-  resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=d78a9faab6c40f8da2a58f81d0a5f2f61a068499"
+  resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=da2d949df7f95df053e5fb887f0a83ef6e347c3b"
   peerDependencies:
-    rescript: ^12.0.0-beta.14
-  checksum: 10c0/94b596b8c9b100a1ff41544bebe1f8e85e44e3c382173b92db4c436d86d3188821e8731214ef74ec29d75d68cb87aee5c4bf28921accfdfb4b6c30e0bae2a4b3
+    rescript: ^12.0.0-rc.2
+  checksum: 10c0/02f0c3e3ebc38d57d5aa7ea42539c8c2eb3410cbf19986283f9fff83c6b0caa1c1ac78cd7f76a72e7e98d84cc0e1d525fe66aefbf0ac98bef4984be9bd0a1d48
   languageName: node
   linkType: hard
 
@@ -4190,24 +4190,24 @@ __metadata:
     bisect_ppx: "npm:^2.7.1"
     docsify-cli: "npm:~4.4.0"
     jest: "npm:^29.7.0"
-    rescript: "npm:^12.0.0-beta.14"
+    rescript: "npm:^12.0.0-rc.2"
     rescript-bastet: "github:dsiu/rescript-bastet#rescript-v12"
   peerDependencies:
-    rescript: ^12.0.0-beta.14
+    rescript: ^12.0.0-rc.2
     rescript-bastet: "*"
   languageName: unknown
   linkType: soft
 
-"rescript@npm:^12.0.0-beta.14":
-  version: 12.0.0-beta.14
-  resolution: "rescript@npm:12.0.0-beta.14"
+"rescript@npm:^12.0.0-rc.2":
+  version: 12.0.0-rc.2
+  resolution: "rescript@npm:12.0.0-rc.2"
   dependencies:
-    "@rescript/darwin-arm64": "npm:12.0.0-beta.14"
-    "@rescript/darwin-x64": "npm:12.0.0-beta.14"
-    "@rescript/linux-arm64": "npm:12.0.0-beta.14"
-    "@rescript/linux-x64": "npm:12.0.0-beta.14"
-    "@rescript/runtime": "npm:12.0.0-beta.14"
-    "@rescript/win32-x64": "npm:12.0.0-beta.14"
+    "@rescript/darwin-arm64": "npm:12.0.0-rc.2"
+    "@rescript/darwin-x64": "npm:12.0.0-rc.2"
+    "@rescript/linux-arm64": "npm:12.0.0-rc.2"
+    "@rescript/linux-x64": "npm:12.0.0-rc.2"
+    "@rescript/runtime": "npm:12.0.0-rc.2"
+    "@rescript/win32-x64": "npm:12.0.0-rc.2"
   dependenciesMeta:
     "@rescript/darwin-arm64":
       optional: true
@@ -4225,7 +4225,7 @@ __metadata:
     rescript: cli/rescript.js
     rescript-legacy: cli/rescript-legacy.js
     rescript-tools: cli/rescript-tools.js
-  checksum: 10c0/5701a64daf4e7c21625bb6d695f456c2fa6f7ef59b970565e0439aea592c69518d681d0e276c68d29fe9a006ae1c0f916482730270d9f15fc89fd4fd8f9866f0
+  checksum: 10c0/57e3f59d729151ec1789872aea9bf0df1d7263578bd1aad4f7d1bf8521b38a8b0a58a182009fa2989bf40fc35a38c02a126fa245c99c8fa34c90266876d8cf4a
   languageName: node
   linkType: hard
 
@@ -4327,11 +4327,11 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.5.4":
-  version: 7.7.2
-  resolution: "semver@npm:7.7.2"
+  version: 7.7.3
+  resolution: "semver@npm:7.7.3"
   bin:
     semver: bin/semver.js
-  checksum: 10c0/aca305edfbf2383c22571cb7714f48cadc7ac95371b4b52362fb8eeffdfbc0de0669368b82b2b15978f8848f01d7114da65697e56cd8c37b0dab8c58e543f9ea
+  checksum: 10c0/4afe5c986567db82f44c8c6faef8fe9df2a9b1d98098fc1721f57c696c4c21cebd572f297fc21002f81889492345b8470473bc6f4aff5fb032a6ea59ea2bc45e
   languageName: node
   linkType: hard
 
@@ -4769,10 +4769,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.13.0":
-  version: 7.13.0
-  resolution: "undici-types@npm:7.13.0"
-  checksum: 10c0/44bbb0935425291351bfd8039571f017295b5d6dc5727045d0a4fea8c6ffe73a6703b48ce010f9cb539b9041a75b463f8cfe1e7309cab7486452505fb0d66151
+"undici-types@npm:~7.14.0":
+  version: 7.14.0
+  resolution: "undici-types@npm:7.14.0"
+  checksum: 10c0/e7f3214b45d788f03c51ceb33817be99c65dae203863aa9386b3ccc47201a245a7955fc721fb581da9c888b6ebad59fa3f53405214afec04c455a479908f0f14
   languageName: node
   linkType: hard
 
