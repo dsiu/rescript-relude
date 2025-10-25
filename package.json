@@ -43,16 +43,22 @@
       "/testUtils/"
     ],
     "transform": {
-      "^.+\\.m?jsx?$": ["babel-jest", {
-        "presets": [
-          ["@babel/preset-env", {
-            "targets": {
-              "node": "current"
-            },
-            "modules": "commonjs"
-          }]
-        ]
-      }]
+      "^.+\\.m?jsx?$": [
+        "babel-jest",
+        {
+          "presets": [
+            [
+              "@babel/preset-env",
+              {
+                "targets": {
+                  "node": "current"
+                },
+                "modules": "commonjs"
+              }
+            ]
+          ]
+        }
+      ]
     },
     "transformIgnorePatterns": [
       "<rootDir>/node_modules/(?!(rescript|@rescript/runtime|@glennsl/rescript-jest|rescript-bastet)/)"
