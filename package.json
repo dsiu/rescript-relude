@@ -9,11 +9,11 @@
     "url": "https://github.com/reazen/relude.git"
   },
   "type": "module",
-  "packageManager": "yarn@4.10.3",
+  "packageManager": "yarn@4.11.0",
   "scripts": {
-    "clean": "rescript clean --dev",
-    "build": "rescript build --dev",
-    "watch": "rescript watch --dev",
+    "clean": "rescript clean",
+    "build": "rescript build",
+    "watch": "rescript watch",
     "test": "jest",
     "coverage": "npm run test",
     "docs": "docsify serve ./docs",
@@ -76,11 +76,11 @@
     "babel-jest": "^27.3.1",
     "docsify-cli": "~4.4.0",
     "jest": "^27.3.1",
-    "rescript": "^12.0.0-rc.3",
+    "rescript": "^12.0.0-rc.5",
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
   },
   "peerDependencies": {
-    "rescript": "^12.0.0-rc.3",
+    "rescript": "^12.0.0-rc.5",
     "rescript-bastet": "*"
   },
   "dependencies": {
