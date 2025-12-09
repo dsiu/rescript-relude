@@ -487,7 +487,7 @@ module WithSequence = (S: Relude_Interface.SEQUENCE) => {
   @ocaml.doc("
   Indicates if the focus is at the given index of the zipper
   ")
-  let isAtIndex: 'a. (int, t<'a>) => bool = (target, z) => z->zipWithIndex->getFocus->snd == target
+  let isAtIndex: 'a. (int, t<'a>) => bool = (target, z) => z->zipWithIndex->getFocus->Pair.second == target
 
   @ocaml.doc("
   Indicates if the focus is at the item, based on the given equality function

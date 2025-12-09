@@ -75,10 +75,10 @@ module String = {
   ")
   let distinct: list<string> => list<string> = xs => {
     Relude_List_Instances.foldLeft((acc, curr) => {
-      Js.Dict.set(acc, curr, 0)
+      Dict.set(acc, curr, 0)
       acc
-    }, Js.Dict.empty(), xs)
-    ->Js.Dict.keys
+    }, Dict.make(), xs)
+    ->Dict.keysToArray
     ->Relude_List_Instances.fromArray
   }
 }

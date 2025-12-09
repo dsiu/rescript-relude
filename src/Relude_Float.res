@@ -257,7 +257,7 @@ the function.
   Float.show(1.0e+03) == \"1000\";
 ]}
 ")
-let show: float => string = x => Js.Float.toString(x)
+let show: float => string = x => Float.toString(x)
 
 @ocaml.doc("
 [Float.toString] is an alias for {!val:show}.

@@ -1025,10 +1025,10 @@ Lifts a side-effect function that might throw an JS exception into a suspended
 If a normal [Js.Exn.t] is throw, it is captured as-is, but if the thrown object
 is not a [Js.Exn.t] it is unsafely coerced into a [Js.Exn.t].
 ")
-let triesJS: 'a. (unit => 'a) => t<'a, Js.Exn.t> = getA => SuspendIO(
+let triesJS: 'a. (unit => 'a) => t<'a, JsExn.t> = getA => SuspendIO(
   () =>
     try Pure(getA()) catch {
-    | Js.Exn.Error(jsExn) => Throw(jsExn)
+    | JsExn(jsExn) => Throw(jsExn)
     | exn =>
       let jsExn = Relude_Js_Exn.unsafeFromExn(exn)
       Throw(jsExn)
@@ -1295,14 +1295,14 @@ Creates an async [IO] that waits for the given millisecond timeout before
 completing with a unit value.
 ")
 let delay: 'e. int => t<unit, 'e> = millis =>
-  async(onDone => Js.Global.setTimeout(_ => onDone(Ok()), millis)->ignore)
+  async(onDone => setTimeout(_ => onDone(Ok()), millis)->ignore)
 
 @ocaml.doc("
 Creates an async non-failing [IO] that waits for the given millisecond timeout
 before completing with a unit value.
 ")
 let delayWithVoid: int => t<unit, Relude_Void.t> = millis =>
-  async(onDone => Js.Global.setTimeout(_ => onDone(Ok()), millis)->ignore)
+  async(onDone => setTimeout(_ => onDone(Ok()), millis)->ignore)
 
 @ocaml.doc("
 Injects a delay in milliseconds after the given IO.  The value or error from the
@@ -1415,7 +1415,7 @@ let throttle: 'r 'a 'e. (~intervalMs: int=?, 'r => t<'a, 'e>, 'r) => t<option<'a
   let currentlyThrottled = ref(false)
   let startThrottle = () => {
     currentlyThrottled := true
-    Js.Global.setTimeout(() => currentlyThrottled := false, intervalMs)->ignore
+    setTimeout(() => currentlyThrottled := false, intervalMs)->ignore
   }
 
   let f = a =>

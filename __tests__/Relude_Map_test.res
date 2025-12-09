@@ -93,12 +93,12 @@ describe("StringMap", () => {
   )
 
   test("fromValueArray", () => {
-    let map = StringMap.fromValueArray(fst, [("a", "b"), ("b", "c"), ("a", "d")])
+    let map = StringMap.fromValueArray(Pair.first, [("a", "b"), ("b", "c"), ("a", "d")])
     expect(StringMap.get("a", map))->toEqual(Some(("a", "d")))
   })
 
   test("fromValueList", () => {
-    let map = StringMap.fromValueList(fst, list{("a", 0), ("b", 1)})
+    let map = StringMap.fromValueList(Pair.first, list{("a", 0), ("b", 1)})
     expect(StringMap.get("a", map))->toEqual(Some(("a", 0)))
   })
 

@@ -70,7 +70,7 @@ module BoundedEnumExtensions = (E: Relude_Interface.BOUNDED_ENUM) => {
       let lookup = a =>
         lookupList
         ->(Relude_List_Instances.find(((a', _)) => eqA(a', a), _))
-        ->Relude_Option_Instances.map(snd, _)
+        ->Relude_Option_Instances.map(Pair.second, _)
 
       lookup(a)
     }

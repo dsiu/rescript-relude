@@ -79,11 +79,11 @@ describe("String", () => {
   test("charAt failure", () => expect(Str.charAt(7, "abcdefg"))->toEqual(None))
 
   test("charAtNullable success", () =>
-    expect(Str.charAtNullable(2, "abcdefg"))->toEqual(Js.Nullable.return("c"))
+    expect(Str.charAtNullable(2, "abcdefg"))->toEqual(Nullable.make("c"))
   )
 
   test("charAtNullable failure", () =>
-    expect(Str.charAtNullable(7, "abcdefg"))->toEqual(Js.Nullable.undefined)
+    expect(Str.charAtNullable(7, "abcdefg"))->toEqual(Nullable.undefined)
   )
 
   test("charAtOrThrow success", () => expect(Str.charAtOrThrow(2, "abcdefg"))->toEqual("c"))

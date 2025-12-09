@@ -243,7 +243,7 @@ module WithKeyMeta = (KeyMeta: KEY_META): (HMAP_TYPE with type Key.keyMeta<'a> =
     let uniqueInt: unit => int = {
       let id = ref(-1)
       () => {
-        incr(id)
+        Int.Ref.increment(id)
         id.contents
       }
     }

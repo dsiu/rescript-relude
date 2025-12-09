@@ -80,9 +80,9 @@ module String = {
   time by using [Js.Dict].
   ")
   let distinct = xs => Relude_Array_Instances.foldLeft((acc, curr) => {
-      Js.Dict.set(acc, curr, 0)
+      Dict.set(acc, curr, 0)
       acc
-    }, Js.Dict.empty(), xs)->Js.Dict.keys
+    }, Dict.make(), xs)->Dict.keysToArray
 }
 
 @ocaml.doc("

@@ -179,7 +179,7 @@ module Make = (Ord: OrderedType) => {
 
   let rec find = (x, param) =>
     switch param {
-    | Empty => raise(Not_found)
+    | Empty => throw(Not_found)
     | Node({l, v, d, r}) =>
       let c = Ord.compare(x, v)
       if c == 0 {
@@ -209,7 +209,7 @@ module Make = (Ord: OrderedType) => {
 
   let rec find_first = (f, param) =>
     switch param {
-    | Empty => raise(Not_found)
+    | Empty => throw(Not_found)
     | Node({l, v, d, r}) =>
       if f(v) {
         find_first_aux(v, d, f, l)
@@ -253,7 +253,7 @@ module Make = (Ord: OrderedType) => {
 
   let rec find_last = (f, param) =>
     switch param {
-    | Empty => raise(Not_found)
+    | Empty => throw(Not_found)
     | Node({l, v, d, r}) =>
       if f(v) {
         find_last_aux(v, d, f, r)
@@ -321,7 +321,7 @@ module Make = (Ord: OrderedType) => {
 
   let rec min_binding = param =>
     switch param {
-    | Empty => raise(Not_found)
+    | Empty => throw(Not_found)
     | Node({l: Empty, v, d}) => (v, d)
     | Node({l}) => min_binding(l)
     }
@@ -335,7 +335,7 @@ module Make = (Ord: OrderedType) => {
 
   let rec max_binding = param =>
     switch param {
-    | Empty => raise(Not_found)
+    | Empty => throw(Not_found)
     | Node({v, d, r: Empty}) => (v, d)
     | Node({r}) => max_binding(r)
     }

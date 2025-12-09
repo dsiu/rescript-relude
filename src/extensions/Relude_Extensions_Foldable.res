@@ -59,7 +59,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   If the item is not found, the result is None.
   ")
   let indexOfBy: 'a. (('a, 'a) => bool, 'a, F.t<'a>) => option<int> = (f, x, xs) =>
-    F.fold_left(((i, v), y) => (i + 1, optionAlt(v, f(x, y) ? Some(i) : None)), (0, None), xs)->snd
+    F.fold_left(((i, v), y) => (i + 1, optionAlt(v, f(x, y) ? Some(i) : None)), (0, None), xs)->Pair.second
 
   @ocaml.doc("
   Finds the index of the given item in the foldable using the given EQ module.
@@ -154,7 +154,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   Finds the first indexed item in the foldable which satisfies the given predicate.
   ")
   let findWithIndex: 'a. (('a, int) => bool, F.t<'a>) => option<'a> = (f, xs) =>
-    F.fold_left(((i, v), x) => (i + 1, optionAlt(v, f(x, i) ? Some(x) : None)), (0, None), xs)->snd
+    F.fold_left(((i, v), x) => (i + 1, optionAlt(v, f(x, i) ? Some(x) : None)), (0, None), xs)->Pair.second
 
   @ocaml.doc("
   Converts the foldable into a list
@@ -209,7 +209,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
         ((init, acc), x) => init ? (false, x) : (false, M.append(acc, M.append(sep, x))),
         (true, M.empty),
         xs,
-      )->snd
+      )->Pair.second
   }
 
   @ocaml.doc("

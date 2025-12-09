@@ -27,7 +27,8 @@ open Json.DSL
 describe("Json", () => {
   test("show", () =>
     list{("a", JE.bool(true)), ("b", JE.bool(false))}
-    ->Js.Dict.fromList
+    ->List.toArray
+    ->Dict.fromArray
     ->Json.fromDictOfJson
     ->Json.show(~indentSpaces=4)
     ->expect
@@ -55,7 +56,7 @@ describe("Json", () => {
 
   test("arrayOfDict", () =>
     expect(
-      [Js.Dict.fromList(list{("a", JE.bool(true))})]
+      [Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))]
       ->JE.arrayOfDict
       ->Json.show(~indentSpaces=0),
     )->toEqual(`[{"a":true}]`)
@@ -63,7 +64,7 @@ describe("Json", () => {
 
   test("listOfDict", () =>
     expect(
-      list{Js.Dict.fromList(list{("a", JE.bool(true))})}
+      list{Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))}
       ->JE.listOfDict
       ->Json.show(~indentSpaces=0),
     )->toEqual(`[{"a":true}]`)
@@ -75,7 +76,7 @@ describe("Json", () => {
 
   test("toArrayOfJsonOrElse ok", () =>
     expect(
-      [Js.Dict.fromList(list{("a", JE.bool(true))})]
+      [Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))]
       ->JE.arrayOfDict
       ->(Json.toArrayOfJsonOrElse([JE.bool(false)], _))
       ->JE.array
@@ -95,7 +96,7 @@ describe("Json", () => {
 
   test("toArrayOfJsonOrEmpty ok", () =>
     expect(
-      [Js.Dict.fromList(list{("a", JE.bool(true))})]
+      [Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))]
       ->JE.arrayOfDict
       ->Json.toArrayOfJsonOrEmpty
       ->JE.array
@@ -115,7 +116,7 @@ describe("Json", () => {
 
   test("toListOfJson some", () =>
     expect(
-      list{Js.Dict.fromList(list{("a", JE.bool(true))})}
+      list{Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))}
       ->JE.listOfDict
       ->Json.toListOfJson
       ->Option.getOrThrow
@@ -128,7 +129,7 @@ describe("Json", () => {
 
   test("toListOfJsonOrElse some", () =>
     expect(
-      list{Js.Dict.fromList(list{("a", JE.bool(true))})}
+      list{Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))}
       ->JE.listOfDict
       ->(Json.toListOfJsonOrElse(list{JE.bool(false)}, _))
       ->JE.list
@@ -147,31 +148,29 @@ describe("Json", () => {
 
   test("toDictOfJsonOrElse some", () =>
     expect(
-      Js.Dict.fromList(list{("a", JE.bool(true))})
+      Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))
       ->JE.dict
-      ->(Json.toDictOfJsonOrElse(Js.Dict.empty(), _)),
-    )->toEqual(Js.Dict.fromList(list{("a", JE.bool(true))}))
+      ->(Json.toDictOfJsonOrElse(Dict.make(), _))
+    )->toEqual(Dict.fromArray(List.toArray(list{("a", JE.bool(true))})))
   )
 
   test("toDictOfJsonOrElse none", () =>
-    expect(%raw(`""`)->JE.dict->(Json.toDictOfJsonOrElse(Js.Dict.empty(), _)))->toEqual(
-      Js.Dict.empty(),
-    )
+    expect(%raw(`""`)->JE.dict->Json.toDictOfJsonOrElse(Dict.make(), _))->toEqual(Dict.make())
   )
 
   test("toDictOfJsonOrEmpty some", () =>
     expect(
-      Js.Dict.fromList(list{("a", JE.bool(true))})->JE.dict->Json.toDictOfJsonOrEmpty,
-    )->toEqual(Js.Dict.fromList(list{("a", JE.bool(true))}))
+      Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))->JE.dict->Json.toDictOfJsonOrEmpty,
+    )->toEqual(Dict.fromArray(List.toArray(list{("a", JE.bool(true))})))
   )
 
   test("toDictOfJsonOrEmpty none", () =>
-    expect(%raw(`""`)->JE.dict->Json.toDictOfJsonOrEmpty)->toEqual(Js.Dict.empty())
+    expect(%raw(`""`)->JE.dict->Json.toDictOfJsonOrEmpty)->toEqual(Dict.make())
   )
 
   test("toListOrEmpty ok", () =>
     expect(
-      list{Js.Dict.fromList(list{("a", JE.bool(true))})}
+      list{Dict.fromArray(List.toArray(list{("a", JE.bool(true))}))}
       ->JE.listOfDict
       ->Json.toListOrEmpty
       ->JE.list
@@ -181,8 +180,8 @@ describe("Json", () => {
 
   test("toListOrEmpty error", () =>
     expect(
-      %raw(`""`)->JE.listOfDict->Json.toListOrEmpty->JE.list->Json.show(~indentSpaces=0),
-    )->toEqual(`[]`)
+      list{}->JE.listOfDict->Json.toListOrEmpty->JE.list->Json.show(~indentSpaces=0),
+    )->toEqual("[]")
   )
 
   test("encode opt Some", () => expect(JE.opt(JE.string, Some("hi")))->toEqual(JE.string("hi")))
@@ -472,7 +471,7 @@ describe("Json", () => {
         JE.float(42.1),
         JE.array([JE.null, JE.null]),
         JE.list(list{JE.null, JE.null}),
-        JE.dict(Js.Dict.fromList(list{("a", JE.null)})),
+        JE.dict(Dict.fromArray(List.toArray(list{("a", JE.null)}))),
       ])->(JD.array((_, json) => JD.string(json), _))
 
     let expected = Validation.error(
@@ -493,7 +492,7 @@ describe("Json", () => {
   })
 
   test("decode object using applicative validation (success)", () => {
-    let json: Js.Json.t = JE.listOfTuples(list{
+    let json: JSON.t = JE.listOfTuples(list{
       ("a", JE.string("hi")),
       ("b", JE.int(42)),
       ("c", JE.bool(true)),
@@ -545,7 +544,7 @@ describe("Json", () => {
   })
 
   test("decode object using applicative validation (error)", () => {
-    let json: Js.Json.t = JE.listOfTuples(list{
+    let json: JSON.t = JE.listOfTuples(list{
       ("a", JE.float(42.1)),
       ("b", JE.int(42)),
       ("c", JE.string("invalid")),
@@ -594,7 +593,7 @@ describe("Json", () => {
   })
 
   test("decode object using applicative validation (invalid type error)", () => {
-    let json: Js.Json.t = JE.listOfTuples(list{
+    let json: JSON.t = JE.listOfTuples(list{
       ("a", JE.null),
       ("b", JE.null),
       ("c", JE.list(list{JE.int(1)})),
@@ -616,7 +615,7 @@ describe("Json", () => {
   })
 
   test("decode object using applicative validation (not found error)", () => {
-    let json: Js.Json.t = JE.array([])
+    let json: JSON.t = JE.array([])
     let make = (a, b, c, d, e, f, g) => (a, b, c, d, e, f, g)
 
     let actual = \"<*>"(
@@ -712,7 +711,7 @@ describe("Json", () => {
   })
 
   test("decode an array into a tuple (not found error)", () => {
-    let json: Js.Json.t = JE.array([])
+    let json: JSON.t = JE.array([])
     let make: (
       string,
       int,

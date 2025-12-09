@@ -266,7 +266,7 @@ If [n] is out of bounds, [charAt()] returns [None].
 ]}
 ")
 let charAt: (int, string) => option<string> = (i, str) =>
-  Js.String.get(str, i)->Js.Nullable.return->Js.Nullable.toOption
+    String.get(str, i)
 
 @ocaml.doc("
 [charAtOrEmpty(n, str)] returns the string containing the character at the
@@ -300,8 +300,8 @@ If [n] is out of bounds, [charAtNullable()] returns [Js.Nullable.undefined].
   charAtNullable(3, \"abc\") == Js.Nullable.undefined;
 ]}
 ")
-let charAtNullable: (int, string) => Js.Nullable.t<string> = (i, str) =>
-  String.get(str, i)->Js.Nullable.fromOption
+let charAtNullable: (int, string) => Nullable.t<string> = (i, str) =>
+  String.get(str, i)->Nullable.fromOption
 
 @ocaml.doc("
 [charAtOrThrow(n, str)] returns a string consisting of the character at
@@ -321,7 +321,7 @@ If [n] is out of bounds, [charAtOrThrow()] throws a [RangeError].
 let charAtOrThrow: (int, string) => string = (i, str) =>
   switch charAt(i, str) {
   | None =>
-    Js.Exn.raiseRangeError(
+    JsError.RangeError.throwWithMessage(
       "Failed to get string at index " ++ (Int.toString(i) ++ (" for string: " ++ str)),
     )
   | Some(v) => v
@@ -549,7 +549,7 @@ returns the empty string.
 ]}
 ")
 let sliceToEnd: (int, string) => string = (fromIndex, str) =>
-  String.sliceToEnd(str, ~start=fromIndex)
+  String.slice(str, ~start=fromIndex)
 
 @ocaml.doc("
 [splitArray(delimiter, str)] splits the given [str] at every occurrence of
@@ -710,7 +710,7 @@ pattern.
   replaceRegex([%re\"/(\\w+)\\s+(\\w+)/\"], \"$2, $1\", \"Clyde Tolson\") == \"Tolson, Clyde\";
 ]}
 ")
-let replaceRegex = (~search: Js.Re.t, ~replaceWith: string, input: string): string =>
+let replaceRegex = (~search: RegExp.t, ~replaceWith: string, input: string): string =>
   String.replaceRegExp(input, search, replaceWith)
 
 @ocaml.doc("

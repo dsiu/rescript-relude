@@ -14,13 +14,11 @@ describe("List", () => {
 
   test("isEmpty is false for non-empty list", () => expect(List.isEmpty(list{1}))->toBe(false))
 
-  // todo: ReScript v12.0.0-alpha.7 bug. see:https://github.com/rescript-lang/rescript/issues/7235
-  Skip.test("isNotEmpty is false for empty list", () =>
+  test("isNotEmpty is false for empty list", () =>
     expect(List.isNotEmpty(list{}))->toBe(false)
   )
 
-  // todo: ReScript v12.0.0-alpha.7 bug. see:https://github.com/rescript-lang/rescript/issues/7235
-  Skip.test("isNotEmpty is true for non-empty list", () =>
+  test("isNotEmpty is true for non-empty list", () =>
     expect(List.isNotEmpty(list{1}))->toBe(true)
   )
 
@@ -771,7 +769,7 @@ describe("List", () => {
 
     let io3 = IO.suspendIO(() => IO.pure(3))
 
-    let io4 = IO.async(onDone => Js.Global.setTimeout(() => onDone(Ok(4)), 0)->ignore)
+    let io4 = IO.async(onDone => setTimeout(() => onDone(Ok(4)), 0)->ignore)
     let io5 = io4->IO.map(four => four + 1, _)
 
     let io6 = io4->IO.flatMap(four => IO.pure(four + 2), _)
@@ -782,7 +780,7 @@ describe("List", () => {
       ->IO.flatMap(six => IO.async(onDone => onDone(Ok(six + 1))), _)
 
     let io8 =
-      io7->IO.flatMap(seven => Relude.Js.Promise.toIOLazy(() => Js.Promise.resolve(seven + 1)), _)
+      io7->IO.flatMap(seven => Relude.Js.Promise.toIOLazy(() => Promise.resolve(seven + 1)), _)
 
     let io9 = IO.throw(9)->IO.flip
 

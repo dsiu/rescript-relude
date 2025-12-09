@@ -65,7 +65,7 @@ module WithMonad = (Monad: MONAD) => {
   @ocaml.doc("
   Run the writer, and discard the result value a, only returning the log w
   ")
-  let execWriterT: 'w 'a. t<'a, 'w> => Monad.t<'w> = (WriterT(mWriter)) => Monad.map(snd, mWriter)
+  let execWriterT: 'w 'a. t<'a, 'w> => Monad.t<'w> = (WriterT(mWriter)) => Monad.map(Pair.second, mWriter)
 
   @ocaml.doc("
   Maps a inner monad-converting function over the WriterT.

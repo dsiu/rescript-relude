@@ -1,90 +1,113 @@
 @ocaml.doc(`
-[Relude.Js.Json] contains helper functions for dealing with [Js.Json.t] values.
+[Relude.Js.Json] contains helper functions for dealing with [JSON.t] values.
 `)
 open! Relude_Function.Infix
 
 @ocaml.doc("
-Type alias for Js.Json.t.
+Type alias for JSON.t.
 ")
-type json = Js.Json.t
+type json = JSON.t
 
 @ocaml.doc("
-Type alias for Js.Dict.t(Js.Json.t)
+Type alias for Js.Dict.t(JSON.t)
 ")
-type dict = Js.Dict.t<json>
+type dict = dict<json>
 
 @ocaml.doc("
 Shows a JSON value with optional space indentation
 ")
 let show = (~indentSpaces: int=2, json: json): string =>
-  Js.Json.stringifyWithSpace(json, indentSpaces)
+  JSON.stringify(json, ~space=indentSpaces)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test functions
 ////////////////////////////////////////////////////////////////////////////////
 
 @ocaml.doc("
-Checks if the Js.Json.t value is a null
+Checks if the JSON.t value is a null
 ")
-let isNull: json => bool = json => Js.Json.test(json, Js.Json.Kind.Null)
+let isNull: json => bool = json =>
+  switch json {
+  | JSON.Null => true
+  | _ => false
+  }
 
 @ocaml.doc("
-Checks if the Js.Json.t value is a bool
+Checks if the JSON.t value is a bool
 ")
-let isBool: json => bool = json => Js.Json.test(json, Js.Json.Kind.Boolean)
+let isBool: json => bool = json =>
+  switch json {
+  | JSON.Boolean(_) => true
+  | _ => false
+  }
 
 @ocaml.doc("
-Checks if the Js.Json.t value is a string
+Checks if the JSON.t value is a string
 ")
-let isString: json => bool = json => Js.Json.test(json, Js.Json.Kind.String)
+let isString: json => bool = json =>
+  switch json {
+  | JSON.String(_) => true
+  | _ => false
+  }
 
 @ocaml.doc("
-Checks if the Js.Json.t value is a number
+Checks if the JSON.t value is a number
 ")
-let isNumber: json => bool = json => Js.Json.test(json, Js.Json.Kind.Number)
+let isNumber: json => bool = json =>
+  switch json {
+  | JSON.Number(_) => true
+  | _ => false
+  }
 
 @ocaml.doc("
-Checks if the Js.Json.t value is a JSON object
+Checks if the JSON.t value is a JSON object
 ")
-let isObject: json => bool = json => Js.Json.test(json, Js.Json.Kind.Object)
+let isObject: json => bool = json =>
+  switch json {
+  | JSON.Object(_) => true
+  | _ => false
+  }
 
 @ocaml.doc("
-Checks if the Js.Json.t value is a JSON array
+Checks if the JSON.t value is a JSON array
 ")
-let isArray: json => bool = json => Js.Json.test(json, Js.Json.Kind.Array)
+let isArray: json => bool = json =>
+  switch json {
+  | JSON.Array(_) => true
+  | _ => false
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor functions (encode values as Json)
 ////////////////////////////////////////////////////////////////////////////////
 
 @ocaml.doc("
-Creates a Js.Json.t null value
+Creates a JSON.t null value
 ")
-let null: json = Js.Json.null
+let null: json = JSON.Encode.null
 
 @ocaml.doc("
-Creates a Js.Json.t boolean value from a boolean
+Creates a JSON.t boolean value from a boolean
 ")
-let fromBool: bool => json = b => Js.Json.boolean(b)
+let fromBool: bool => json = JSON.Encode.bool
 
 @ocaml.doc("
-Creates a Js.Json.t string value from a string
+Creates a JSON.t string value from a string
 ")
-let fromString: string => json = s => Js.Json.string(s)
+let fromString: string => json = JSON.Encode.string
 
 @ocaml.doc("
-Creates a Js.Json.t number value from an int
+Creates a JSON.t number value from an int
 ")
-let fromInt: int => json =
-  \">>"(Float.fromInt, n => Js.Json.number(n), ...)
+let fromInt: int => json = JSON.Encode.int
 
 @ocaml.doc("
-Creates a Js.Json.t number value from a float
+Creates a JSON.t number value from a float
 ")
-let fromFloat: float => json = n => Js.Json.number(n)
+let fromFloat: float => json = JSON.Encode.float
 
 @ocaml.doc("
-Creates a Js.Json.t value from an option('a). If the option is [None], a null
+Creates a JSON.t value from an option('a). If the option is [None], a null
 value is returned, otherwise, the value is encoded using the given function.
 ")
 let fromOption: ('a => json, option<'a>) => json = (encode, opt) => {
@@ -92,67 +115,67 @@ let fromOption: ('a => json, option<'a>) => json = (encode, opt) => {
 }
 
 @ocaml.doc("
-Creates a Js.Json.t array value from an array of Js.Json.t values
+Creates a JSON.t array value from an array of JSON.t values
 ")
-let fromArrayOfJson: array<json> => json = xs => Js.Json.array(xs)
+let fromArrayOfJson: array<json> => json = JSON.Encode.array
 
 @ocaml.doc("
-Creates a Js.Json.t array value from an array of values that can be converted to Js.Json.t values with the given function
+Creates a JSON.t array value from an array of values that can be converted to JSON.t values with the given function
 ")
 let fromArrayOfJsonBy: 'a. ('a => json, array<'a>) => json = (f, items) => {
   Array.map(items, f)->fromArrayOfJson
 }
 
 @ocaml.doc("
-Creates a Js.Json.t array value from an list of Js.Json.t values
+Creates a JSON.t array value from an list of JSON.t values
 ")
 let fromListOfJson: list<json> => json = {
   Relude_List.toArray->(\">>"(fromArrayOfJson, ...))
 }
 
 @ocaml.doc("
-Creates a Js.Json.t array value from an list of values that can be converted to
-Js.Json.t values with the given function
+Creates a JSON.t array value from an list of values that can be converted to
+JSON.t values with the given function
 ")
 let fromListOfJsonBy: 'a. ('a => json, list<'a>) => json = (f, items) => {
   Relude_List.map(f, items)->fromListOfJson
 }
 
 @ocaml.doc("
-Creates a Js.Json.t object value from a Js.Dict containing Js.Json.t values.
+Creates a JSON.t object value from a Js.Dict containing JSON.t values.
 ")
-let fromDictOfJson: dict => json = obj => Js.Json.object_(obj)
+let fromDictOfJson: dict => json = JSON.Encode.object
 
 @ocaml.doc("
-Creates a Js.Json.t array value from an array of Js.Dict.t(Js.Json.t) values.
+Creates a JSON.t array value from an array of Js.Dict.t(JSON.t) values.
 ")
-let fromArrayOfDictOfJson: array<dict> => json = oa => Js.Json.objectArray(oa)
+let fromArrayOfDictOfJson: array<dict> => json = JSON.Encode.objectArray
 
 @ocaml.doc("
-Creates a Js.Json.t array value from an list of Js.Dict.t(Js.Json.t) values.
+Creates a JSON.t array value from an list of Js.Dict.t(JSON.t) values.
 ")
 let fromListOfDictOfJson: list<dict> => json = {
-  Relude_List.toArray->(\">>"(oa => Js.Json.objectArray(oa), ...))
+  Relude_List.toArray->(\">>"(oa => JSON.Encode.objectArray(oa), ...))
 }
 
 @ocaml.doc("
-Creates a Js.Json.t object value from an array of key/value (string/Js.Json.t)
+Creates a JSON.t object value from an array of key/value (string/JSON.t)
 tuples.
 ")
-let fromArrayOfKeyValueTuples: array<(Js.Dict.key, json)> => json = tuples =>
-  fromDictOfJson(Js.Dict.fromArray(tuples))
+let fromArrayOfKeyValueTuples: array<(string, json)> => json = tuples =>
+  fromDictOfJson(Dict.fromArray(tuples))
 
 @ocaml.doc("
-Creates a Js.Json.t object value from an list of key/value (string/Js.Json.t)
+Creates a JSON.t object value from an list of key/value (string/JSON.t)
 tuples.
 ")
-let fromListOfKeyValueTuples: list<(Js.Dict.key, json)> => json = tuples =>
-  fromDictOfJson(Js.Dict.fromList(tuples))
+let fromListOfKeyValueTuples: list<(string, json)> => json = tuples =>
+  fromDictOfJson(Dict.fromArray(List.toArray(tuples)))
 
 ////////////////////////////////////////////////////////////////////////////////
-// Basic conversions from the top-level Js.Json.t type to the specific Json
+// Basic conversions from the top-level JSON.t type to the specific Json
 // subtypes.  These functions do not unpack nested json objects - i.e. asDict
-// will attempt to convert a [Js.Json.t] value to an [option(Js.Dict.t(Js.Json.t))]
+// will attempt to convert a [JSON.t] value to an [option(Js.Dict.t(JSON.t))]
 // but does not attempt to decode the resulting dictionary.
 
 // Note: there are intentially very basic. For more advanced decoding, try a
@@ -160,43 +183,43 @@ let fromListOfKeyValueTuples: list<(Js.Dict.key, json)> => json = tuples =>
 ////////////////////////////////////////////////////////////////////////////////
 
 @ocaml.doc("
-Attempts to decode the given Js.Json.t value as a null.  Returns [Some(())] if
+Attempts to decode the given JSON.t value as a null.  Returns [Some(())] if
 it is a [null], otherwise [None].
 ")
 let toNull: json => option<unit> = json => {
-  json->Js.Json.decodeNull->Relude_Option.void
+  json->JSON.Decode.null->Relude_Option.void
 }
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a [boolean]
+Attempts to decode the given [JSON.t] value as a [boolean]
 ")
-let toBool: json => option<bool> = b => Js.Json.decodeBoolean(b)
+let toBool: json => option<bool> = JSON.Decode.bool
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a [string]
+Attempts to decode the given [JSON.t] value as a [string]
 ")
-let toString: json => option<string> = s => Js.Json.decodeString(s)
+let toString: json => option<string> = JSON.Decode.string
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as an [int]
+Attempts to decode the given [JSON.t] value as an [int]
 ")
 let toInt: json => option<int> = json => {
-  json->Js.Json.decodeNumber->Relude_Option.map(Float.toInt, _)
+  json->JSON.Decode.float->Relude_Option.map(Float.toInt, _)
 }
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a [float]
+Attempts to decode the given [JSON.t] value as a [float]
 ")
-let toFloat: json => option<float> = n => Js.Json.decodeNumber(n)
+let toFloat: json => option<float> = JSON.Decode.float
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as an array of [Js.Json.t]
+Attempts to decode the given [JSON.t] value as an array of [JSON.t]
 values.
 ")
-let toArrayOfJson: json => option<array<json>> = xs => Js.Json.decodeArray(xs)
+let toArrayOfJson: json => option<array<json>> = JSON.Decode.array
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as an array of [Js.Json.t]
+Attempts to decode the given [JSON.t] value as an array of [JSON.t]
 values, with a fallback.
 ")
 let toArrayOfJsonOrElse: (array<json>, json) => array<json> = (default, json) => {
@@ -204,20 +227,20 @@ let toArrayOfJsonOrElse: (array<json>, json) => array<json> = (default, json) =>
 }
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as an array of [Js.Json.t]
+Attempts to decode the given [JSON.t] value as an array of [JSON.t]
 values, with a fallback of an empty array.
 ")
 let toArrayOfJsonOrEmpty = toArrayOfJsonOrElse([], _)
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a list of [Js.Json.t] values.
+Attempts to decode the given [JSON.t] value as a list of [JSON.t] values.
 ")
 let toListOfJson: json => option<list<json>> = json => {
   json->toArrayOfJson->Relude_Option.map(Relude_Array.toList, _)
 }
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as an list of [Js.Json.t] values,
+Attempts to decode the given [JSON.t] value as an list of [JSON.t] values,
 with a fallback.
 ")
 let toListOfJsonOrElse = (default, json) => {
@@ -225,18 +248,18 @@ let toListOfJsonOrElse = (default, json) => {
 }
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a list of [Js.Json.t] values,
+Attempts to decode the given [JSON.t] value as a list of [JSON.t] values,
 with a fallback of an empty list.
 ")
 let toListOrEmpty = toListOfJsonOrElse(list{}, _)
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a [Js.Dict.t(Js.Json.t)]
+Attempts to decode the given [JSON.t] value as a [Js.Dict.t(JSON.t)]
 ")
-let toDictOfJson: json => option<dict> = obj => Js.Json.decodeObject(obj)
+let toDictOfJson: json => option<dict> = JSON.Decode.object
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a [Js.Dict.t(Js.Json.t)] with
+Attempts to decode the given [JSON.t] value as a [Js.Dict.t(JSON.t)] with
 a fallback.
 ")
 let toDictOfJsonOrElse = (default, json) => {
@@ -244,10 +267,10 @@ let toDictOfJsonOrElse = (default, json) => {
 }
 
 @ocaml.doc("
-Attempts to decode the given [Js.Json.t] value as a [Js.Dict.t(Js.Json.t)] with
+Attempts to decode the given [JSON.t] value as a [Js.Dict.t(JSON.t)] with
 a fallback of an empty [Js.Dict].
 ")
-let toDictOfJsonOrEmpty: json => dict = toDictOfJsonOrElse(Js.Dict.empty(), _)
+let toDictOfJsonOrEmpty: json => dict = toDictOfJsonOrElse(Dict.make(), _)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Basic applicative-validation style decoding of arrays and objects. The
@@ -298,7 +321,7 @@ module TraversableE = ArrayValidationE.Traversable
 ////////////////////////////////////////////////////////////////////////////////
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is a null
+Validates that the given JSON.t value is a null
 ")
 let validateNull: json => Relude_Validation.t<unit, Errors.t> = json => {
   toNull(json)->Relude_Validation.fromOptionLazy(
@@ -308,7 +331,7 @@ let validateNull: json => Relude_Validation.t<unit, Errors.t> = json => {
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is a bool
+Validates that the given JSON.t value is a bool
 ")
 let validateBool: json => Relude_Validation.t<bool, Errors.t> = json => {
   toBool(json)->Relude_Validation.fromOptionLazy(
@@ -318,7 +341,7 @@ let validateBool: json => Relude_Validation.t<bool, Errors.t> = json => {
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is a string
+Validates that the given JSON.t value is a string
 ")
 let validateString: json => Relude_Validation.t<string, Errors.t> = json => {
   toString(json)->Relude_Validation.fromOptionLazy(
@@ -328,7 +351,7 @@ let validateString: json => Relude_Validation.t<string, Errors.t> = json => {
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an int
+Validates that the given JSON.t value is an int
 ")
 let validateInt: json => Relude_Validation.t<int, Errors.t> = json => {
   toInt(json)->Relude_Validation.fromOptionLazy(
@@ -338,7 +361,7 @@ let validateInt: json => Relude_Validation.t<int, Errors.t> = json => {
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is a float
+Validates that the given JSON.t value is a float
 ")
 let validateFloat: json => Relude_Validation.t<float, Errors.t> = json => {
   toFloat(json)->Relude_Validation.fromOptionLazy(
@@ -382,15 +405,15 @@ let validateOptional = (
 ////////////////////////////////////////////////////////////////////////////////
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array, and attempts to get the
-value at the given index as a raw Js.Json.t value.
+Validates that the given JSON.t value is an array, and attempts to get the
+value at the given index as a raw JSON.t value.
 ")
 let getJsonAtIndex: (int, json) => option<json> = (index, json) => {
   toArrayOfJson(json)->Relude_Option.flatMap(Relude_Array.at(index, _), _)
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array, and attempts to get the
+Validates that the given JSON.t value is an array, and attempts to get the
 value at the given index and validate it with the given validation function.
 ")
 let validateJsonAtIndex: (
@@ -409,7 +432,7 @@ let validateJsonAtIndex: (
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array with a null at the given
+Validates that the given JSON.t value is an array with a null at the given
 index.
 ")
 let validateNullAtIndex: (int, json) => Relude_Validation.t<unit, Errors.t> = (index, json) =>
@@ -424,7 +447,7 @@ let validateNullAtIndex: (int, json) => Relude_Validation.t<unit, Errors.t> = (i
   )
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array with a bool at the given
+Validates that the given JSON.t value is an array with a bool at the given
 index.
 ")
 let validateBoolAtIndex: (int, json) => Relude_Validation.t<bool, Errors.t> = (index, json) =>
@@ -436,7 +459,7 @@ let validateBoolAtIndex: (int, json) => Relude_Validation.t<bool, Errors.t> = (i
   )
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array with an int at the given
+Validates that the given JSON.t value is an array with an int at the given
 index.
 ")
 let validateIntAtIndex: (int, json) => Relude_Validation.t<int, Errors.t> = (index, json) =>
@@ -448,7 +471,7 @@ let validateIntAtIndex: (int, json) => Relude_Validation.t<int, Errors.t> = (ind
   )
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array with a float at the given
+Validates that the given JSON.t value is an array with a float at the given
 index.
 ")
 let validateFloatAtIndex: (int, json) => Relude_Validation.t<float, Errors.t> = (index, json) =>
@@ -460,7 +483,7 @@ let validateFloatAtIndex: (int, json) => Relude_Validation.t<float, Errors.t> = 
   )
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array with a string at the given
+Validates that the given JSON.t value is an array with a string at the given
 index.
 ")
 let validateStringAtIndex: (int, json) => Relude_Validation.t<string, Errors.t> = (index, json) =>
@@ -472,7 +495,7 @@ let validateStringAtIndex: (int, json) => Relude_Validation.t<string, Errors.t> 
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value at the given index, using the validation
+Validates the given JSON.t value at the given index, using the validation
 function.
 
 An invalid index can be treated as None or returned as an error using the
@@ -528,7 +551,7 @@ let validateOptionalAtIndex = (
   }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array, then validates each item
+Validates that the given JSON.t value is an array, then validates each item
 of the array using the given validation function.
 ")
 let validateArrayOfJson: 'a 'e. (
@@ -553,7 +576,7 @@ let validateArrayOfJson: 'a 'e. (
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array, then validates each item
+Validates that the given JSON.t value is an array, then validates each item
 of the array using the given validation function, then converts the result to a
 list.
 ")
@@ -582,7 +605,7 @@ let validateArrayOfJsonAsList: 'a 'e. (
 }
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an array, and then validates the
+Validates that the given JSON.t value is an array, and then validates the
 value at the given index is an array, and validates it using the given
 validation function.
 ")
@@ -601,7 +624,7 @@ let validateArrayAtIndex: 'a. (
   )
 
 @ocaml.doc("
-Validates that the Js.Json.t value is an array, then validates that the value at
+Validates that the JSON.t value is an array, then validates that the value at
 the given index is a Json object, and validates the object using the given
 validation function.
 ")
@@ -616,14 +639,14 @@ let validateObjectAtIndex: 'a. (
 ////////////////////////////////////////////////////////////////////////////////
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an object, and then gets the raw
-Js.Json.t value for the given key.
+Validates that the given JSON.t value is an object, and then gets the raw
+JSON.t value for the given key.
 ")
 let getJsonForKey: (string, json) => option<json> = (key, json) =>
-  Relude_Option.flatMap(dict => Js.Dict.get(dict, key), toDictOfJson(json))
+  Relude_Option.flatMap(dict => Dict.get(dict, key), toDictOfJson(json))
 
 @ocaml.doc("
-Validates that the given Js.Json.t value is an object, then validates the value
+Validates that the given JSON.t value is an object, then validates the value
 at the given key using the given validation function.
 ")
 let validateJsonForKey: (
@@ -638,7 +661,7 @@ let validateJsonForKey: (
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with a null at the given key.
+Validates the given JSON.t value is an object with a null at the given key.
 ")
 let validateNullForKey: (string, json) => Relude_Validation.t<unit, Errors.t> = (key, json) =>
   validateJsonForKey(
@@ -648,7 +671,7 @@ let validateNullForKey: (string, json) => Relude_Validation.t<unit, Errors.t> = 
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with a bool at the given key.
+Validates the given JSON.t value is an object with a bool at the given key.
 ")
 let validateBoolForKey: (string, json) => Relude_Validation.t<bool, Errors.t> = (key, json) =>
   validateJsonForKey(
@@ -658,7 +681,7 @@ let validateBoolForKey: (string, json) => Relude_Validation.t<bool, Errors.t> = 
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with an int at the given key.
+Validates the given JSON.t value is an object with an int at the given key.
 ")
 let validateIntForKey: (string, json) => Relude_Validation.t<int, Errors.t> = (key, json) =>
   validateJsonForKey(
@@ -668,7 +691,7 @@ let validateIntForKey: (string, json) => Relude_Validation.t<int, Errors.t> = (k
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with a float at the given key.
+Validates the given JSON.t value is an object with a float at the given key.
 ")
 let validateFloatForKey: (string, json) => Relude_Validation.t<float, Errors.t> = (key, json) =>
   validateJsonForKey(
@@ -678,7 +701,7 @@ let validateFloatForKey: (string, json) => Relude_Validation.t<float, Errors.t> 
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with a string at the given key.
+Validates the given JSON.t value is an object with a string at the given key.
 ")
 let validateStringForKey: (string, json) => Relude_Validation.t<string, Errors.t> = (key, json) =>
   validateJsonForKey(
@@ -688,7 +711,7 @@ let validateStringForKey: (string, json) => Relude_Validation.t<string, Errors.t
   )
 
 @ocaml.doc("
-Validates the given Js.Json.t value at the given key, using the validation
+Validates the given JSON.t value at the given key, using the validation
 function.
 
 A missing key or null value can be treated as [None] or returned as an error
@@ -745,7 +768,7 @@ let validateOptionalForKey = (
   }
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with an array at the given key,
+Validates the given JSON.t value is an object with an array at the given key,
 then validates the array using the given validation function.
 ")
 let validateArrayForKey: 'a. (
@@ -761,7 +784,7 @@ let validateArrayForKey: 'a. (
 }
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with an array at the given key,
+Validates the given JSON.t value is an object with an array at the given key,
 then validates the array using the given validation function, returning the
 result in a list.
 ")
@@ -778,7 +801,7 @@ let validateListForKey: 'a. (
 }
 
 @ocaml.doc("
-Validates the given Js.Json.t value is an object with an object at the given
+Validates the given JSON.t value is an object with an object at the given
 key, then validates the object using the given validation function.
 ")
 let validateObjectForKey: 'a. (
@@ -851,7 +874,7 @@ module DSL = {
     let opt: ('a => json, option<'a>) => json = fromOption
 
     @ocaml.doc("
-    Encodes an array(Js.Json.t) as a single Js.Json.t (array) value
+    Encodes an array(JSON.t) as a single JSON.t (array) value
     ")
     let array: array<json> => json = fromArrayOfJson
 
@@ -862,38 +885,38 @@ module DSL = {
     let arrayBy: 'a. ('a => json, array<'a>) => json = fromArrayOfJsonBy
 
     @ocaml.doc("
-    Encodes an array(Js.Dict.t(Js.Json.t)) into a Js.Json.t value
+    Encodes an array(Js.Dict.t(JSON.t)) into a JSON.t value
     ")
     let arrayOfDict: array<dict> => json = fromArrayOfDictOfJson
 
     @ocaml.doc("
-    Encodes an array of key/value pairs into a Js.Json.t value
+    Encodes an array of key/value pairs into a JSON.t value
     ")
-    let arrayOfTuples: array<(Js.Dict.key, json)> => json = fromArrayOfKeyValueTuples
+    let arrayOfTuples: array<(string, json)> => json = fromArrayOfKeyValueTuples
 
     @ocaml.doc("
-    Encodes a list of Js.Json.t values to a Js.Json.t value
+    Encodes a list of JSON.t values to a JSON.t value
     ")
     let list: list<json> => json = fromListOfJson
 
     @ocaml.doc("
     Maps a JSON-conversion function over a list of values, then encodes the
-    result as a Js.Json.t array value
+    result as a JSON.t array value
     ")
     let listBy = fromListOfJsonBy
 
     @ocaml.doc("
-    Encodes a list Js.Dict.t(Js.Json.t) values into a Js.Json.t array value
+    Encodes a list Js.Dict.t(JSON.t) values into a JSON.t array value
     ")
     let listOfDict: list<dict> => json = fromListOfDictOfJson
 
     @ocaml.doc("
-    Encodes a list of key/value pairs into a Js.Json.t array value
+    Encodes a list of key/value pairs into a JSON.t array value
     ")
-    let listOfTuples: list<(Js.Dict.key, json)> => json = fromListOfKeyValueTuples
+    let listOfTuples: list<(string, json)> => json = fromListOfKeyValueTuples
 
     @ocaml.doc("
-    Encodes a dict of Js.Json.t values into a Js.Json.t value
+    Encodes a dict of JSON.t values into a JSON.t value
     ")
     let dict: dict => json = fromDictOfJson
   }
@@ -907,32 +930,32 @@ module DSL = {
     ////////////////////////////////////////////////////////////////////////////
 
     @ocaml.doc("
-    Validates the given Js.Json.t value is a null
+    Validates the given JSON.t value is a null
     ")
     let null: json => Relude_Validation.t<unit, Errors.t> = validateNull
 
     @ocaml.doc("
-    Validates the given Js.Json.t value is a bool
+    Validates the given JSON.t value is a bool
     ")
     let bool: json => Relude_Validation.t<bool, Errors.t> = validateBool
 
     @ocaml.doc("
-    Validates the given Js.Json.t value as a string
+    Validates the given JSON.t value as a string
     ")
     let int: json => Relude_Validation.t<int, Errors.t> = validateInt
 
     @ocaml.doc("
-    Validates the given Js.Json.t value as a float
+    Validates the given JSON.t value as a float
     ")
     let float: json => Relude_Validation.t<float, Errors.t> = validateFloat
 
     @ocaml.doc("
-    Validates the given Js.Json.t value as a string
+    Validates the given JSON.t value as a string
     ")
     let string: json => Relude_Validation.t<string, Errors.t> = validateString
 
     @ocaml.doc("
-    Validates that the given Js.Json.t value is either null or can be validated
+    Validates that the given JSON.t value is either null or can be validated
     using the given function.
 
     If the validation function fails, the error can either be returned as a
@@ -950,12 +973,12 @@ module DSL = {
     ////////////////////////////////////////////////////////////////////////////////
 
     @ocaml.doc("
-    Gets the Js.Json.t value at the given index of a Js.Json.t array
+    Gets the JSON.t value at the given index of a JSON.t array
     ")
     let getAt: (int, json) => option<json> = getJsonAtIndex
 
     @ocaml.doc("
-    Validates the Js.Json.t value at the given index with the given validation
+    Validates the JSON.t value at the given index with the given validation
     function
     ")
     let jsonAt: 'a. (
@@ -965,32 +988,32 @@ module DSL = {
     ) => Relude_Validation.t<'a, Errors.t> = validateJsonAtIndex
 
     @ocaml.doc("
-    Validates a null value at the given index of a Js.Json.t array value
+    Validates a null value at the given index of a JSON.t array value
     ")
     let nullAt: (int, json) => Relude_Validation.t<unit, Errors.t> = validateNullAtIndex
 
     @ocaml.doc("
-    Validates a bool value at the given index of a Js.Json.t array value
+    Validates a bool value at the given index of a JSON.t array value
     ")
     let boolAt: (int, json) => Relude_Validation.t<bool, Errors.t> = validateBoolAtIndex
 
     @ocaml.doc("
-    Validates a string value at the given index of a Js.Json.t array value
+    Validates a string value at the given index of a JSON.t array value
     ")
     let stringAt: (int, json) => Relude_Validation.t<string, Errors.t> = validateStringAtIndex
 
     @ocaml.doc("
-    Validates an int value at the given index of a Js.Json.t array value
+    Validates an int value at the given index of a JSON.t array value
     ")
     let intAt: (int, json) => Relude_Validation.t<int, Errors.t> = validateIntAtIndex
 
     @ocaml.doc("
-    Validates a float value at the given index of a Js.Json.t array value
+    Validates a float value at the given index of a JSON.t array value
     ")
     let floatAt: (int, json) => Relude_Validation.t<float, Errors.t> = validateFloatAtIndex
 
     @ocaml.doc("
-    Validates that the Js.Json.t value at the given index is either null or can
+    Validates that the JSON.t value at the given index is either null or can
     be validated using the given function.
 
     - Bad indices can be treated as None or as an error using [missingAsNone]
@@ -1008,7 +1031,7 @@ module DSL = {
       validateOptionalAtIndex(~missingAsNone, ~nullAsNone, ~errorAsNone, index, validate, json)
 
     @ocaml.doc("
-    Validates an array at the given index of a Js.Json.t array value
+    Validates an array at the given index of a JSON.t array value
     ")
     let arrayAt: 'a. (
       int,
@@ -1017,7 +1040,7 @@ module DSL = {
     ) => Relude_Validation.t<array<'a>, Errors.t> = validateArrayAtIndex
 
     @ocaml.doc("
-    Validates an obejct at the given index of a Js.Json.t array value
+    Validates an obejct at the given index of a JSON.t array value
     ")
     let objectAt: 'a. (
       int,
@@ -1026,7 +1049,7 @@ module DSL = {
     ) => Relude_Validation.t<'a, Errors.t> = validateObjectAtIndex
 
     @ocaml.doc("
-    Validates an Js.Json.t array using the given validation function
+    Validates an JSON.t array using the given validation function
     ")
     let array: 'a. (
       (int, json) => Relude_Validation.t<'a, Errors.t>,
@@ -1034,7 +1057,7 @@ module DSL = {
     ) => Relude_Validation.t<array<'a>, Errors.t> = validateArrayOfJson
 
     @ocaml.doc("
-    Validates an Js.Json.t object using the given validation function
+    Validates an JSON.t object using the given validation function
     ")
     let list: 'a. (
       (int, json) => Relude_Validation.t<'a, Errors.t>,
@@ -1046,12 +1069,12 @@ module DSL = {
     ////////////////////////////////////////////////////////////////////////////////
 
     @ocaml.doc("
-    Gets the Js.Json.t value for the given key of a Js.Json.t object value
+    Gets the JSON.t value for the given key of a JSON.t object value
     ")
     let getFor: (string, json) => option<json> = getJsonForKey
 
     @ocaml.doc("
-    Validates the Js.Json.t value for the given key, using the given validation
+    Validates the JSON.t value for the given key, using the given validation
     function
     ")
     let jsonFor: 'a. (
@@ -1061,32 +1084,32 @@ module DSL = {
     ) => Relude_Validation.t<'a, Errors.t> = validateJsonForKey
 
     @ocaml.doc("
-    Validates a null for the given key of a Js.Json.t object value
+    Validates a null for the given key of a JSON.t object value
     ")
     let nullFor: (string, json) => Relude_Validation.t<unit, Errors.t> = validateNullForKey
 
     @ocaml.doc("
-    Validates a bool for the given key of a Js.Json.t object value
+    Validates a bool for the given key of a JSON.t object value
     ")
     let boolFor: (string, json) => Relude_Validation.t<bool, Errors.t> = validateBoolForKey
 
     @ocaml.doc("
-    Validates a string for the given key of a Js.Json.t object value
+    Validates a string for the given key of a JSON.t object value
     ")
     let stringFor: (string, json) => Relude_Validation.t<string, Errors.t> = validateStringForKey
 
     @ocaml.doc("
-    Validates an int for the given key of a Js.Json.t object value
+    Validates an int for the given key of a JSON.t object value
     ")
     let intFor: (string, json) => Relude_Validation.t<int, Errors.t> = validateIntForKey
 
     @ocaml.doc("
-    Validates a float for the given key of a Js.Json.t object value
+    Validates a float for the given key of a JSON.t object value
     ")
     let floatFor: (string, json) => Relude_Validation.t<float, Errors.t> = validateFloatForKey
 
     @ocaml.doc("
-    Validates that the Js.Json.t value at the given key is either null or can be
+    Validates that the JSON.t value at the given key is either null or can be
     validated using the given function.
 
     - Bad indices can be treated as None or as an error using [missingAsNone]
@@ -1104,7 +1127,7 @@ module DSL = {
       validateOptionalForKey(~missingAsNone, ~nullAsNone, ~errorAsNone, key, validate, json)
 
     @ocaml.doc("
-    Validates an array for the given key of a Js.Json.t object value
+    Validates an array for the given key of a JSON.t object value
     ")
     let arrayFor: 'a. (
       string,
@@ -1113,7 +1136,7 @@ module DSL = {
     ) => Relude_Validation.t<array<'a>, Errors.t> = validateArrayForKey
 
     @ocaml.doc("
-    Validates an array for the given key of a Js.Json.t object value, as a list
+    Validates an array for the given key of a JSON.t object value, as a list
     ")
     let listFor: 'a. (
       string,
@@ -1122,7 +1145,7 @@ module DSL = {
     ) => Relude_Validation.t<list<'a>, Errors.t> = validateListForKey
 
     @ocaml.doc("
-    Validates an object for the given key of a Js.Json.t object value
+    Validates an object for the given key of a JSON.t object value
     ")
     let objectFor = validateObjectForKey
   }

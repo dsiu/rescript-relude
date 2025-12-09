@@ -9,23 +9,23 @@ Note: prefer {!val:toIOLazy} over this function if possible. A [Js.Promise] is
 eagerly executed, so using [toIO] with an already-constructed and running
 [Js.Promise] will not suspend the side effects.
 ")
-let toIO: 'a. Js.Promise.t<'a> => Relude_IO.t<'a, Js.Promise.error> = promise =>
+let toIO: 'a. promise<'a> => Relude_IO.t<'a, exn> = promise =>
   Relude_IO.async(onDone =>
     promise
-    ->(Js.Promise.then_(v => Js.Promise.resolve(onDone(Ok(v))), _))
-    ->(Js.Promise.catch(e => Js.Promise.resolve(onDone(Error(e))), _))
+    ->(Promise.then(v => Promise.resolve(onDone(Ok(v)))))
+    ->(Promise.catch(e => Promise.resolve(onDone(Error(e)))))
     ->ignore
   )
 
 @ocaml.doc("
 Lifts a lazily-executed [Js.Promise] into a [Relude.IO].
 ")
-let toIOLazy: 'a. (unit => Js.Promise.t<'a>) => Relude_IO.t<'a, Js.Promise.error> = runPromise =>
+let toIOLazy: 'a. (unit => promise<'a>) => Relude_IO.t<'a, exn> = runPromise =>
   Relude_IO.async(onDone => {
     let promise = runPromise()
     promise
-    ->(Js.Promise.then_(v => Js.Promise.resolve(onDone(Ok(v))), _))
-    ->(Js.Promise.catch(e => Js.Promise.resolve(onDone(Error(e))), _))
+    ->(Promise.then(v => Promise.resolve(onDone(Ok(v)))))
+    ->(Promise.catch(e => Promise.resolve(onDone(Error(e)))))
     ->ignore
   })
 
@@ -39,8 +39,8 @@ effects to be run.
 The promise that is returned will not reject, it will instead have a [result] as
 its resolution.
 ")
-let fromIOWithResult: 'a 'e. Relude_IO.t<'a, 'e> => Js.Promise.t<result<'a, 'e>> = io =>
-  Js.Promise.make((~resolve, ~reject as _) =>
+let fromIOWithResult: 'a 'e. Relude_IO.t<'a, 'e> => promise<result<'a, 'e>> = io =>
+  Promise.make((resolve, _) =>
     io->(Relude_IO.unsafeRunAsync(result => resolve(result), _))
   )
 @ocaml.doc("
@@ -50,8 +50,8 @@ effects to be run.
 The error channel is unsafely coerced into the promise error type, which is
 probably fine, because the [Js.Promise] error type is opaque.
 ")
-let fromIO: 'a 'e. Relude_IO.t<'a, 'e> => Js.Promise.t<'a> = io =>
-  Js.Promise.make((~resolve, ~reject) =>
+let fromIO: 'a 'e. Relude_IO.t<'a, 'e> => promise<'a> = io =>
+  Promise.make((resolve, reject) =>
     io->(
       Relude_IO.unsafeRunAsync(
         result =>
@@ -70,8 +70,8 @@ let fromIO: 'a 'e. Relude_IO.t<'a, 'e> => Js.Promise.t<'a> = io =>
 Converts a [Relude.IO] with an extensible OCaml [exn] as the error type into a
 [Js.Promise.t]. This function will cause the IO effects to be run.
 ")
-let fromIOExn: 'a. Relude_IO.t<'a, exn> => Js.Promise.t<'a> = io =>
-  Js.Promise.make((~resolve, ~reject) => io->(Relude_IO.unsafeRunAsync(result =>
+let fromIOExn: 'a. Relude_IO.t<'a, exn> => promise<'a> = io =>
+  Promise.make((resolve, reject) => io->(Relude_IO.unsafeRunAsync(result =>
         switch result {
         | Ok(v) => resolve(v)
         | Error(e) => reject(e)
@@ -82,8 +82,8 @@ let fromIOExn: 'a. Relude_IO.t<'a, exn> => Js.Promise.t<'a> = io =>
 Converts a [Relude.IO] with a [Js.Exn.t] as the error type into a
 [Js.Promise.t]. This function will cause the IO effects to be run.
 ")
-let fromIOJsExn: 'a. Relude_IO.t<'a, Js.Exn.t> => Js.Promise.t<'a> = io =>
-  Js.Promise.make((~resolve, ~reject) => io->(Relude_IO.unsafeRunAsync(result =>
+let fromIOJsExn: 'a. Relude_IO.t<'a, JsExn.t> => promise<'a> = io =>
+  Promise.make((resolve, reject) => io->(Relude_IO.unsafeRunAsync(result =>
         switch result {
         | Ok(v) => resolve(v)
         | Error(e) => reject(Relude_Js_Exn.unsafeToExn(e))

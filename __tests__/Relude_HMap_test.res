@@ -103,7 +103,7 @@ describe("HMap", () => {
     // each value into a string.
     let intKey = HMapS.Key.create(("key1", string_of_int))
     let stringKey = HMapS.Key.create(("key2", a => a))
-    let floatKey = HMapS.Key.create(("key3", x => Js.Float.toString(x)))
+    let floatKey = HMapS.Key.create(("key3", x => Float.toString(x)))
 
     let map =
       HMapS.empty
@@ -131,7 +131,7 @@ describe("HMap", () => {
     // each value into a string.
     let intKey = HMapS.Key.create(("key1", string_of_int))
     let stringKey = HMapS.Key.create(("key2", a => a))
-    let floatKey = HMapS.Key.create(("key3", x => Js.Float.toString(x)))
+    let floatKey = HMapS.Key.create(("key3", x => Float.toString(x)))
 
     let map =
       HMapS.empty
@@ -159,7 +159,7 @@ describe("HMap", () => {
     // each value into a string.
     let intKey = HMapS.Key.create(("key1", string_of_int))
     let stringKey = HMapS.Key.create(("key2", a => a))
-    let floatKey = HMapS.Key.create(("key3", x => Js.Float.toString(x)))
+    let floatKey = HMapS.Key.create(("key3", x => Float.toString(x)))
 
     let map =
       HMapS.empty
@@ -186,7 +186,7 @@ describe("HMap", () => {
     // each value into a string.
     let intKey = HMapS.Key.create(("key1", string_of_int))
     let stringKey = HMapS.Key.create(("key2", a => a))
-    let floatKey = HMapS.Key.create(("key3", x => Js.Float.toString(x)))
+    let floatKey = HMapS.Key.create(("key3", x => Float.toString(x)))
 
     let map =
       HMapS.empty
@@ -211,7 +211,7 @@ describe("HMap", () => {
     // each value into a string.
     let intKey = HMapS.Key.create(("key1", string_of_int))
     let stringKey = HMapS.Key.create(("key2", a => a))
-    let floatKey = HMapS.Key.create(("key3", x => Js.Float.toString(x)))
+    let floatKey = HMapS.Key.create(("key3", x => Float.toString(x)))
 
     let map =
       HMapS.empty

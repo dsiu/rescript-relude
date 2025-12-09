@@ -16,12 +16,12 @@ module WithMonad = (M: MONAD) => {
   @ocaml.doc("
   Same as runStateT, but discards the final state, only returning the result a.
   ")
-  let evalStateT: 's 'a. (t<'a, 's>, 's) => M.t<'a> = (StateT(sToMAS), s) => M.map(fst, sToMAS(s))
+  let evalStateT: 's 'a. (t<'a, 's>, 's) => M.t<'a> = (StateT(sToMAS), s) => M.map(Pair.first, sToMAS(s))
 
   @ocaml.doc("
   Same as runStateT, but discards the final result a, only returning the final state s.
   ")
-  let execStateT: 's 'a. (t<'a, 's>, 's) => M.t<'s> = (StateT(sToMAS), s) => M.map(snd, sToMAS(s))
+  let execStateT: 's 'a. (t<'a, 's>, 's) => M.t<'s> = (StateT(sToMAS), s) => M.map(Pair.second, sToMAS(s))
 
   @ocaml.doc("
   Change the result type in the StateT.

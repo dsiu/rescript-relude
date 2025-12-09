@@ -2610,8 +2610,8 @@ describe("IO tries/exceptions", () => {
       x =>
         switch x {
         | Ok(_) => onDone(fail("Should not be Ok"))
-        | Error(Js.Exn.Error(jsExn)) =>
-          let msg = Js.Exn.message(jsExn)
+        | Error(JsExn(jsExn)) =>
+          let msg = JsExn.message(jsExn)
           onDone(expect(msg)->toEqual(Some("Error from JS")))
         | Error(_) => onDone(fail("Should have been an Js.Exn"))
         },
@@ -2625,7 +2625,7 @@ describe("IO tries/exceptions", () => {
         switch x {
         | Ok(_) => onDone(fail("Should not be Ok"))
         | Error(jsExn) =>
-          let msg = Js.Exn.message(jsExn)
+          let msg = JsExn.message(jsExn)
           onDone(expect(msg)->toEqual(Some("Error from JS")))
         },
       _,
@@ -2633,11 +2633,11 @@ describe("IO tries/exceptions", () => {
   )
 
   testAsync("triesJS with Reason Js.Exn.raiseError", onDone =>
-    IO.triesJS(() => Js.Exn.raiseError("Fail"))->IO.unsafeRunAsync(
+    IO.triesJS(() => JsError.make("Fail")->JsError.throw)->IO.unsafeRunAsync(
       result =>
         switch result {
         | Ok(_) => onDone(fail("Should not be Ok"))
-        | Error(e) => onDone(expect(Js.Exn.message(e))->toEqual(Some("Fail")))
+        | Error(e) => onDone(expect(JsExn.message(e))->toEqual(Some("Fail")))
         },
       _,
     )
@@ -2654,7 +2654,7 @@ describe("IO tries/exceptions", () => {
       x =>
         switch x {
         | Ok(_) => onDone(fail("Should not be Ok"))
-        | Error(e) => onDone(expect(Js.Exn.message(e))->toEqual(Some("This sucks")))
+        | Error(e) => onDone(expect(JsExn.message(e))->toEqual(Some("This sucks")))
         },
       _,
     )
@@ -2666,13 +2666,13 @@ describe("IO tries/exceptions", () => {
   Skip.testAsync("triesJS with exn", onDone => {
     exception MyExn(string)
 
-    IO.triesJS(() => raise(MyExn("Custom error")))->IO.unsafeRunAsync(
+    IO.triesJS(() => throw(MyExn("Custom error")))->IO.unsafeRunAsync(
       result =>
         switch result {
         | Ok(_) => onDone(fail("Should not be Ok"))
         | Error(e) =>
-          Js.log(e)
-          onDone(expect(Js.Exn.message(e))->toEqual(Some("Unexpected error: MyExn,8,Custom error")))
+          Console.log(e)
+          onDone(expect(JsExn.message(e))->toEqual(Some("Unexpected error: MyExn,8,Custom error")))
         },
       _,
     )
@@ -4160,7 +4160,7 @@ describe("IO debounce", () => {
     // This will test that when a debounced IO is called, it will only let the most recent one go through
     // after some predetermined amount of time. After that call has gone through the time should reset and
     // the next time the function is called it will have to wait that amount of time all over again.
-    let getTimestamp = () => Js.Date.make()->Js.Date.getTime
+    let getTimestamp = () => Date.make()->Date.getTime
     let timeIntervals = ref(list{getTimestamp()})
     let intervalMs = 100
     let areTimestampsSpacedCorrectly = (x1, x2) => x2 -. x1 >= intervalMs->float_of_int
@@ -4217,7 +4217,7 @@ describe("IO debounce", () => {
     // test that the first execution immediately goes out and that only the latest execution that happens
     // within the time interval goes out. After that time interval is up, the next time the IO is executed it
     // should go out immediately
-    let getTimestamp = () => Js.Date.make()->Js.Date.getTime
+    let getTimestamp = () => Date.make()->Date.getTime
     let timeIntervals = ref(list{getTimestamp()})
     let intervalMs = 100
     let areTimestampsSpacedCorrectly = (x1, x2) => x2 -. x1 >= intervalMs->float_of_int
@@ -4269,7 +4269,7 @@ describe("IO debounce", () => {
 describe("IO throttle", () => {
   // TODO: need to use fake timers
   Skip.testAsync("throttle", onDone => {
-    let getTimestamp = () => Js.Date.make()->Js.Date.getTime
+    let getTimestamp = () => Date.make()->Date.getTime
     let timeIntervals = ref(list{getTimestamp()})
     let intervalMs = 100
     let throttledIO =
@@ -4527,8 +4527,8 @@ describe("IO realish examples", () => {
 
 let testFilePath = FS.testFilePath("Eff_test.txt")
 
-module JsExnType: BsBastet.Interface.TYPE with type t = Js.Exn.t = {
-  type t = Js.Exn.t
+module JsExnType: BsBastet.Interface.TYPE with type t = JsExn.t = {
+  type t = JsExn.t
 }
 module IOJsExn = IO.WithError(JsExnType)
 

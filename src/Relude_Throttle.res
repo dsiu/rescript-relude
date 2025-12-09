@@ -24,7 +24,7 @@ let throttle = (~delayMS: int, ~leading: bool=false, f: unit => unit): throttled
   let timerId = ref(None)
 
   let cancel = () => {
-    timerId.contents->(Relude_Option.forEach(timerId => Js.Global.clearTimeout(timerId), _))
+    timerId.contents->(Relude_Option.forEach(timerId => clearTimeout(timerId), _))
     timerId := None
   }
 
@@ -35,7 +35,7 @@ let throttle = (~delayMS: int, ~leading: bool=false, f: unit => unit): throttled
       cancel()
       isThrottled := true
       f()
-      timerId := Some(Js.Global.setTimeout(() => {
+      timerId := Some(setTimeout(() => {
             isThrottled := false
             timerId := None
           }, delayMS))

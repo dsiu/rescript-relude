@@ -636,7 +636,7 @@ let removeFirstBy: 'a. (('a, 'a) => bool, 'a, array<'a>) => array<'a> = (innerEq
       found ? (true, append(x, ys)) : innerEq(v, x) ? (true, ys) : (false, append(x, ys)),
     (false, []),
     xs,
-  )->snd
+  )->Pair.second
 
 @ocaml.doc("
 [Array.removeEachBy] removes all occurrences of the given value from the array,
@@ -711,7 +711,7 @@ Running time: O(n)
 ]}
 ")
 let scanLeft: 'a 'b. (('b, 'a) => 'b, 'b, array<'a>) => array<'b> = (f, init, xs) =>
-  snd(Relude_Array_Instances.foldLeft(((acc, result), curr) => {
+  Pair.second(Relude_Array_Instances.foldLeft(((acc, result), curr) => {
       let nextAcc = f(acc, curr)
       (nextAcc, append(nextAcc, result))
     }, (init, []), xs))
@@ -727,7 +727,7 @@ Running time: O(n)
 ]}
 ")
 let scanRight: 'a 'b. (('a, 'b) => 'b, 'b, array<'a>) => array<'b> = (f, init, xs) =>
-  snd(Relude_Array_Instances.foldRight((curr, (acc, result)) => {
+  Pair.second(Relude_Array_Instances.foldRight((curr, (acc, result)) => {
       let nextAcc = f(curr, acc)
       (nextAcc, prepend(nextAcc, result))
     }, (init, []), xs))

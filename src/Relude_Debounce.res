@@ -44,13 +44,13 @@ let debounce = (~delayMS: int, ~leading: bool=false, f: unit => unit): debounced
   let timerId = ref(None)
 
   let cancel = () => {
-    timerId.contents->(Relude_Option.forEach(timerId => Js.Global.clearTimeout(timerId), _))
+    timerId.contents->(Relude_Option.forEach(timerId => clearTimeout(timerId), _))
     timerId := None
   }
 
   let schedule = () => {
     cancel()
-    timerId := Some(Js.Global.setTimeout(() => {
+    timerId := Some(setTimeout(() => {
           f()
           timerId := None
         }, delayMS))

@@ -70,7 +70,7 @@ describe("Function", () => {
 
   test("apply", () => {
     let showResult = (n, x: float) =>
-      "input " ++ (Int.toString(n) ++ (" yields " ++ Js.Float.toString(x)))
+      "input " ++ (Int.toString(n) ++ (" yields " ++ Float.toString(x)))
 
     let cube = x => Float.fromInt(x * x * x)
 
@@ -81,7 +81,7 @@ describe("Function", () => {
 
   test("bind", () => {
     let showResult = (x, n: int) =>
-      "input " ++ (Int.toString(n) ++ (" yields " ++ Js.Float.toString(x)))
+      "input " ++ (Int.toString(n) ++ (" yields " ++ Float.toString(x)))
 
     let cube = x => Float.fromInt(x * x * x)
 
@@ -90,7 +90,7 @@ describe("Function", () => {
 
   test("flatMap", () => {
     let showResult = (x, n: int) =>
-      "input " ++ (Int.toString(n) ++ (" yields " ++ Js.Float.toString(x)))
+      "input " ++ (Int.toString(n) ++ (" yields " ++ Float.toString(x)))
 
     let cube = x => Float.fromInt(x * x * x)
 

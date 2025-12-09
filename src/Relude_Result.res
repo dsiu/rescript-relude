@@ -819,7 +819,7 @@ JavaScript's magic ability to construct a [string] from anything.
 ]}
 ")
 let triesAsString: 'a. (unit => 'a) => t<'a, string> = fn =>
-  tries(fn)->(mapError(x => Js.String.make(x), _))
+  tries(fn)->mapError(x => String.make(x), _)
 
 @ocaml.doc("
 [toValidation(result)] converts [Ok(val)] to [VOk(val)] and [Error(err)] to

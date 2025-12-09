@@ -432,7 +432,7 @@ equality function.
 let removeFirstBy: 'a. (('a, 'a) => bool, 'a, list<'a>) => list<'a> = (innerEq, v, xs) => {
   let go = ((found, ys), x) =>
     found ? (true, list{x, ...ys}) : innerEq(v, x) ? (true, ys) : (false, list{x, ...ys})
-  reverse(snd(Relude_List_Instances.foldLeft(go, (false, list{}), xs)))
+  reverse(Pair.second(Relude_List_Instances.foldLeft(go, (false, list{}), xs)))
 }
 
 @ocaml.doc("
@@ -497,7 +497,7 @@ let scanLeft: (('b, 'a) => 'b, 'b, list<'a>) => list<'b> = (f, init, xs) => {
     let nextAcc = f(acc, curr)
     (nextAcc, list{nextAcc, ...result})
   }, (init, list{}), xs)
-  ->snd
+  ->Pair.second
   ->Belt.List.reverse // TODO use our own implementation
 }
 
@@ -509,7 +509,7 @@ let scanRight: (('a, 'b) => 'b, 'b, list<'a>) => list<'b> = (f, init, xs) => {
   Relude_List_Instances.foldRight((curr, (acc, result)) => {
     let nextAcc = f(curr, acc)
     (nextAcc, list{nextAcc, ...result})
-  }, (init, list{}), xs)->snd
+  }, (init, list{}), xs)->Pair.second
 }
 
 @ocaml.doc("
