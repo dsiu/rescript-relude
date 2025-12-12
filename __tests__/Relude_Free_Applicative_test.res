@@ -17,7 +17,7 @@ module Field = {
 
   let map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (f, {name, validator}) => {
     name,
-    validator: \">>"(validator, Result.map(f)),
+    validator: \">>"(validator, Result.map(f, _), _),
   }
 
   module Functor: BsBastet.Interface.FUNCTOR with type t<'a> = t<'a> = {
@@ -38,18 +38,20 @@ module Schema = {
   // describes an operation that will parse a string to an int
   let int: string => t<int> = name =>
     field(name, input =>
-      Result.fromOption(
+      Relude.Int.fromString(input)->Result.fromOption(
         "Invalid input for field " ++ (name ++ (" (expected int): " ++ input)),
-        Relude.Int.fromString(input),
+        _,
       )
     )
 
   // describes an operation that will parse a string and make sure it's not empty
   let nonEmptyString: string => t<string> = name =>
     field(name, input =>
-      Relude.Result.fromOption(
-        "Invalid input for field " ++ (name ++ (" (expected non-empty): " ++ input)),
-        Relude.Option.keep(String.isNotEmpty, Some(input)),
+      Some(input)
+      ->Relude.Option.keep(String.isNotEmpty, _)
+      ->Relude.Result.fromOption(
+        "Invalid input for field " ++ name ++ " (expected non-empty): " ++ input,
+        _,
       )
     )
 }
@@ -61,15 +63,15 @@ module User = {
     age: int,
   }
 
-  let make = (first, last, age) => {first, last, age}
+  let make = first => last => age => {first, last, age}
 
   // This is our free applicative that describes metadata about a user
   let schema: Schema.t<t> = {
     open Schema.Infix
-    \"<*>"(
-      \"<*>"(\"<$>"(make, Schema.nonEmptyString("first")), Schema.nonEmptyString("last")),
-      Schema.int("age"),
-    )
+    make
+    ->\"<$>"(Schema.nonEmptyString("first"))
+    ->\"<*>"(Schema.nonEmptyString("last"))
+    ->\"<*>"(Schema.int("age"))
   }
 }
 
@@ -87,9 +89,9 @@ let validateUser = (first: string, last: string, age: string): ValidationE.t<Use
     type g<'a> = ValidationE.t<'a>
     let f = (field: f<'a>) =>
       switch field.name {
-      | "first" => Result.toValidationNel(field.validator(first))
-      | "last" => Result.toValidationNel(field.validator(last))
-      | "age" => Result.toValidationNel(field.validator(age))
+      | "first" => field.validator(first)->Result.toValidationNel
+      | "last" => field.validator(last)->Result.toValidationNel
+      | "age" => field.validator(age)->Result.toValidationNel
       | _ => Validation.errorNel("Unexpected field: " ++ field.name)
       }
   }
@@ -99,18 +101,17 @@ let validateUser = (first: string, last: string, age: string): ValidationE.t<Use
 
 describe("Relude_Free_Applicative", () => {
   test("validateUser success", () =>
-    toEqual(
+    expect(validateUser("Andy", "White", "101"))->toEqual(
       Validation.VOk({
         open User
         {first: "Andy", last: "White", age: 101}
       }),
-      expect(validateUser("Andy", "White", "101")),
     )
   )
 
   test("validateUser error", () =>
     // TODO: list of errors is reversed just b/c of how this works. Could reverse it somewhere.
-    toEqual(
+    expect(validateUser("", "", "abc"))->toEqual(
       Validation.VError(
         NonEmpty.List.make(
           "Invalid input for field age (expected int): abc",
@@ -120,7 +121,6 @@ describe("Relude_Free_Applicative", () => {
           },
         ),
       ),
-      expect(validateUser("", "", "abc")),
     )
   )
 })

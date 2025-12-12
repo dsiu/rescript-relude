@@ -1,5 +1,15 @@
+@@ocaml.text(`
+Free Applicative functor implementation.
+
+Changes for ReScript v12:
+- Added [open!] directive to suppress shadowing warning for [Relude_Function.Infix]
+- Replaced [\\\">>\\\"(xToA, aToB, ...)] with explicit function composition in [map]
+- Added local [flip] helper for curried functions (different from [Relude_Function.flip]
+  which works with tuple-style functions)
+`)
+
 open BsBastet.Interface
-open Relude_Function.Infix
+open! Relude_Function.Infix
 
 module WithFunctor = (F: FUNCTOR) => {
   type rec t<'a> =
@@ -9,7 +19,8 @@ module WithFunctor = (F: FUNCTOR) => {
   let rec map: 'a 'b. ('a => 'b, t<'a>) => t<'b> = (aToB, freeA) =>
     switch freeA {
     | Pure(a) => Pure(aToB(a))
-    | Apply(fx, freeXToA) => Apply(fx, map(xToA => \">>"(xToA, aToB, ...), freeXToA))
+    | Apply(fx, freeXToA) =>
+      Apply(fx,  freeXToA -> map(xToA =>  \">>"(xToA, aToB, _), _))
     }
 
   module Functor: FUNCTOR with type t<'a> = t<'a> = {
@@ -18,18 +29,26 @@ module WithFunctor = (F: FUNCTOR) => {
   }
   include Relude_Extensions_Functor.FunctorExtensions(Functor)
 
-  let flip_orig: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
-  let flip_fix: 'a 'b 'c. (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
+  @ocaml.doc("
+  Local helper to flip the arguments of a curried function.
+
+  Note: This is different from [Relude_Function.flip] which works with
+  tuple-style functions [(('a, 'b) => 'c)]. The Free Applicative requires
+  flipping curried functions [('a => 'b => 'c)] to reorder type applications.
+
+  In the [apply] function below, we use this to transform a function of type
+  ['x => 'a => 'b] into ['a => 'x => 'b], which is necessary for the
+  applicative semantics to work correctly with the existential type ['x].
+  ")
+  let flip: 'a 'b 'c. ('a => 'b => 'c) => 'b => 'a => 'c = f => b => a => f(a)(b)
 
   let rec apply: 'a 'b. (t<'a => 'b>, t<'a>) => t<'b> = (freeAToB, freeA) =>
     switch freeAToB {
     | Pure(aToB) => freeA->map(aToB, _)
     | Apply(fx, freeXToAToB) =>
-      //      let freeAToXToB = map( => Relude_Function.flip(x, ...), freeXToAToB)
-
-      // freeXToAToB has type t<\"$Apply_'x" => 'a => 'b>
-
-      let freeAToXToB = map(f => flip_fix(f, ...), freeXToAToB)
+      // freeXToAToB has type t<'x => 'a => 'b>
+      // We need to flip it to get t<'a => 'x => 'b>
+      let freeAToXToB = map(flip, freeXToAToB)
       let freeXToB = apply(freeAToXToB, freeA)
 
       Apply(fx, freeXToB)
