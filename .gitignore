@@ -20,3 +20,5 @@ npm-debug.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+/.idea/
+/coverage/
