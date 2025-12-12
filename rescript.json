@@ -3,7 +3,6 @@
   "compiler-flags": [
     "-bs-no-version-header"
   ],
-  "version": "0.1.0",
   "sources": [
     {
       "dir": "src",
@@ -30,7 +29,6 @@
     "number": "+A-4-29-40-42-60+102",
     "error": "+A-3-102"
   },
-  "refmt": 3,
   "ppx-flags": [
 
   ]
