@@ -1764,11 +1764,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 25.0.1
-  resolution: "@types/node@npm:25.0.1"
+  version: 25.0.2
+  resolution: "@types/node@npm:25.0.2"
   dependencies:
     undici-types: "npm:~7.16.0"
-  checksum: 10c0/1d5ca9f240d0cf8e43d5281c0e6ee96fb22d37dc2e5ef52c6ca71de47957a6128e124990cedf5b14c03d0250737bd78ad370d93bcf1729a75ca4e54384fdd51a
+  checksum: 10c0/12c4044bf2e46ba3d313ddf6256ee3c88e336a62d129fe788eeab8ff2631b3df51eb31ade4cdc04552fbe51e285f0663c49b60c78acd31da2b9f2c86a84347e3
   languageName: node
   linkType: hard
 
@@ -2111,11 +2111,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.9.0":
-  version: 2.9.6
-  resolution: "baseline-browser-mapping@npm:2.9.6"
+  version: 2.9.7
+  resolution: "baseline-browser-mapping@npm:2.9.7"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/9d9bae544342c02200e0a489d4caf3611a2a517d0d7a8c97e1dd7d640ac18d2784710bf08375b5951fb9034bd18d902b50797d90218a33b88e6244ae917f881f
+  checksum: 10c0/500af82926d71d23fab20bcf821eb27deeaad45d1a01bd33d2dea7aab6114149068fa0d42bb9c5c18657e996b6e8063b84612c8fb8ac8ba6c6c6028fa4930ed1
   languageName: node
   linkType: hard
 
@@ -5330,10 +5330,10 @@ __metadata:
 
 "rescript-bastet@github:dsiu/rescript-bastet#rescript-v12":
   version: 0.0.1
-  resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=2c87e4d97be4046157c7fb71e1e9b2f8256e3dc6"
+  resolution: "rescript-bastet@https://github.com/dsiu/rescript-bastet.git#commit=47fcf3951b0bd774e03ea4c4df092e28779ddeaa"
   peerDependencies:
     rescript: ^12.0.1
-  checksum: 10c0/494843eeb48125c3d50de9691e44edeb05bcaba0c9e646b24cc7030bfb8d9d39a2c9e70246b567c40abc177015503f7f0ee22584d1bd773558694dd1b086a519
+  checksum: 10c0/87be12578c84afdc84dbca7115ab1cba997d693befacdbc9d3ab7fbfadf4e124fdd595ae37bee6d8abf0157bd05b267c8c5997cfb9f8eea2e44722ef29757195
   languageName: node
   linkType: hard
 
@@ -5348,15 +5348,15 @@ __metadata:
     bisect_ppx: "npm:^2.7.1"
     docsify-cli: "npm:~4.4.0"
     jest: "npm:^27.3.1"
-    rescript: "npm:^12.0.0"
+    rescript: "npm:^12.0.1"
     rescript-bastet: "github:dsiu/rescript-bastet#rescript-v12"
   peerDependencies:
-    rescript: ^12.0.0
+    rescript: ^12.0.1
     rescript-bastet: "*"
   languageName: unknown
   linkType: soft
 
-"rescript@npm:^12.0.0":
+"rescript@npm:^12.0.1":
   version: 12.0.1
   resolution: "rescript@npm:12.0.1"
   dependencies:
