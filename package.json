@@ -75,7 +75,7 @@
     "babel-jest": "^27.3.1",
     "docsify-cli": "~4.4.0",
     "jest": "^27.3.1",
-    "rescript": "^12.0.2",
+    "rescript": "^12.1.0",
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
   },
   "peerDependencies": {
