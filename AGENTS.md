@@ -20,6 +20,17 @@
 - Always use the `JSON.t` type for json.
 - Module with React components do require a signature file (`.resi`) for Vite HMR to work. Only the React components can be exposed from the javascript.
 
+## Development Tools
+
+### ReScript LSP Integration
+- **IF the rescript-lsp plugin is installed and available in Claude Code**, use it to structurally analyze, search, and navigate ReScript code
+- When available, prefer LSP features for:
+  - Document symbols and structure analysis (viewing modules, types, functions)
+  - Go to definition and find references
+  - Type information and hover documentation
+  - Structural navigation within functors and modules
+- LSP-based code exploration is more accurate than text-based search for understanding ReScript module structure
+
 ## Build & Test Commands
 - `yarn build` - Compile ReScript to JavaScript
 - `yarn clean` - Clean build artifacts
