@@ -31,7 +31,7 @@ if the array is non-empty.
 let uncons: 'a. array<'a> => option<('a, array<'a>)> = xs =>
   switch xs {
   | [] => None
-  | _ => Some((Belt.Array.getExn(xs, 0), Belt.Array.sliceToEnd(xs, 1)))
+  | _ => Some((Array.getUnsafe(xs, 0), Array.slice(xs, ~start=1)))
   }
 
 @ocaml.doc("
@@ -57,7 +57,7 @@ Running time: O(n) where [n] is the provided size
   Array.repeat(-10, ()) == [||];
 ]}
 ")
-let repeat: 'a. (int, 'a) => array<'a> = (i, x) => Belt.Array.make(i, x)
+let repeat: 'a. (int, 'a) => array<'a> = (i, x) => Array.make(~length=i, x)
 
 @ocaml.doc("
 [Array.makeWithIndex] creates an array of the given size, filled with the result
@@ -72,7 +72,7 @@ Running time: O(n) where [n] is the provided size
   Array.makeWithIndex(-1, const(true)) == [||];
 ]}
 ")
-let makeWithIndex: 'a. (int, int => 'a) => array<'a> = (i, fn) => Belt.Array.makeBy(i, fn)
+let makeWithIndex: 'a. (int, int => 'a) => array<'a> = (i, fn) => Array.fromInitializer(~length=i, fn)
 
 @ocaml.doc("
 [Array.mapWithIndex] maps a pure function over the array which accepts both the
@@ -87,7 +87,7 @@ Running time: O(n)
 ]}
 ")
 let mapWithIndex: 'a 'b. (('a, int) => 'b, array<'a>) => array<'b> = (f, xs) =>
-  Belt.Array.mapWithIndex(xs, (i, x) => f(x, i))
+  Array.mapWithIndex(xs, (x, i) => f(x, i))
 
 @ocaml.doc("
 [Array.reverse] returns a copy of the input array in reverse order.
@@ -98,7 +98,7 @@ Running time: O(n)
   Array.reverse([|1, 2, 3|]) == [|3, 2, 1|];
 ]}
 ")
-let reverse: 'a. array<'a> => array<'a> = xs => Belt.Array.reverse(xs)
+let reverse: 'a. array<'a> => array<'a> = xs => Array.toReversed(xs)
 
 @ocaml.doc("
 [Array.shuffleInPlace] mutates the provided array by randomizing the positions
@@ -109,7 +109,7 @@ of the contained values.
 ]}
 ")
 let shuffleInPlace: 'a. array<'a> => array<'a> = xs => {
-  Belt.Array.shuffleInPlace(xs)
+  Array.shuffle(xs)
   xs
 }
 
@@ -118,7 +118,7 @@ let shuffleInPlace: 'a. array<'a> => array<'a> = xs => {
 array. This is similar to [Array.shuffleInPlace] except the input array is left
 unchanged.
 ")
-let shuffle: 'a. array<'a> => array<'a> = xs => Belt.Array.shuffle(xs)
+let shuffle: 'a. array<'a> => array<'a> = xs => Array.toShuffled(xs)
 
 @ocaml.doc("
 [Array.length] returns the count of items in the array in O(1) time.
@@ -127,7 +127,7 @@ let shuffle: 'a. array<'a> => array<'a> = xs => Belt.Array.shuffle(xs)
   Array.length([|\"a\", \"b\", \"c\"|]) == 3;
 ]}
 ")
-let length: 'a. array<'a> => int = xs => Belt.Array.length(xs)
+let length: 'a. array<'a> => int = xs => Array.length(xs)
 
 @ocaml.doc("
 [Array.isEmpty] determines whether the array contains no values (has length 0)
@@ -163,7 +163,7 @@ Running time: O(1)
   Array.at(0, [||]) == None;
 ]}
 ")
-let at: 'a. (int, array<'a>) => option<'a> = (i, xs) => Belt.Array.get(xs, i)
+let at: 'a. (int, array<'a>) => option<'a> = (i, xs) => Array.get(xs, i)
 
 @ocaml.doc("
 [Array.setAt] mutates the provided array by setting the provided value at the
@@ -178,10 +178,11 @@ This is an in-place mutation that doesn't affect the size of the array.
 ]}
 ")
 let setAt: 'a. (int, 'a, array<'a>) => option<array<'a>> = (i, x, xs) =>
-  if Belt.Array.set(xs, i, x) {
-    Some(xs)
-  } else {
+  if i > Array.length(xs) -1 {
     None
+  } else {
+     Array.set(xs, i, x)
+    Some(xs)
   }
 
 @ocaml.doc("
@@ -192,7 +193,7 @@ let setAt: 'a. (int, 'a, array<'a>) => option<array<'a>> = (i, x, xs) =>
   Array.head([|\"a\", \"b\", \"c\"|]) == Some(\"a\");
 ]}
 ")
-let head: 'a. array<'a> => option<'a> = arr => Belt.Array.get(arr, 0)
+let head: 'a. array<'a> => option<'a> = arr => Array.get(arr, 0)
 
 @ocaml.doc("
 [Array.tail] optionally returns a new array containing all but the the first
@@ -215,7 +216,7 @@ let tail: 'a. array<'a> => option<array<'a>> = xs => {
   } else if l == 1 {
     Some([])
   } else {
-    let ys = Belt.Array.sliceToEnd(xs, 1)
+    let ys = Array.slice(xs, ~start=1)
     length(ys) > 0 ? Some(ys) : None
   }
 }
@@ -251,7 +252,7 @@ let init: 'a. array<'a> => option<array<'a>> = xs => {
   if l == 0 {
     None
   } else {
-    Some(Belt.Array.slice(xs, ~offset=0, ~len=l - 1))
+    Some(Array.slice(xs, ~start=0, ~end=l - 1))
   }
 }
 
@@ -307,7 +308,7 @@ Running time: O(n)
 let take: 'a. (int, array<'a>) => array<'a> = (i, xs) => {
   let l = length(xs)
   let len = i < 0 ? 0 : l < i ? l : i
-  Belt.Array.slice(xs, ~offset=0, ~len)
+  Array.slice(xs, ~start=0, ~end=len)
 }
 
 @ocaml.doc("
@@ -327,7 +328,7 @@ let takeExactly: 'a. (int, array<'a>) => option<array<'a>> = (i, xs) =>
   if i < 0 || i > length(xs) {
     None
   } else {
-    Some(Belt.Array.slice(xs, ~offset=0, ~len=i))
+    Some(Array.slice(xs, ~start=0, ~end=i))
   }
 
 @ocaml.doc("
@@ -363,7 +364,7 @@ array will be returned.
 let drop: 'a. (int, array<'a>) => array<'a> = (i, xs) => {
   let l = length(xs)
   let start = i < 0 ? 0 : l < i ? l : i
-  Belt.Array.sliceToEnd(xs, start)
+  Array.slice(xs, ~start=start)
 }
 
 @ocaml.doc("
@@ -379,7 +380,7 @@ let dropExactly: 'a. (int, array<'a>) => option<array<'a>> = (i, xs) =>
   if i < 0 || i > length(xs) {
     None
   } else {
-    Some(Belt.Array.sliceToEnd(xs, i))
+    Some(Array.slice(xs, ~start=i))
   }
 
 @ocaml.doc("
@@ -404,7 +405,7 @@ array which satisfy the given predicate.
   Array.filter(v => v mod 2 == 0, [|1, 2, 3, 4|]) == [|2, 4|];
 ]}
 ")
-let filter: 'a. ('a => bool, array<'a>) => array<'a> = (f, xs) => Belt.Array.keep(xs, f)
+let filter: 'a. ('a => bool, array<'a>) => array<'a> = (f, xs) => Array.filter(xs, f)
 
 @ocaml.doc("
 [Array.keep] is an alias for {!val:filter}.
@@ -416,7 +417,7 @@ let keep: 'a. ('a => bool, array<'a>) => array<'a> = filter
 satisfy the given indexed predicate.
 ")
 let filterWithIndex: 'a. (('a, int) => bool, array<'a>) => array<'a> = (f, xs) =>
-  Belt.Array.keepWithIndex(xs, f)
+  Array.filterWithIndex(xs, f)
 
 @ocaml.doc("
 [Array.keepWithIndex] is an alias for [filterWithIndex].
@@ -503,7 +504,7 @@ let splitAt: 'a. (int, array<'a>) => option<(array<'a>, array<'a>)> = (i, xs) =>
   if i < 0 || i > length(xs) {
     None
   } else {
-    Some((Belt.Array.slice(xs, ~offset=0, ~len=i), Belt.Array.sliceToEnd(xs, i)))
+    Some((Array.slice(xs, ~start=0, ~end=i), Array.slice(xs, ~start=i)))
   }
 
 @ocaml.doc("

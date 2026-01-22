@@ -1,3 +1,5 @@
+// prevent shadowing ReScript Stdlib
+module Stdlib_Ordering = Ordering
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -94,28 +96,28 @@ Running time: O(n) (where n is the provided count)
   List.repeat(-1, 42) == [];
 ]}
 ")
-let repeat: 'a. (int, 'a) => list<'a> = (i, x) => Belt.List.make(i, x)
+let repeat: 'a. (int, 'a) => list<'a> = (i, x) => List.make(~length=i, x)
 
 @ocaml.doc("
 Makes a list by mapping a function over a range of ints from [0] to [[n - 1]].
 ")
-let makeWithIndex: 'a. (int, int => 'a) => list<'a> = (i, f) => Belt.List.makeBy(i, f)
+let makeWithIndex: 'a. (int, int => 'a) => list<'a> = (i, f) => List.fromInitializer(~length=i, f)
 
 @ocaml.doc("
 Maps an indexed function over the values of a list to produce a new list.
 ")
 let mapWithIndex: 'a 'b. (('a, int) => 'b, list<'a>) => list<'b> = (f, xs) =>
-  Belt.List.mapWithIndex(xs, (i, x) => f(x, i))
+  List.mapWithIndex(xs, (x, i) => f(x, i))
 
 @ocaml.doc("
 Reverses the given list
 ")
-let reverse: 'a. list<'a> => list<'a> = l => Belt.List.reverse(l)
+let reverse: 'a. list<'a> => list<'a> = l => List.reverse(l)
 
 @ocaml.doc("
 Shuffles the given list to create a new list
 ")
-let shuffle: 'a. list<'a> => list<'a> = l => Belt.List.shuffle(l)
+let shuffle: 'a. list<'a> => list<'a> = l => List.shuffle(l)
 
 @ocaml.doc("
 Indicates if the given list is empty ([length == 0]).
@@ -135,7 +137,7 @@ let isNotEmpty: 'a. list<'a> => bool = xs => !isEmpty(xs)
 Gets the value at the given index of the list, or None if the index is out of
 range.
 ")
-let at: 'a. (int, list<'a>) => option<'a> = (i, xs) => Belt.List.get(xs, i)
+let at: 'a. (int, list<'a>) => option<'a> = (i, xs) => List.get(xs, i)
 
 @ocaml.doc("
 Gets the first item of the list, or None if the list is empty.
@@ -248,7 +250,7 @@ let rec drop: 'a. (int, list<'a>) => list<'a> = (i, xs) =>
 Creates a new list by dropping exactly [n] items from the given list. If there
 are fewer than [n] items, None is returned.
 ")
-let dropExactly: 'a. (int, list<'a>) => option<list<'a>> = (i, xs) => Belt.List.drop(xs, i)
+let dropExactly: 'a. (int, list<'a>) => option<list<'a>> = (i, xs) => List.drop(xs, i)
 
 @ocaml.doc("
 Creates a new list by dropping items from the list until an item is reached
@@ -264,7 +266,7 @@ let rec dropWhile: 'a. ('a => bool, list<'a>) => list<'a> = (f, xs) =>
 Creates a new list containing only the items from the given list that satisfy
 the given predicate.
 ")
-let filter: 'a. ('a => bool, list<'a>) => list<'a> = (f, xs) => Belt.List.keep(xs, f)
+let filter: 'a. ('a => bool, list<'a>) => list<'a> = (f, xs) => List.filter(xs, f)
 
 @ocaml.doc("
 Alias of filter
@@ -276,7 +278,7 @@ Creates a new list containing only the items from the given list that satisfy
 the given indexed predicate.
 ")
 let filterWithIndex: 'a. (('a, int) => bool, list<'a>) => list<'a> = (f, xs) =>
-  Belt.List.keepWithIndex(xs, f)
+  List.filterWithIndex(xs, f)
 
 @ocaml.doc("
 Alias of filterWithIndex
@@ -329,14 +331,14 @@ satisfy the given predicate and one
 (right-side) containing values that do not satisfy the predicate.
 ")
 let partition: 'a. ('a => bool, list<'a>) => (list<'a>, list<'a>) = (f, xs) =>
-  Belt.List.partition(xs, f)
+  List.partition(xs, f)
 
 @ocaml.doc("
 Splits a list into two lists at the given index.  None is returned if the index
 is out of range.
 ")
 let splitAt: 'a. (int, list<'a>) => option<(list<'a>, list<'a>)> = (i, xs) =>
-  Belt.List.splitAt(xs, i)
+  List.splitAt(xs, i)
 
 @ocaml.doc("
 Creates a new list by prepending the given value to each item in the list.
@@ -376,13 +378,13 @@ let replicate: 'a. (int, list<'a>) => list<'a> = (i, xs) => {
 @ocaml.doc("
 Combines two lists pair-wise into a list of tuple-2
 ")
-let zip: 'a 'b. (list<'a>, list<'b>) => list<('a, 'b)> = (a, b) => Belt.List.zip(a, b)
+let zip: 'a 'b. (list<'a>, list<'b>) => list<('a, 'b)> = (a, b) => List.zip(a, b)
 
 @ocaml.doc("
 Combines two lists using a function to combine pair-wise values.
 ")
 let zipWith: 'a 'b 'c. (('a, 'b) => 'c, list<'a>, list<'b>) => list<'c> = (f, xs, ys) =>
-  Belt.List.zipBy(xs, ys, f)
+  List.zipBy(xs, ys, f)
 
 @ocaml.doc("
 Creates a new list with each item paired with its index in the list.
@@ -392,12 +394,12 @@ let zipWithIndex: 'a. list<'a> => list<('a, int)> = xs => mapWithIndex((v, i) =>
 @ocaml.doc("
 Creates two lists by splitting a list of tuple-2 on the left and right.
 ")
-let unzip: 'a 'b. list<('a, 'b)> => (list<'a>, list<'b>) = l => Belt.List.unzip(l)
+let unzip: 'a 'b. list<('a, 'b)> => (list<'a>, list<'b>) = l => List.unzip(l)
 
 @ocaml.doc("
 Sorts a list with the given int-based compare function.
 ")
-let sortWithInt: 'a. (('a, 'a) => int, list<'a>) => list<'a> = (f, xs) => Belt.List.sort(xs, f)
+let sortWithInt: 'a. (('a, 'a) => int, list<'a>) => list<'a> = (f, xs) => List.sort(xs, (a,b) => f(a,b)->Stdlib_Ordering.fromInt)
 
 @ocaml.doc("
 Sorts a list with the given ordering-based compare function.
@@ -498,7 +500,7 @@ let scanLeft: (('b, 'a) => 'b, 'b, list<'a>) => list<'b> = (f, init, xs) => {
     (nextAcc, list{nextAcc, ...result})
   }, (init, list{}), xs)
   ->Pair.second
-  ->Belt.List.reverse // TODO use our own implementation
+  ->List.reverse // TODO use our own implementation
 }
 
 @ocaml.doc("

@@ -156,7 +156,7 @@ Convert an associated list (a list of (key, value) tuples) into a map.
 let fromList: (Belt.Id.comparable<'key, 'id>, list<('key, 'value)>) => t<'key, 'value, 'id> = (
   comparable,
   lst,
-) => Belt.Map.fromArray(Belt.List.toArray(lst), ~id=comparable)
+) => Belt.Map.fromArray(List.toArray(lst), ~id=comparable)
 
 @ocaml.doc("
 Convert a list of values into a map, using the provided function from
@@ -178,7 +178,7 @@ let keyArray: t<'key, 'value, 'id> => array<'key> = m => m->Belt.Map.keysToArray
 @ocaml.doc("
 Return a sorted list containing each key in the map
 ")
-let keys: t<'key, 'value, 'id> => list<'key> = map => map->keyArray->Belt.List.fromArray
+let keys: t<'key, 'value, 'id> => list<'key> = map => map->keyArray->List.fromArray
 
 @ocaml.doc("
 Return an array of each value (sorted by key) in the map.
@@ -188,7 +188,7 @@ let valueArray: t<'key, 'value, 'id> => array<'value> = m => m->Belt.Map.valuesT
 @ocaml.doc("
 Return a list of each value (sorted by key) in the map.
 ")
-let values: t<'key, 'value, 'id> => list<'value> = map => map->valueArray->Belt.List.fromArray
+let values: t<'key, 'value, 'id> => list<'value> = map => map->valueArray->List.fromArray
 
 @ocaml.doc("
 Optionally find the smallest key, using the key ordering.
@@ -316,7 +316,7 @@ let groupListBy: (
   let addItemToGroup = (x, dict) =>
     \">>"(getOrElse(groupBy(x), list{}, ...), xs => list{x, ...xs}, dict)
   let addItemToMap = (dict, x) => dict->(set(groupBy(x), dict->(addItemToGroup(x, _)), _))
-  \">>"(Belt.List.reduce(_, make(comparable), addItemToMap), map(l => Belt.List.reverse(l), ...), l)
+  \">>"(List.reduce(_, make(comparable), addItemToMap), map(l => List.reverse(l), ...), l)
 }
 
 let groupArrayBy: (
@@ -326,9 +326,9 @@ let groupArrayBy: (
 ) => t<'key, array<'value>, 'id> = (comparable, groupBy, arr) => {
   open! Relude_Function.Infix
   let addItemToGroup = (x, dict) =>
-    \">>"(getOrElse(groupBy(x), [], ...), Belt.Array.concat(_, [x]), dict)
+    \">>"(getOrElse(groupBy(x), [], ...), Array.concat(_, [x]), dict)
   let addItemToMap = (dict, x) => dict->(set(groupBy(x), dict->(addItemToGroup(x, _)), _))
-  Belt.Array.reduce(arr, make(comparable), addItemToMap)
+  Array.reduce(arr, make(comparable), addItemToMap)
 }
 
 module type MAP = {

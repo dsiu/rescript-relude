@@ -3,7 +3,7 @@ open BsBastet.Interface
 @ocaml.doc("
 Concatenates two arrays with the left side array first, and the right side last
 ")
-let concat: 'a. (array<'a>, array<'a>) => array<'a> = (a, b) => Belt.Array.concat(a, b)
+let concat: 'a. (array<'a>, array<'a>) => array<'a> = (a, b) => Array.concat(a, b)
 
 module SemigroupAny: SEMIGROUP_ANY with type t<'a> = array<'a> = {
   type t<'a> = array<'a>
@@ -109,8 +109,8 @@ module Traversable = BsBastet.Array.Traversable
 Indicates if two arrays are pair-wise equal, using the given equality function
 ")
 let rec eqBy: 'a. (('a, 'a) => bool, array<'a>, array<'a>) => bool = (innerEq, xs, ys) => {
-  let head = Belt.Array.get(_, 0)
-  let tailOrEmpty = Belt.Array.sliceToEnd(_, 1)
+  let head = Array.get(_, 0)
+  let tailOrEmpty = Array.slice(_, ~start=1)
   switch (head(xs), head(ys)) {
   | (None, None) => true
   | (Some(x), Some(y)) if innerEq(x, y) => eqBy(innerEq, tailOrEmpty(xs), tailOrEmpty(ys))
@@ -158,12 +158,12 @@ module Show = (ShowA: SHOW) => {
 @ocaml.doc("
 Converts the given list to an array
 ")
-let fromList: 'a. list<'a> => array<'a> = l => Belt.List.toArray(l)
+let fromList: 'a. list<'a> => array<'a> = l => List.toArray(l)
 
 @ocaml.doc("
 Converts the given array to a list
 ")
-let toList: 'a. array<'a> => list<'a> = a => Belt.List.fromArray(a)
+let toList: 'a. array<'a> => list<'a> = a => List.fromArray(a)
 
 module IsoList: Relude_Interface.ISO_LIST with type t<'a> = array<'a> = {
   type t<'a> = array<'a>

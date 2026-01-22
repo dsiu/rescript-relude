@@ -15,7 +15,7 @@
     "build": "rescript build",
     "watch": "rescript watch",
     "test": "jest",
-    "coverage": "npm run test",
+    "coverage": "jest --coverage",
     "docs": "docsify serve ./docs",
     "cleanbisect": "rm bisect*.coverage || true",
     "cleanbuild": "npm run clean && npm run build",

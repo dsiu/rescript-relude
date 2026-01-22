@@ -32,7 +32,7 @@ ordered by the comparator function [Comparable.cmp].
 let fromList: (
   module(Belt.Id.Comparable with type t = 'value and type identity = 'id),
   list<'value>,
-) => Belt.Set.t<'value, 'id> = (id, value) => Belt.Set.fromArray(~id, Belt.List.toArray(value))
+) => Belt.Set.t<'value, 'id> = (id, value) => Belt.Set.fromArray(~id, List.toArray(value))
 
 @ocaml.doc("
 Determine whether a set is empty.

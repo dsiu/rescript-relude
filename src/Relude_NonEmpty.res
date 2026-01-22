@@ -1,3 +1,6 @@
+// Prevent shadowing ReScript Stdlib
+module Stdlib_List = List
+
 open BsBastet.Interface
 
 @ocaml.doc("
@@ -326,11 +329,11 @@ module Array = {
 
   let toNonEmptyList: 'a. t<'a> => List.t<'a> = (NonEmpty(h, tailArray)) => NonEmpty(
     h,
-    Belt.List.fromArray(tailArray),
+    Stdlib_List.fromArray(tailArray),
   )
 
   let fromNonEmptyList: 'a. List.t<'a> => t<'a> = (NonEmpty(h, tailList)) => NonEmpty(
     h,
-    Belt.List.toArray(tailList),
+    Stdlib_List.toArray(tailList),
   )
 }

@@ -165,7 +165,7 @@ module FoldableExtensions = (F: FOLDABLE) => {
   Converts the foldable into an array
   ")
   let toArray: F.t<'a> => array<'a> = fa =>
-    F.fold_left((acc, a) => Belt.Array.concat(acc, [a]), [], fa)
+    F.fold_left((acc, a) => Array.concat(acc, [a]), [], fa)
 
   @ocaml.doc("
   Foldable extensions for when you have a Semigroup instance

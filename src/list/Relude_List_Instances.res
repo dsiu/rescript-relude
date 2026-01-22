@@ -3,7 +3,7 @@ open BsBastet.Interface
 @ocaml.doc("
 Concatenates two lists with the left-side first and the right-side last.
 ")
-let concat: 'a. (list<'a>, list<'a>) => list<'a> = (xs, ys) => Belt.List.concat(xs, ys)
+let concat: 'a. (list<'a>, list<'a>) => list<'a> = (xs, ys) => List.concat(xs, ys)
 
 module SemigroupAny: SEMIGROUP_ANY with type t<'a> = list<'a> = {
   type t<'a> = list<'a>
@@ -168,12 +168,12 @@ module Show = (ShowA: SHOW) => {
 @ocaml.doc("
 Converts the given array to a list
 ")
-let fromArray = a => Belt.List.fromArray(a)
+let fromArray = a => List.fromArray(a)
 
 @ocaml.doc("
 Converts the given list to an array
 ")
-let toArray = l => Belt.List.toArray(l)
+let toArray = l => List.toArray(l)
 
 module IsoArray: Relude_Interface.ISO_ARRAY with type t<'a> = list<'a> = {
   type t<'a> = list<'a>
