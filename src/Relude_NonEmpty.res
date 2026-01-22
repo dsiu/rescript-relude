@@ -27,7 +27,7 @@ module WithSequence = (TailSequence: Relude_Interface.SEQUENCE) => {
   fail with None if the Sequence is empty.
   ")
   let fromSequence: 'a. TailSequence.t<'a> => option<t<'a>> = sequence =>
-    TailSequence.head(sequence)->Belt.Option.map(head => NonEmpty(
+    TailSequence.head(sequence)->Option.map(head => NonEmpty(
       head,
       TailSequence.tailOrEmpty(sequence),
     ))

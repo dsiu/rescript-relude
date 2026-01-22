@@ -118,7 +118,7 @@ let getOrElseLazy: 'a. (unit => 'a, option<'a>) => 'a = (getDefault, x) =>
 
 This should only be used if you are absolutely sure there is a value in the option.
 ")
-let getOrThrow: 'a. option<'a> => 'a = o => Belt.Option.getExn(o)
+let getOrThrow: 'a. option<'a> => 'a = o => Option.getUnsafe(o)
 
 @ocaml.doc("
 Similar to alt, but with the arguments reversed and labelled for use with [|>]

@@ -26,8 +26,6 @@
   "dev-dependencies": [
   ],
   "warnings": {
-    "number": "+A-4-29-40-42-60+102",
-    "error": "+A-3-102"
   },
   "ppx-flags": [
 
