@@ -25,10 +25,8 @@
     "releasebuild": "npm run cleancoverage"
   },
   "keywords": [
-    "ReasonML",
-    "^12.2.0-rc.1",
-    "^12.2.0-rc.1",
-    "^12.2.0-rc.1",
+    "ReScript",
+    "Prelude",
     "Standard Library"
   ],
   "author": "",
