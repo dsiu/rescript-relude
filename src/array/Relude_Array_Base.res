@@ -178,10 +178,10 @@ This is an in-place mutation that doesn't affect the size of the array.
 ]}
 ")
 let setAt: 'a. (int, 'a, array<'a>) => option<array<'a>> = (i, x, xs) =>
-  if i > Array.length(xs) -1 {
+  if i < 0 || i > Array.length(xs) - 1 {
     None
   } else {
-     Array.set(xs, i, x)
+    Array.set(xs, i, x)
     Some(xs)
   }
 

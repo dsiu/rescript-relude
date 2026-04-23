@@ -119,6 +119,10 @@ describe("Array", () => {
     expect(Array.setAt(5, "a", ["0", "1", "2"]))->toEqual(None)
   )
 
+  test("setAt negative index", () =>
+    expect(Array.setAt(-1, "a", ["0", "1", "2"]))->toEqual(None)
+  )
+
   test("head empty array", () => expect(Array.head([]))->toEqual(None))
 
   test("head single item array", () => expect(Array.head([1]))->toEqual(Some(1)))

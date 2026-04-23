@@ -31,7 +31,7 @@ let inverse: bool => bool = not
 @ocaml.doc("
 [Bool.not_] is an alias for {!val:inverse}.
 ")
-let not__: bool => bool = inverse
+let not_: bool => bool = inverse
 
 @ocaml.doc("
 Combines two boolean using an AND
