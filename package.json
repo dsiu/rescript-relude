@@ -77,7 +77,7 @@
     "rescript-bastet": "github:dsiu/rescript-bastet#rescript-v12"
   },
   "peerDependencies": {
-    "rescript": "^12.2.0",
+    "rescript": "^12.3.0",
     "rescript-bastet": "*"
   },
   "dependencies": {
