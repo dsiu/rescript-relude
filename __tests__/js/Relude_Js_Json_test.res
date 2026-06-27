@@ -180,7 +180,7 @@ describe("Json", () => {
 
   test("toListOrEmpty error", () =>
     expect(
-      list{}->JE.listOfDict->Json.toListOrEmpty->JE.list->Json.show(~indentSpaces=0),
+      %raw(`""`)->Json.toListOrEmpty->JE.list->Json.show(~indentSpaces=0),
     )->toEqual("[]")
   )
 

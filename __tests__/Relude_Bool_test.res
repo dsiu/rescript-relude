@@ -12,6 +12,10 @@ describe("Bool", () => {
     expect(Bool.inverse(input))->toEqual(expected)
   )
 
+  testAll("not_", list{(true, false), (false, true)}, ((input, expected)) =>
+    expect(Bool.not_(input))->toEqual(expected)
+  )
+
   testAll(
     "and_",
     list{(true, true, true), (true, false, false), (false, true, false), (false, false, false)},

@@ -10,6 +10,7 @@ let testEnv: env = {intValue: 42, stringValue: "abc"}
 
 type error = {message: string}
 
+module IO = Relude.IO
 module ReaderT = Relude.ReaderT
 
 module Reader = Relude.Reader.WithEnv({
@@ -65,10 +66,6 @@ describe("Reader", () => {
   )
 })
 
-/*
-
-module IO = Relude.IO
-
 module IOE = IO.WithError({
   type t = error
 })
@@ -80,18 +77,14 @@ module ReaderIOE = ReaderT.WithMonadAndEnv(
   },
 )
 
-let (\"<$>", \"<$$>", \">>=") = {
-  open ReaderIOE.Infix
-  (\"<$>", \"<$$>", \">>=")
-}
-
 describe("Reader IO", () =>
-  testAsync("test flow", onDone =>
+  testAsync("test flow", onDone => {
+    open ReaderIOE.Infix
     \">>="(
       ReaderIOE.ask,
       env =>
         \"<$$>"(
-          \"<$$>"(ReaderIOE.pure(-1 * env.intValue), Int.fromString),
+          \"<$$>"(ReaderIOE.pure(-1 * env.intValue), i => Int.toString(i)),
           a => a ++ env.stringValue,
         ),
     )
@@ -108,7 +101,5 @@ describe("Reader IO", () =>
         _,
       )
     )
-  )
+  })
 )
-
-*/

@@ -381,6 +381,36 @@ describe("Array", () => {
 
   test("reverse", () => expect(Array.reverse([1, 2, 3, 4, 5]))->toEqual([5, 4, 3, 2, 1]))
 
+  test("shuffle preserves length and elements", () => {
+    let input = [1, 2, 3, 4, 5]
+    let result = Array.shuffle(input)
+    expect((Array.length(result), Array.sort(module(Int.Ord), result)))->toEqual((
+      5,
+      [1, 2, 3, 4, 5],
+    ))
+  })
+
+  test("shuffle returns a new array", () => {
+    let input = [1, 2, 3]
+    let result = Array.shuffle(input)
+    expect(result === input)->toEqual(false)
+  })
+
+  test("shuffleInPlace preserves length and elements", () => {
+    let input = [1, 2, 3, 4, 5]
+    let result = Array.shuffleInPlace(input)
+    expect((Array.length(result), Array.sort(module(Int.Ord), result)))->toEqual((
+      5,
+      [1, 2, 3, 4, 5],
+    ))
+  })
+
+  test("shuffleInPlace mutates the original array", () => {
+    let input = [1, 2, 3]
+    let result = Array.shuffleInPlace(input)
+    expect(result === input)->toEqual(true)
+  })
+
   test("containsBy false", () =>
     expect(Array.containsBy(Int.eq, 10, [0, 1, 2, 3, 4]))->toEqual(false)
   )
